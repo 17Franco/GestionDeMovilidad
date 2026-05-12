@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.example</groupId>
+    <artifactId>GestionDeMovilidad</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>war</packaging>
+
+    <properties>
+    <!--
+        tendriamos dependecia para realizar api, cdi,test,mockito
+    -->
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <jakartaee-api.version>10.0.0</jakartaee-api.version>
+        <wildfly.version>27.0.1.Final</wildfly.version>
+        <compiler-plugin.version>3.11.0</compiler-plugin.version>
+        <war-plugin.version>3.3.2</war-plugin.version>
+        <wildfly-plugin.version>4.1.0.Final</wildfly-plugin.version>
+        <junit.version>5.8.2</junit.version>
+        <mockito.verson>4.5.1</mockito.verson>
+        <weld.version>5.1.0.Final</weld.version>
+    </properties>
+    <dependencies>
+    <!--
+        Esta dependencia agrega las APIs de Jakarta EE (como @Inject, @Path, @Entity, etc.)
+        que usas en tu código para desarrollar la aplicación.
+        No trae implementación real, solo definiciones (interfaces y anotaciones).
+        El scope "provided" significa que NO se incluye en él .war
+     -->
+        <dependency>
+            <groupId>jakarta.platform</groupId>
+            <artifactId>jakarta.jakartaee-api</artifactId>
+            <version>${jakartaee-api.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- CDI standalone (Weld) -->
+        <!-- Permite usar inyección de dependencias (@Inject) y eventos sin servidor -->
+        <!-- Es la base para que funcione la lógica con CDI en modo local -->
+        <dependency>
+            <groupId>org.jboss.weld.se</groupId>
+            <artifactId>weld-se-shaded</artifactId>
+            <version>${weld.version}</version>
+        </dependency>
+
+        <!-- Motor principal de JUnit 5 -->
+        <!-- Ejecuta los tests unitarios -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- JUnit parámetros -->
+        <!-- Permite tests con múltiples valores (@ParameterizedTest) -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Mockito core -->
+        <!-- Permite crear mocks (simular objetos) para aislar tests -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.verson}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Integración Mockito + JUnit 5 -->
+        <!-- Permite usar @ExtendWith(MockitoExtension.class) -->
+        <!-- Facilita la inicialización automática de mocks -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito.verson}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- AssertJ -->
+        <!-- Librería de asserts más expresiva y legibles que los de JUnit -->
+        <!-- Ej: assertThat(obj).isNotNull().hasSize(3) -->
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.24.2</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Weld + JUnit 5 -->
+        <!-- Permite probar CDI en tests -->
+        <!-- Levanta el contenedor Weld dentro de JUnit -->
+        <dependency>
+            <groupId>org.jboss.weld</groupId>
+            <artifactId>weld-junit5</artifactId>
+            <version>4.0.0.Final</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!--
+        Lombok: genera código automáticamente como getters, setters,
+        constructores, builders y logs mediante anotaciones
+        -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.32</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!--
+            JBoss Logging: librería de logging usada en WildFly/Jakarta
+            para registrar mensajes, errores y eventos de la aplicación
+        -->
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging</artifactId>
+            <version>3.5.3.Final</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>GestionDeMovilidad</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${compiler-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>${war-plugin.version}</version>
+                <configuration>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                </configuration>
+            </plugin>
+
+            <!-- Execute 'mvn clean package wildfly:dev' to run the application. -->
+            <plugin>
+                <groupId>org.wildfly.plugins</groupId>
+                <artifactId>wildfly-maven-plugin</artifactId>
+                <version>${wildfly-plugin.version}</version>
+                <configuration>
+                    <version>${wildfly.version}</version>
+                    <server-config>standalone-full.xml</server-config>
+                    <add-user>
+
+                        <users>
+                            <user>
+                                <username>root</username>
+                                <password>rootpass1234</password>
+                                <application-user>false</application-user>
+                            </user>
+                        </users>
+                    </add-user>
+
+                    <scripts>
+                        <!--
+                        ver archivo config.cli que está en ./
+                        <script>config.cli</script>
+                        -->
+                    </scripts>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
