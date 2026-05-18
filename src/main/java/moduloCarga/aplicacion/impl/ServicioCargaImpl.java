@@ -30,7 +30,7 @@ public class ServicioCargaImpl implements ServicioCarga {
         //espero una respuesta del cargador así que supongo que interfaz
         boolean respuestaCargador = cargadorMock.iniciarCarga();
         if (respuestaCargador){
-            System.out.print("El cliente " + cli.getNombre() + " " + cli.getApellido() + "inició correctamente"
+            System.out.print("El cliente " + cli.getNombre() + " " + cli.getApellido() + " inició correctamente"
                                 + " la carga con " + formaPago.getTipoMedioPago());
         }
         else{
