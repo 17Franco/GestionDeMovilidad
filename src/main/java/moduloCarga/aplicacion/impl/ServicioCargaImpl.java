@@ -17,17 +17,27 @@ public class ServicioCargaImpl implements ServicioCarga {
     @Inject
     private RepoCarga repo;
 
-    public void iniciarCarga(Cliente cli, MedioPago formaPago){}
+    public void iniciarCarga(Cliente cli, MedioPago formaPago) {}
 
-    public void verCargaActual(Cliente cli){}
+    public void verCargaActual(Cliente cli) {}
 
-    public void verHistorico(Cliente cli,String fechaIni,String fechaFin){}
+    public void verHistorico(Cliente cli, String fechaIni, String fechaFin) {}
 
-    public void finalizarCarga(Cargador cargador, Carga carga,int recargo){}
+    public void finalizarCarga(Cargador cargador, Carga carga, int recargo) {}
 
-    public void altaEstacion(EstacionCarga datos){}
+    public void altaEstacion(EstacionCarga datos) {
+        if (datos != null) {
+            repo.registrarEstacion(datos);
+        }
+    }
 
-    public void altaCargador(Cargador datos){}
+    public void altaCargador(Cargador datos) {}
 
-    public void obtenerEstaciones(){}
+    public void obtenerEstaciones() {
+        var estaciones = repo.obtenerEstaciones();
+        System.out.println("Estaciones de carga disponibles:");
+        for (EstacionCarga estacion : estaciones) {
+            System.out.printf("- %s en %s\n", estacion.getDescripcion(), estacion.getCalle());
+        }
+    }
 }
