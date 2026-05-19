@@ -11,48 +11,55 @@ import moduloCarga.dominio.cliente.Cliente;
 import moduloCarga.dominio.medioPago.MedioPago;
 import moduloCarga.dominio.repositorio.RepoCarga;
 
-
-
-import moduloPago.dominio.repositorio.RepoPago;
-
 @ApplicationScoped
 public class ServicioCargaImpl implements ServicioCarga {
-    /*
+
     @Inject
     private RepoCarga repo;
-     */
+
     @Inject
     private CargadorInterfaceMOCK cargadorMock;
 
     @Override
-    public void iniciarCarga(Cliente cli, MedioPago formaPago){
-        //envío un evento o una interface mokeada del cargador? 
-        //espero una respuesta del cargador así que supongo que interfaz
+    public void iniciarCarga(Cliente cli, MedioPago formaPago) {
+        // Envío un evento o una interfaz mockeada del cargador.
+        // Espero una respuesta del cargador, así que uso la interfaz.
         boolean respuestaCargador = cargadorMock.iniciarCarga();
-        if (respuestaCargador){
-            System.out.print("El cliente " + cli.getNombre() + " " + cli.getApellido() + " inició correctamente"
-                                + " la carga con " + formaPago.getTipoMedioPago());
-        }
-        else{
+
+        if (respuestaCargador) {
+            System.out.print("El cliente " + cli.getNombre() + " " + cli.getApellido()
+                    + " inició correctamente la carga con " + formaPago.getTipoMedioPago());
+        } else {
             System.out.print("No se pudo inicializar la carga correctamente");
         }
     }
 
     @Override
-    public void verCargaActual(Cliente cli){}
-    
-    @Override   
-    public void verHistorico(Cliente cli,String fechaIni,String fechaFin){}
+    public void verCargaActual(Cliente cli) {}
 
     @Override
-    public void finalizarCarga(Cargador cargador, Carga carga,int recargo){}
+    public void verHistorico(Cliente cli, String fechaIni, String fechaFin) {}
 
     @Override
-    public void altaEstacion(EstacionCarga datos){}
+    public void finalizarCarga(Cargador cargador, Carga carga, int recargo) {}
 
     @Override
-    public void altaCargador(Cargador datos){}
+    public void altaEstacion(EstacionCarga datos) {
+        if (datos != null) {
+            repo.registrarEstacion(datos);
+        }
+    }
 
     @Override
-    public void obtenerEstaciones(){}
+    public void altaCargador(Cargador datos) {}
+
+    @Override
+    public void obtenerEstaciones() {
+        var estaciones = repo.obtenerEstaciones();
+
+        System.out.println("Estaciones de carga disponibles:");
+        for (EstacionCarga estacion : estaciones) {
+            System.out.printf("- %s en %s\n", estacion.getDescripcion(), estacion.getCalle());
+        }
+    }
 }
