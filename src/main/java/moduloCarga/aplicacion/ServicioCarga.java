@@ -3,8 +3,8 @@ package moduloCarga.aplicacion;
 import moduloCarga.dominio.Carga;
 import moduloCarga.dominio.Cargador;
 import moduloCarga.dominio.EstacionCarga;
-import moduloCliente.dominio.MedioPago;
-import moduloCliente.dominio.cliente.Cliente;
+import moduloCarga.dominio.cliente.Cliente;
+import moduloCarga.dominio.medioPago.MedioPago;
 
 public interface ServicioCarga {
 
@@ -21,4 +21,5 @@ public interface ServicioCarga {
     void altaCargador(Cargador datos);
 
     void obtenerEstaciones();
+
 }
