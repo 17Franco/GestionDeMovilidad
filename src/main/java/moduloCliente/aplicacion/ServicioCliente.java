@@ -9,5 +9,5 @@ public interface ServicioCliente {
     boolean registrarCliente(Cliente cliente);
     boolean altaMedioPago(String ci, MedioPago formaPago);
     void obtenerClientes();
-    void realizarReclamo();
+    void realizarReclamo(String asunto, String descripcion,String ci);
 }

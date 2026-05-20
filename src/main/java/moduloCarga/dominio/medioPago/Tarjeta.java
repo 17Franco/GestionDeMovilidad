@@ -1,4 +1,4 @@
-package moduloCliente.dominio;
+package moduloCarga.dominio.medioPago;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -7,11 +7,11 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
-@Entity
+@Entity (name = "Tarjeta_Carga")
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "MCliente_Tarjeta")
+@Table(name = "MCarga_Tarjeta")
 public class Tarjeta extends MedioPago {
     private String numero;
     private LocalDate fechaVencimiento;
@@ -19,4 +19,9 @@ public class Tarjeta extends MedioPago {
 
     @Enumerated(EnumType.STRING)
     private TipoTarjeta tipo;
+
+    @Override
+    public String getTipoMedioPago(){
+        return "Tarjeta";
+    }
 }

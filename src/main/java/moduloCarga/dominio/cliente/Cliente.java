@@ -1,32 +1,28 @@
-package moduloCliente.dominio.cliente;
+package moduloCarga.dominio.cliente;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import moduloCliente.dominio.Reclamos;
-
-import java.util.ArrayList;
-import java.util.List;
+import moduloCarga.dominio.Carga;
+import moduloCarga.dominio.HistorialDeCargas;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)
-@Table(name = "MCliente_Cliente")
-@Entity
+@Table(name = "MCarga_Cliente")
+@Entity (name = "Cliente_Carga")
 public abstract class Cliente {
     @Id
     private String cedula;
+
     private String nombre;
     private String apellido;
     private String numTel;
     private String contra;
-
-    @OneToMany(mappedBy = "cliente")
-    private List<Reclamos> reclamos = new ArrayList<>();
 
     public Cliente(String cedula, String nombre, String apellido,String numTel, String contra) {
         this.cedula = cedula;
@@ -35,4 +31,16 @@ public abstract class Cliente {
         this.numTel = numTel;
         this.contra = contra;
     }
+    //carga actual, (la ultima carga del historial)
+    Carga cargaActual;
+    //cada cliente tiene un historial de cargas asociado
+    //@OneToMany
+    HistorialDeCargas historialAsociado;
+
+    //cuando este la bd implementada en ves de pedirle al cliente su
+    //carga se lo pido al manejador de persistencia pasandole
+    //cliente y que me de su clave asociada
+
+
+    
 }

@@ -1,20 +1,21 @@
-package moduloCliente.dominio.cliente;
+package moduloCarga.dominio.cliente;
+
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import moduloCliente.dominio.MedioPago;
-import moduloCliente.dominio.TipoProfesional;
+import moduloCarga.dominio.medioPago.MedioPago;
+
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
+@Entity(name = "ClienteProfesional_Carga")
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "MCliente_ClienteProfesional")
+@Table(name = "MCarga_ClienteProfesional")
 public class ClienteProfesional extends Cliente{
 
     @Enumerated(EnumType.STRING)
