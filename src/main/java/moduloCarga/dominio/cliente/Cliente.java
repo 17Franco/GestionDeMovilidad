@@ -28,4 +28,9 @@ public abstract class Cliente {
     //cada cliente tiene un historial de cargas asociado
     //@OneToMany
     HistorialDeCargas historialAsociado;
+
+    //cuando este la bd implementada en ves de pedirle al cliente su
+    //carga se lo pido al manejador de persistencia pasandole
+    //cliente y que me de su clave asociada
+
 }
