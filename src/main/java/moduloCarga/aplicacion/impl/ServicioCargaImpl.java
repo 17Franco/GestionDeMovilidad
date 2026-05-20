@@ -35,7 +35,9 @@ public class ServicioCargaImpl implements ServicioCarga {
     }
 
     @Override
-    public void verCargaActual(Cliente cli) {}
+    public Carga verCargaActual(Cliente cli) {
+        return cli.getCargaActual();
+    }
 
     @Override
     public void verHistorico(Cliente cli, String fechaIni, String fechaFin) {}
