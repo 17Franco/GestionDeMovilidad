@@ -23,6 +23,14 @@ public abstract class Cliente {
     private String apellido;
     private String numTel;
     private String contra;
+
+    public Cliente(String cedula, String nombre, String apellido,String numTel, String contra) {
+        this.cedula = cedula;
+        this.nombre = nombre;
+        this.apellido = apellido;
+        this.numTel = numTel;
+        this.contra = contra;
+    }
     //carga actual, (la ultima carga del historial)
     Carga cargaActual;
     //cada cliente tiene un historial de cargas asociado
@@ -33,4 +41,6 @@ public abstract class Cliente {
     //carga se lo pido al manejador de persistencia pasandole
     //cliente y que me de su clave asociada
 
+
+    
 }
