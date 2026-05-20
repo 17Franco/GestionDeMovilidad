@@ -5,10 +5,12 @@ import jakarta.inject.Inject;
 import moduloCliente.aplicacion.ServicioCliente;
 import moduloCliente.dominio.CuentaUTE;
 import moduloCliente.dominio.MedioPago;
+import moduloCliente.dominio.Reclamos;
 import moduloCliente.dominio.cliente.Cliente;
 import moduloCliente.dominio.cliente.ClienteComun;
 import moduloCliente.dominio.cliente.ClienteProfesional;
 import moduloCliente.dominio.repositorio.ClienteRepositorio;
+import moduloCliente.interfaz.evento.out.PublicadorEventoCliente;
 
 @ApplicationScoped
 public class ServicioClienteImpl implements ServicioCliente {
@@ -16,8 +18,20 @@ public class ServicioClienteImpl implements ServicioCliente {
     @Inject
     private ClienteRepositorio repo;
 
+    @Inject
+    private PublicadorEventoCliente evento;
+
     public boolean registrarCliente(Cliente cliente) {
-        return repo.registrar(cliente);
+        boolean resu = repo.registrar(cliente);
+        if(resu){
+            if(cliente instanceof ClienteComun){
+                evento.publicarEventoClienteComun(cliente);
+            }else{
+                evento.publicarEventoClienteProfesional(cliente);
+            }
+
+        }
+        return resu ;
     }
 
     public boolean altaMedioPago(String ci, MedioPago formaPago) {
@@ -51,10 +65,12 @@ public class ServicioClienteImpl implements ServicioCliente {
         var clientes = repo.obtenerTodos();
         System.out.println("Clientes registrados:");
         for (Cliente cliente : clientes) {
-            System.out.printf("- %s %s %s\n", cliente.getCedula(), cliente.getNombre(), cliente.getApellido());
+            System.out.printf("- %s %s %s\n", cliente.getCedula(), cliente.getNombre(), cliente.getApellido(),cliente.getReclamos());
         }
     }
 
-    public void realizarReclamo() {
+    public void realizarReclamo(String asunto, String descripcion,String ci) {
+        //llamo a repo creo el objeto reclamo y se lo asigno
+        repo.hacerReclamo(asunto,descripcion,ci);
     }
 }

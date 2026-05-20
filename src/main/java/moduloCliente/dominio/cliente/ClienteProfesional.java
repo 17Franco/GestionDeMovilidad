@@ -25,4 +25,10 @@ public class ClienteProfesional extends Cliente{
     //esto es porque cada medio de pago ya tiene relacion con cliente
     @Transient
     private List<MedioPago> metodosPago = new ArrayList<>();
+
+    public ClienteProfesional(String cedula, String nombre, String apellido, String numTel, String contra, TipoProfesional tipo, float porcentajeDescuento) {
+        super(cedula, nombre, apellido, numTel, contra);
+        this.tipo = tipo;
+        this.porcentajeDescuento = porcentajeDescuento;
+    }
 }

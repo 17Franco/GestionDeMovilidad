@@ -13,8 +13,8 @@ import moduloCarga.dominio.HistorialDeCargas;
 @AllArgsConstructor
 @NoArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)
-@Table(name = "MCliente_Cliente")
-@Entity
+@Table(name = "MCarga_Cliente")
+@Entity (name = "Cliente_Carga")
 public abstract class Cliente {
     @Id
     private String cedula;
