@@ -8,13 +8,13 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
-@Entity
+@Entity (name = "MedioPago_Carga")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)
-@Table(name = "MCliente_MedioPago")
+@Table(name = "MCarga_MedioPago")
 public abstract class MedioPago {
     @Id
     private int id;

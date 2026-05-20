@@ -9,7 +9,7 @@ import moduloCarga.dominio.medioPago.MedioPago;
 import moduloCarga.dominio.medioPago.Tarjeta;
 
 import CargadorMock.aplicacion.Impl.CargadorInterfaceMOCKImpl;
-
+import moduloCarga.infraestructura.persistencia.CargaRepoImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 import org.jboss.weld.junit5.auto.AddPackages;
@@ -19,7 +19,8 @@ import org.jboss.weld.junit5.auto.EnableAutoWeld;
 @EnableAutoWeld
 @AddPackages({
     ServicioCargaImpl.class,
-    CargadorInterfaceMOCKImpl.class
+    CargadorInterfaceMOCKImpl.class,
+    CargaRepoImpl.class
 })
 public class iniciarCargaTest {
 

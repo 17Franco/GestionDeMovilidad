@@ -7,11 +7,11 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
-@Entity
+@Entity (name = "Tarjeta_Carga")
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "MCliente_Tarjeta")
+@Table(name = "MCarga_Tarjeta")
 public class Tarjeta extends MedioPago {
     private String numero;
     private LocalDate fechaVencimiento;

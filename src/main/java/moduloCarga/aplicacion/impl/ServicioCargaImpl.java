@@ -62,4 +62,18 @@ public class ServicioCargaImpl implements ServicioCarga {
             System.out.printf("- %s en %s\n", estacion.getDescripcion(), estacion.getCalle());
         }
     }
+
+    @Override
+    public boolean altaCliente(Cliente cli){
+
+        return repo.registrarCliente(cli);
+    }
+
+    public void obtenerClientes() {
+        var clientes = repo.obtenerTodos();
+        System.out.println("Clientes registrados Modulo Carga:");
+        for (Cliente cliente : clientes) {
+            System.out.printf("- %s %s %s\n", cliente.getCedula(), cliente.getNombre(), cliente.getApellido());
+        }
+    }
 }

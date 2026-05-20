@@ -6,11 +6,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity
+@Entity (name = "CuentaUTE_Carga")
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "MCliente_CuentUte")
+@Table(name = "MCarga_CuentUte")
 public class CuentaUTE extends MedioPago {
     private String numeroCuenta;
 
