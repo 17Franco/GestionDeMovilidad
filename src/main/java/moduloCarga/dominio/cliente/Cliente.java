@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import moduloCarga.dominio.Carga;
+import moduloCarga.dominio.HistorialDeCargas;
 
 @Getter
 @Setter
@@ -21,4 +23,9 @@ public abstract class Cliente {
     private String apellido;
     private String numTel;
     private String contra;
+    //carga actual, (la ultima carga del historial)
+    Carga cargaActual;
+    //cada cliente tiene un historial de cargas asociado
+    //@OneToMany
+    HistorialDeCargas historialAsociado;
 }
