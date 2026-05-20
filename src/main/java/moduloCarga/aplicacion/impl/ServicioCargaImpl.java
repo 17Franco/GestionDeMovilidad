@@ -52,8 +52,10 @@ public class ServicioCargaImpl implements ServicioCarga {
         }
     }
 
-    @Override
-    public void altaCargador(Cargador datos) {}
+  @Override
+    public void altaCargador(Cargador datos){
+        repo.guardarCargador(datos);
+    }
 
     @Override
     public void obtenerEstaciones() {
@@ -69,8 +71,10 @@ public class ServicioCargaImpl implements ServicioCarga {
     public boolean altaCliente(Cliente cli){
 
         return repo.registrarCliente(cli);
+
     }
 
+  
     public void obtenerClientes() {
         var clientes = repo.obtenerTodos();
         System.out.println("Clientes registrados Modulo Carga:");

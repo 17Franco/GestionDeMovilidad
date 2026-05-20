@@ -4,15 +4,33 @@ import jakarta.enterprise.context.ApplicationScoped;
 import moduloCarga.dominio.EstacionCarga;
 import moduloCarga.dominio.cliente.Cliente;
 import moduloCarga.dominio.repositorio.RepoCarga;
+import moduloCarga.dominio.Cargador;
+import moduloCarga.dominio.EstacionCarga;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @ApplicationScoped
 public class CargaRepoImpl implements RepoCarga {
-    private final List<EstacionCarga> estaciones = new ArrayList<>();
-    private final List<Cliente> clientes = new ArrayList<>();
 
+    private List<EstacionCarga> estaciones = new ArrayList<>();
+    private List<Cargador> cargadores = new ArrayList<>();
+    private final List<Cliente> clientes = new ArrayList<>();
+    
+    @Override
+    public void guardarEstacion(EstacionCarga estacion) {
+        estaciones.add(estacion);
+    }
+
+    @Override
+    public void guardarCargador(Cargador cargador) {
+        cargadores.add(cargador); 
+    }
+
+   
     @Override
     public void registrarEstacion(EstacionCarga estacion) {
         if (estacion != null) {
@@ -23,6 +41,7 @@ public class CargaRepoImpl implements RepoCarga {
     public List<EstacionCarga> obtenerEstaciones() {
         return new ArrayList<>(estaciones);
     }
+  
     @Override
     public Cliente buscarPorCedula(String cedula) {
         if (cedula == null) {
@@ -52,5 +71,6 @@ public class CargaRepoImpl implements RepoCarga {
         clientes.add(cliente);
 
         return true;
+
     }
 }
