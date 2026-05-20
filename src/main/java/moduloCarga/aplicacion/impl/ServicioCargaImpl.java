@@ -25,9 +25,15 @@ public class ServicioCargaImpl implements ServicioCarga {
 
     public void finalizarCarga(Cargador cargador, Carga carga,int recargo){}
 
-    public void altaEstacion(EstacionCarga datos){}
+    @Override
+    public void altaEstacion(EstacionCarga datos){
+        repo.guardarEstacion(datos);
+    }
 
-    public void altaCargador(Cargador datos){}
+    @Override
+    public void altaCargador(Cargador datos){
+        repo.guardarCargador(datos);
+    }
 
     public void obtenerEstaciones(){}
 }
