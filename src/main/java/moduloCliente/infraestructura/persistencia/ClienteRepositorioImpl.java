@@ -1,6 +1,7 @@
 package moduloCliente.infraestructura.persistencia;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import moduloCliente.dominio.Reclamos;
 import moduloCliente.dominio.cliente.Cliente;
 import moduloCliente.dominio.repositorio.ClienteRepositorio;
 
@@ -20,6 +21,7 @@ public class ClienteRepositorioImpl implements ClienteRepositorio {
             return false;
         }
         clientes.add(cliente);
+        //lanzo evento que recibe modulocarga y creo al cliente en se modulo
         return true;
     }
 
@@ -48,5 +50,16 @@ public class ClienteRepositorioImpl implements ClienteRepositorio {
 
     public List<Cliente> obtenerTodos() {
         return new ArrayList<>(clientes);
+    }
+
+    public Reclamos hacerReclamo(String asunto, String descripcion, String ci){
+        Cliente cli=buscarPorCedula(ci);
+        Reclamos rec = null;
+        if (cli != null){
+            rec = new Reclamos(asunto,descripcion,cli);
+            //como manejo memoria lo guardo en la lista de cliente
+            cli.getReclamos().add(rec);
+        }
+        return rec;
     }
 }
