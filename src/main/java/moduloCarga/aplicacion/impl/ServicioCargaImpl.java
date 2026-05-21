@@ -22,8 +22,7 @@ public class ServicioCargaImpl implements ServicioCarga {
 
     @Override
     public void iniciarCarga(Cliente cli, MedioPago formaPago) {
-        // Envío un evento o una interfaz mockeada del cargador.
-        // Espero una respuesta del cargador, así que uso la interfaz.
+
         boolean respuestaCargador = cargadorMock.iniciarCarga();
 
         if (respuestaCargador) {
@@ -47,23 +46,32 @@ public class ServicioCargaImpl implements ServicioCarga {
 
     @Override
     public void altaEstacion(EstacionCarga datos) {
+
         if (datos != null) {
             repo.registrarEstacion(datos);
         }
     }
 
-  @Override
-    public void altaCargador(Cargador datos){
-        repo.guardarCargador(datos);
-    }
+
+    @Override
+    public void altaCargador(Cargador datos) {
+
+        if (datos != null) {
+            repo.registrarCargador(datos);
+        }
+
 
     @Override
     public void obtenerEstaciones() {
+
         var estaciones = repo.obtenerEstaciones();
 
         System.out.println("Estaciones de carga disponibles:");
+
         for (EstacionCarga estacion : estaciones) {
-            System.out.printf("- %s en %s\n", estacion.getDescripcion(), estacion.getCalle());
+            System.out.printf("- %s en %s\n",
+                    estacion.getDescripcion(),
+                    estacion.getCalle());
         }
     }
 
@@ -74,12 +82,19 @@ public class ServicioCargaImpl implements ServicioCarga {
 
     }
 
-  
+
+ 
     public void obtenerClientes() {
+
         var clientes = repo.obtenerTodos();
+
         System.out.println("Clientes registrados Modulo Carga:");
+
         for (Cliente cliente : clientes) {
-            System.out.printf("- %s %s %s\n", cliente.getCedula(), cliente.getNombre(), cliente.getApellido());
+            System.out.printf("- %s %s %s\n",
+                    cliente.getCedula(),
+                    cliente.getNombre(),
+                    cliente.getApellido());
         }
     }
 }

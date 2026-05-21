@@ -11,10 +11,16 @@ public interface RepoCarga {
   
     void guardarEstacion(EstacionCarga estacion);
     void guardarCargador(Cargador cargador);
-    void registrarEstacion(EstacionCarga estacion);
-    List<EstacionCarga> obtenerEstaciones();
-    Cliente buscarPorCedula(String cedula);
-    public List<Cliente> obtenerTodos();
-    boolean registrarCliente(Cliente cli);
 
+    void registrarEstacion(EstacionCarga estacion);
+
+    void registrarCargador(Cargador cargador);
+
+    List<EstacionCarga> obtenerEstaciones();
+
+    Cliente buscarPorCedula(String cedula);
+
+    List<Cliente> obtenerTodos();
+
+    boolean registrarCliente(Cliente cli);
 }
