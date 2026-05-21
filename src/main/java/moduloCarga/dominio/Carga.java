@@ -14,6 +14,7 @@ import moduloCarga.dominio.cliente.Cliente;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Carga {
+    private int id;
     private LocalDate fecha;
     private LocalDateTime horaInicio;
     private LocalDateTime horaFin;

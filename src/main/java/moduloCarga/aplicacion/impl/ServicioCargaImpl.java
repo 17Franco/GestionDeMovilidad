@@ -21,10 +21,11 @@ public class ServicioCargaImpl implements ServicioCarga {
     private CargadorInterfaceMOCK cargadorMock;
 
     @Override
-    public void iniciarCarga(Cliente cli, MedioPago formaPago) {
+    public Carga iniciarCarga(Cliente cli, MedioPago formaPago) {
         // Envío un evento o una interfaz mockeada del cargador.
         // Espero una respuesta del cargador, así que uso la interfaz.
-        boolean respuestaCargador = cargadorMock.iniciarCarga();
+        Carga cargaCliente = new Carga();
+        Carga carganNueva = cargadorMock.iniciarCarga();
 
         if (respuestaCargador) {
             System.out.print("El cliente " + cli.getNombre() + " " + cli.getApellido()
@@ -32,6 +33,9 @@ public class ServicioCargaImpl implements ServicioCarga {
         } else {
             System.out.print("No se pudo inicializar la carga correctamente");
         }
+
+        return null;
+
     }
 
     @Override
