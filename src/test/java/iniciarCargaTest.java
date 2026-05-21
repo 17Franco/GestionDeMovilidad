@@ -2,6 +2,7 @@ import jakarta.inject.Inject;
 
 import moduloCarga.aplicacion.ServicioCarga;
 import moduloCarga.aplicacion.impl.ServicioCargaImpl;
+import moduloCarga.dominio.EstadoCarga;
 import moduloCarga.dominio.cliente.Cliente;
 import moduloCarga.dominio.cliente.ClienteComun;
 import moduloCarga.dominio.medioPago.CuentaUTE;
@@ -45,6 +46,15 @@ public class iniciarCargaTest {
     void test(){
         cargarDatosTest();
         servicioCargaImpl.iniciarCarga(clientePrueba, tarjeta);
+        if (clientePrueba.getCargaActual().getEstado() == EstadoCarga.ENPROGRESO){
+            System.out.print("La carga está en progreso");
+        }
+        else if(clientePrueba.getCargaActual().getEstado() == EstadoCarga.TERMINADO){
+            System.out.print("La carga finalizó");
+        }
+        else{
+            System.out.print("Error inesperado, llame a soporte");
+        }
     }
 
     
