@@ -23,7 +23,7 @@ import org.jboss.weld.junit5.auto.EnableAutoWeld;
     CargadorInterfaceMOCKImpl.class,
     CargaRepoImpl.class
 })
-public class iniciarCargaTest {
+public class ModuloDeCarga_iniciarCargaTest {
 
     @Inject
     ServicioCarga servicioCargaImpl;
@@ -32,8 +32,8 @@ public class iniciarCargaTest {
     private Cliente clientePrueba = new ClienteComun();
 
     //creo los 2 metodos de pago
-    private MedioPago tarjeta = new Tarjeta();
-    private MedioPago cuentaUTE = new CuentaUTE();
+    private MedioPago medioPago = new Tarjeta();
+    //private MedioPago medioPago = new CuentaUTE();
 
 
     public void cargarDatosTest(){
@@ -45,7 +45,9 @@ public class iniciarCargaTest {
 	@Test
     void test(){
         cargarDatosTest();
-        servicioCargaImpl.iniciarCarga(clientePrueba, tarjeta);
+        servicioCargaImpl.iniciarCarga(clientePrueba, medioPago);
+        System.out.print("El cliente " + clientePrueba.getNombre() + " " + clientePrueba.getApellido() +
+            " inició una carga" + "\n" + "Realizó el pago con " + medioPago + "\n");
         if (clientePrueba.getCargaActual().getEstado() == EstadoCarga.ENPROGRESO){
             System.out.print("La carga está en progreso");
         }
