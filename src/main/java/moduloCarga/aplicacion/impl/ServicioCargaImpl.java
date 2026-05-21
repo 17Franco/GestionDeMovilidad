@@ -26,6 +26,11 @@ public class ServicioCargaImpl implements ServicioCarga {
         // Espero una respuesta del cargador, así que uso la interfaz.
         Carga cargaCliente = new Carga();
         Carga carganNueva = cargadorMock.iniciarCarga();
+    /*
+    public void iniciarCargaViejo(Cliente cli, MedioPago formaPago) {
+
+        boolean respuestaCargador = cargadorMock.iniciarCarga();
+
 
         if (respuestaCargador) {
             System.out.print("El cliente " + cli.getNombre() + " " + cli.getApellido()
@@ -37,6 +42,7 @@ public class ServicioCargaImpl implements ServicioCarga {
         return null;
 
     }
+    */
 
     @Override
     public Carga verCargaActual(Cliente cli) {
@@ -51,21 +57,32 @@ public class ServicioCargaImpl implements ServicioCarga {
 
     @Override
     public void altaEstacion(EstacionCarga datos) {
+
         if (datos != null) {
             repo.registrarEstacion(datos);
         }
     }
 
+
     @Override
-    public void altaCargador(Cargador datos) {}
+    public void altaCargador(Cargador datos) {
+
+        if (datos != null) {
+            repo.registrarCargador(datos);
+        }
+
 
     @Override
     public void obtenerEstaciones() {
+
         var estaciones = repo.obtenerEstaciones();
 
         System.out.println("Estaciones de carga disponibles:");
+
         for (EstacionCarga estacion : estaciones) {
-            System.out.printf("- %s en %s\n", estacion.getDescripcion(), estacion.getCalle());
+            System.out.printf("- %s en %s\n",
+                    estacion.getDescripcion(),
+                    estacion.getCalle());
         }
     }
 
@@ -73,13 +90,22 @@ public class ServicioCargaImpl implements ServicioCarga {
     public boolean altaCliente(Cliente cli){
 
         return repo.registrarCliente(cli);
+
     }
 
+
+ 
     public void obtenerClientes() {
+
         var clientes = repo.obtenerTodos();
+
         System.out.println("Clientes registrados Modulo Carga:");
+
         for (Cliente cliente : clientes) {
-            System.out.printf("- %s %s %s\n", cliente.getCedula(), cliente.getNombre(), cliente.getApellido());
+            System.out.printf("- %s %s %s\n",
+                    cliente.getCedula(),
+                    cliente.getNombre(),
+                    cliente.getApellido());
         }
     }
 }
