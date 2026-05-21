@@ -12,8 +12,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class CargadorInterfaceMOCKImpl implements CargadorInterfaceMOCK{
     private void setContenidoCargaMock(DTOCarga cargaNueva){
-        cargaNueva.setFecha(LocalDate.of(2026, 5, 20));
-        cargaNueva.setHoraInicio(LocalDateTime.of(2026, 5, 20, 18, 30));
+        cargaNueva.setFecha(LocalDate.now());
+        cargaNueva.setHoraInicio(LocalDateTime.now());
         //hora fin sin setear
         cargaNueva.setImporteTotal(500f);
         cargaNueva.setRecargoPorDemora(0f);
