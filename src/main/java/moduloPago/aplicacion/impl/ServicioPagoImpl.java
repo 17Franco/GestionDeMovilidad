@@ -15,7 +15,32 @@ public class ServicioPagoImpl implements ServicioPago {
     @Inject
     private RepoPago repo;
 
-    public void pagarCarga(Cliente cliente, float importe, MedioPago medioPago){}
+    @Override
+    public void pagarCarga(Cliente cliente, float importe, MedioPago medioPago){
 
+        if (cliente == null || medioPago == null) {
+            return;
+        }
+
+        System.out.println("Procesando pago...");
+
+        System.out.println(
+                "Cliente: " +
+                cliente.getNombre() +
+                " " +
+                cliente.getApellido()
+        );
+
+        System.out.println("Importe total: $" + importe);
+
+        System.out.println(
+                "Medio de pago utilizado: " +
+                medioPago.getClass().getSimpleName()
+        );
+
+        System.out.println("Pago realizado correctamente");
+    }
+
+    @Override
     public void consultarPagos(Cliente cliente, LocalDate fechaIni, LocalDate fechaFin){}
 }
