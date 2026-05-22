@@ -152,7 +152,6 @@ public class ServicioCargaImpl implements ServicioCarga {
         }
     }
 
-
     @Override
     public void altaCargador(Cargador datos) {
 
@@ -160,6 +159,7 @@ public class ServicioCargaImpl implements ServicioCarga {
             repo.registrarCargador(datos);
         }
     }
+
     @Override
     public void obtenerEstaciones() {
 
@@ -181,8 +181,7 @@ public class ServicioCargaImpl implements ServicioCarga {
 
     }
 
-
- 
+    @Override
     public void obtenerClientes() {
 
         var clientes = repo.obtenerTodos();
