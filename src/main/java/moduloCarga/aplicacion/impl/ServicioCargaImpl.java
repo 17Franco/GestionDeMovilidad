@@ -125,7 +125,24 @@ public class ServicioCargaImpl implements ServicioCarga {
     }
 
     @Override
-    public void finalizarCarga(Cargador cargador, Carga carga, int recargo) {}
+    public void finalizarCarga(Cargador cargador, Carga carga, int recargo) {
+
+        if (carga == null) {
+            return;
+        }
+
+        carga.setHoraFin(LocalDateTime.now());
+
+        carga.setEstado(EstadoCarga.TERMINADO);
+
+        carga.setRecargoPorDemora((float) recargo);
+
+        float importeBase = 500f;
+
+        carga.setImporteTotal(importeBase + recargo);
+
+        System.out.println("Carga finalizada correctamente");
+    }
 
     @Override
     public void altaEstacion(EstacionCarga datos) {
