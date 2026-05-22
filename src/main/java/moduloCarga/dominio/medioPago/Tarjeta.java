@@ -24,4 +24,9 @@ public class Tarjeta extends MedioPago {
     public String getTipoMedioPago(){
         return "Tarjeta";
     }
+
+    @Override
+    public String toString(){
+        return "tarjeta";
+    }
 }

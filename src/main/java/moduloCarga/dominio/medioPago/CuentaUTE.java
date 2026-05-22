@@ -18,4 +18,9 @@ public class CuentaUTE extends MedioPago {
     public String getTipoMedioPago() {
         return "Cuenta UTE";
     }
+
+    @Override
+    public String toString(){
+        return "Cuenta UTE";
+    }
 }
