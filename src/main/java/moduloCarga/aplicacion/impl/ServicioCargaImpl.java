@@ -59,7 +59,7 @@ public class ServicioCargaImpl implements ServicioCarga {
         if (datos != null) {
             repo.registrarCargador(datos);
         }
-
+    }
 
     @Override
     public void obtenerEstaciones() {
