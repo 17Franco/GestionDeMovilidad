@@ -1,14 +1,33 @@
 package CargadorMock.aplicacion.Impl;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 import CargadorMock.aplicacion.CargadorInterfaceMOCK;
+import CargadorMock.aplicacion.DTOs.DTOCarga;
+import CargadorMock.aplicacion.DTOs.DTOEstadoCarga;
 import jakarta.enterprise.context.ApplicationScoped;
+
 
 @ApplicationScoped
 public class CargadorInterfaceMOCKImpl implements CargadorInterfaceMOCK{
-    
-    //La funcion simplemente retorna ok para simular la interacción con el cargador
-    @Override
-    public boolean iniciarCarga(){
-        return true;
+    private void setContenidoCargaMock(DTOCarga cargaNueva){
+        cargaNueva.setFecha(LocalDate.now());
+        cargaNueva.setHoraInicio(LocalDateTime.now());
+        //hora fin sin setear
+        cargaNueva.setImporteTotal(500f);
+        cargaNueva.setRecargoPorDemora(0f);
+        cargaNueva.setPorcentajeAvance(0f);
+        cargaNueva.setHoraEstimadaFin(cargaNueva.getHoraInicio().plusHours(2)); //le sumo 2 horas a la hora de inicio
+        cargaNueva.setEstado(DTOEstadoCarga.ENPROGRESO);
     }
+    @Override
+    public DTOCarga iniciarCarga(){
+        //creo una carga nueva vacía
+        DTOCarga cargaNueva = new DTOCarga();
+        //seteo los datos de la carga hardcordeados arriba
+        setContenidoCargaMock(cargaNueva);
+        return cargaNueva;
+    }
+  
 }

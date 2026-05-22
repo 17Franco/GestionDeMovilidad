@@ -5,6 +5,7 @@ import moduloCarga.aplicacion.impl.ServicioCargaImpl;
 import moduloCarga.dominio.Carga;
 import moduloCarga.dominio.cliente.Cliente;
 import moduloCarga.dominio.cliente.ClienteComun;
+import moduloCarga.dominio.medioPago.CuentaUTE;
 import moduloCarga.dominio.medioPago.MedioPago;
 import moduloCarga.dominio.medioPago.Tarjeta;
 import CargadorMock.aplicacion.Impl.CargadorInterfaceMOCKImpl;
@@ -12,6 +13,7 @@ import moduloCarga.infraestructura.persistencia.CargaRepoImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 
+import java.time.LocalDate;
 
 import org.jboss.weld.junit5.auto.AddPackages;
 import org.jboss.weld.junit5.auto.EnableAutoWeld;
@@ -23,12 +25,12 @@ import org.jboss.weld.junit5.auto.EnableAutoWeld;
     CargadorInterfaceMOCKImpl.class,
     CargaRepoImpl.class
 })
-public class ModuloDeCarga_mostrarCargaTest {
+public class ModuloDeCarga_verHistorico {
 
     @Inject
     ServicioCarga servicioCargaImpl;
 
-    @DisplayName("Test ver carga actual")
+    @DisplayName("Test ver historico cargas del cliente")
     @Test
     void test() {
         // 1: Creo un cliente de moduloCarga de prueba
@@ -37,9 +39,14 @@ public class ModuloDeCarga_mostrarCargaTest {
         clientePrueba.setApellido("Aramburu");
         //2: creo el medio de pago
         MedioPago tarjeta = new Tarjeta();
+        MedioPago cuentaUTE = new CuentaUTE();
         //3: creo una carga de prueba
         servicioCargaImpl.iniciarCarga(clientePrueba, tarjeta);
-        //3: traigo la carga utilizando la interface
-        servicioCargaImpl.verCargaActual(clientePrueba);
+        servicioCargaImpl.iniciarCarga(clientePrueba, cuentaUTE);
+        servicioCargaImpl.iniciarCarga(clientePrueba, tarjeta);
+        //5: muestro la carga usando la interface
+        String fechaInicio = "2026-05-01";
+        String fechaFin = "2026-05-31"; 
+        servicioCargaImpl.verHistorico(clientePrueba, fechaInicio, fechaFin);
     }
 }

@@ -2,6 +2,7 @@ import jakarta.inject.Inject;
 
 import moduloCarga.aplicacion.ServicioCarga;
 import moduloCarga.aplicacion.impl.ServicioCargaImpl;
+import moduloCarga.dominio.EstadoCarga;
 import moduloCarga.dominio.cliente.Cliente;
 import moduloCarga.dominio.cliente.ClienteComun;
 import moduloCarga.dominio.medioPago.CuentaUTE;
@@ -22,7 +23,7 @@ import org.jboss.weld.junit5.auto.EnableAutoWeld;
     CargadorInterfaceMOCKImpl.class,
     CargaRepoImpl.class
 })
-public class iniciarCargaTest {
+public class ModuloDeCarga_iniciarCargaTest {
 
     @Inject
     ServicioCarga servicioCargaImpl;
@@ -31,8 +32,8 @@ public class iniciarCargaTest {
     private Cliente clientePrueba = new ClienteComun();
 
     //creo los 2 metodos de pago
-    private MedioPago tarjeta = new Tarjeta();
-    private MedioPago cuentaUTE = new CuentaUTE();
+    private MedioPago medioPago = new Tarjeta();
+    //private MedioPago medioPago = new CuentaUTE();
 
 
     public void cargarDatosTest(){
@@ -44,7 +45,18 @@ public class iniciarCargaTest {
 	@Test
     void test(){
         cargarDatosTest();
-        servicioCargaImpl.iniciarCarga(clientePrueba, tarjeta);
+        servicioCargaImpl.iniciarCarga(clientePrueba, medioPago);
+        System.out.print("El cliente " + clientePrueba.getNombre() + " " + clientePrueba.getApellido() +
+            " inició una carga" + "\n" + "Realizó el pago con " + medioPago + "\n");
+        if (clientePrueba.getCargaActual().getEstado() == EstadoCarga.ENPROGRESO){
+            System.out.print("La carga está en progreso");
+        }
+        else if(clientePrueba.getCargaActual().getEstado() == EstadoCarga.TERMINADO){
+            System.out.print("La carga finalizó");
+        }
+        else{
+            System.out.print("Error inesperado, llame a soporte");
+        }
     }
 
     
