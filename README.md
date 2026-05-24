@@ -114,6 +114,8 @@ Antes de ejecutar el proyecto es necesario tener instalado:
 
 ## 📊 Diagrama del Sistema
 
+![Diagrama del Sistema](imgReadme/Diagrama%20De%20modulos.drawio.png)
+
 ## 🧪 Testing
 
 El proyecto incluye pruebas para validar el correcto funcionamiento de los principales casos de uso implementados:
