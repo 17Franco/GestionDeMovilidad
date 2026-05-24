@@ -23,6 +23,17 @@ También busca aplicar conceptos como inyección de dependencias, comunicación 
 
 ## 🛠 Tecnologías Utilizadas
 
+- **Java**: lenguaje principal del proyecto.
+- **Jakarta EE 10**: APIs utilizadas para el desarrollo de la aplicación.
+- **CDI / Weld**: inyección de dependencias y manejo de eventos.
+- **WildFly**: servidor de aplicaciones utilizado para desplegar el proyecto.
+- **Maven**: gestión de dependencias, compilación y empaquetado del proyecto.
+- **JUnit 5**: ejecución de pruebas unitarias.
+- **Mockito**: creación de mocks para pruebas.
+- **AssertJ**: assertions más expresivas en los tests.
+- **Lombok**: generación automática de código repetitivo como getters, setters y constructores.
+- **JBoss Logging**: registro de mensajes y errores de la aplicación.
+
 ## 🏗 Arquitectura del Sistema
 
 El sistema se encuentra organizado mediante una arquitectura modular.
@@ -87,6 +98,13 @@ Responsable de administrar el proceso de carga de vehículos eléctricos, incluy
 Encargado de procesar y gestionar los pagos asociados a las cargas realizadas por los usuarios.
     
 ## ⚙ Requisitos Previos
+
+Antes de ejecutar el proyecto es necesario tener instalado:
+
+- Java JDK 21+
+- Apache Maven
+- MariaDB
+- IDE compatible (visual studio code o IntelliJ IDEA)
 
 ## 📥 Instalación
 
