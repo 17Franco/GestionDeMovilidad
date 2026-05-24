@@ -25,7 +25,7 @@ También busca aplicar conceptos como inyección de dependencias, comunicación 
 
 ## 🏗 Arquitectura del Sistema
 
-El sistema se encuentra organizado mediante una arquitectura en modular.
+El sistema se encuentra organizado mediante una arquitectura modular.
 
 La estructura se divide principalmente en:
 
@@ -74,6 +74,17 @@ La estructura se divide principalmente en:
     │   └── infraestructura/
     │       ├── configuracion/
     │       └── persistencia/
+
+## 📦 Módulos del Sistema
+
+### 👤 Módulo Cliente
+Responsable de la gestión de clientes registrados en el sistema, permitiendo el registro de usuarios, administración de medios de pago y realización de reclamos.
+
+### ⚡ Módulo Carga
+Responsable de administrar el proceso de carga de vehículos eléctricos, incluyendo el inicio y finalización de cargas, consulta de historial y gestión de estaciones y cargadores.
+
+### 💳 Módulo Pago
+Encargado de procesar y gestionar los pagos asociados a las cargas realizadas por los usuarios.
     
 ## ⚙ Requisitos Previos
 
@@ -83,12 +94,6 @@ La estructura se divide principalmente en:
 
 ## 🌐 API / Endpoints
 
-## 📦 Módulos del Sistema
-
-### Módulo Cliente
-
-### Módulo Carga
-
-### Módulo Pago
-
 ## 📊 Diagrama del Sistema
+
+## 🧪 Testing
