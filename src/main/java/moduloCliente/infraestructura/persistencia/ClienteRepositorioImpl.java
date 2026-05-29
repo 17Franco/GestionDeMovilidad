@@ -1,6 +1,8 @@
 package moduloCliente.infraestructura.persistencia;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import moduloCliente.dominio.Reclamos;
 import moduloCliente.dominio.cliente.Cliente;
 import moduloCliente.dominio.repositorio.ClienteRepositorio;
@@ -11,17 +13,17 @@ import java.util.Objects;
 
 @ApplicationScoped
 public class ClienteRepositorioImpl implements ClienteRepositorio {
+
+    @PersistenceContext
+    private EntityManager em;
+
     private final List<Cliente> clientes = new ArrayList<>();
 
     public boolean registrar(Cliente cliente) {
-        if (cliente == null || cliente.getCedula() == null || cliente.getCedula().isBlank()) {
-            return false;
-        }
-        if (buscarPorCedula(cliente.getCedula()) != null) {
-            return false;
-        }
+
         clientes.add(cliente);
-        //lanzo evento que recibe modulocarga y creo al cliente en se modulo
+
+        em.persist(cliente);
         return true;
     }
 

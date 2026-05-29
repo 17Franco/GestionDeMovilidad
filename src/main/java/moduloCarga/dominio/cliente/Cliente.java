@@ -32,9 +32,11 @@ public abstract class Cliente {
         this.contra = contra;
     }
     //carga actual, (la ultima carga del historial)
+    @Transient //quitar porque sino no mapea
     Carga cargaActual;
     //cada cliente tiene un historial de cargas asociado
     //@OneToMany
+    @Transient
     HistorialDeCargas historialAsociado;
 
     //cuando este la bd implementada en ves de pedirle al cliente su

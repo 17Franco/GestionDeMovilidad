@@ -2,6 +2,7 @@ package moduloCliente.aplicacion.impl;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import moduloCliente.aplicacion.ServicioCliente;
 import moduloCliente.dominio.CuentaUTE;
 import moduloCliente.dominio.MedioPago;
@@ -21,17 +22,27 @@ public class ServicioClienteImpl implements ServicioCliente {
     @Inject
     private PublicadorEventoCliente evento;
 
+    @Transactional // hace que todo el metodo sea una transacción
     public boolean registrarCliente(Cliente cliente) {
+        //verifico que el cliente que viene de la api no sea null
+        if(cliente == null){
+            throw new IllegalArgumentException("Cliente no puede ser null");
+        }
+        //verifico que no exista ya ese cliente
+        Cliente cli = repo.buscarPorCedula(cliente.getCedula());
+        if(cli != null){
+            throw new RuntimeException("Cliente ya existe");
+        }
         boolean resu = repo.registrar(cliente);
+
         if(resu){
             if(cliente instanceof ClienteComun){
                 evento.publicarEventoClienteComun(cliente);
             }else{
                 evento.publicarEventoClienteProfesional(cliente);
             }
-
         }
-        return resu ;
+        return resu;
     }
 
     public boolean altaMedioPago(String ci, MedioPago formaPago) {
