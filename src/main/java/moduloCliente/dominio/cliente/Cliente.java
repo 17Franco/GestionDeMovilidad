@@ -5,7 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import moduloCliente.dominio.Reclamos;
+import moduloCliente.dominio.Reclamo;
+import moduloCliente.dominio.Tarjeta;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +27,10 @@ public abstract class Cliente {
     private String contra;
 
     @OneToMany(mappedBy = "cliente")
-    private List<Reclamos> reclamos = new ArrayList<>();
+    private List<Reclamo> reclamos = new ArrayList<>();
+
+    @OneToMany(mappedBy = "cliente")
+    private List<Tarjeta> tarjetas = new ArrayList<>();
 
     public Cliente(String cedula, String nombre, String apellido,String numTel, String contra) {
         this.cedula = cedula;

@@ -7,6 +7,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import moduloCarga.dominio.Carga;
 import moduloCarga.dominio.HistorialDeCargas;
+import moduloCarga.dominio.medioPago.Tarjeta;
+
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -18,11 +23,13 @@ import moduloCarga.dominio.HistorialDeCargas;
 public abstract class Cliente {
     @Id
     private String cedula;
-
     private String nombre;
     private String apellido;
     private String numTel;
     private String contra;
+
+    @OneToMany(mappedBy = "cliente")
+    private List<Tarjeta> tarjetas = new ArrayList<>();
 
     public Cliente(String cedula, String nombre, String apellido,String numTel, String contra) {
         this.cedula = cedula;

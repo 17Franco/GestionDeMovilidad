@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import moduloCarga.dominio.cliente.Cliente;
+
 
 import java.time.LocalDate;
 
@@ -19,6 +21,10 @@ public class Tarjeta extends MedioPago {
 
     @Enumerated(EnumType.STRING)
     private TipoTarjeta tipo;
+
+    @ManyToOne
+    @JoinColumn(name = "cliente_id")
+    private Cliente cliente;
 
     @Override
     public String getTipoMedioPago(){

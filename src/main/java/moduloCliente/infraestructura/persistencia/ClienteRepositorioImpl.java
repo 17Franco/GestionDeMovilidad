@@ -3,7 +3,7 @@ package moduloCliente.infraestructura.persistencia;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import moduloCliente.dominio.Reclamos;
+import moduloCliente.dominio.Reclamo;
 import moduloCliente.dominio.cliente.Cliente;
 import moduloCliente.dominio.repositorio.ClienteRepositorio;
 
@@ -19,14 +19,15 @@ public class ClienteRepositorioImpl implements ClienteRepositorio {
 
     private final List<Cliente> clientes = new ArrayList<>();
 
-    public boolean registrar(Cliente cliente) {
+    @Override
+    public boolean saveCliente(Cliente cliente) {
 
         clientes.add(cliente);
 
         em.persist(cliente);
         return true;
     }
-
+    @Override
     public boolean actualizar(Cliente cliente) {
         if (cliente == null || cliente.getCedula() == null) {
             return false;
@@ -40,7 +41,8 @@ public class ClienteRepositorioImpl implements ClienteRepositorio {
         return false;
     }
 
-    public Cliente buscarPorCedula(String cedula) {
+    @Override
+    public Cliente buscarCliente(String cedula) {
         if (cedula == null) {
             return null;
         }
@@ -50,15 +52,17 @@ public class ClienteRepositorioImpl implements ClienteRepositorio {
                 .orElse(null);
     }
 
-    public List<Cliente> obtenerTodos() {
+    @Override
+    public List<Cliente> allcliente() {
         return new ArrayList<>(clientes);
     }
 
-    public Reclamos hacerReclamo(String asunto, String descripcion, String ci){
-        Cliente cli=buscarPorCedula(ci);
-        Reclamos rec = null;
+    @Override
+    public Reclamo saveReclamo(String asunto, String descripcion, String ci){
+        Cliente cli=buscarCliente(ci);
+        Reclamo rec = null;
         if (cli != null){
-            rec = new Reclamos(asunto,descripcion,cli);
+            rec = new Reclamo(asunto,descripcion,cli);
             //como manejo memoria lo guardo en la lista de cliente
             cli.getReclamos().add(rec);
         }
