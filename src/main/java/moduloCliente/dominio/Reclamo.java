@@ -1,7 +1,6 @@
 package moduloCliente.dominio;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,7 +12,7 @@ import moduloCliente.dominio.cliente.Cliente;
 @NoArgsConstructor
 @Table(name = "MCliente_Reclamos")
 @Entity
-public class Reclamos {
+public class Reclamo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,9 +22,10 @@ public class Reclamos {
     private String descripcion;
 
     @ManyToOne
+    @JoinColumn(name = "cliente_id")
     private Cliente cliente;
 
-    public Reclamos(String asunto, String descripcion, Cliente cliente) {
+    public Reclamo(String asunto, String descripcion, Cliente cliente) {
         this.asunto = asunto;
         this.descripcion = descripcion;
         this.cliente = cliente;

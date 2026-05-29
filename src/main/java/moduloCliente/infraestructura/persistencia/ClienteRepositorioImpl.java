@@ -1,7 +1,9 @@
 package moduloCliente.infraestructura.persistencia;
 
 import jakarta.enterprise.context.ApplicationScoped;
-import moduloCliente.dominio.Reclamos;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import moduloCliente.dominio.Reclamo;
 import moduloCliente.dominio.cliente.Cliente;
 import moduloCliente.dominio.repositorio.ClienteRepositorio;
 
@@ -11,20 +13,21 @@ import java.util.Objects;
 
 @ApplicationScoped
 public class ClienteRepositorioImpl implements ClienteRepositorio {
+
+    @PersistenceContext
+    private EntityManager em;
+
     private final List<Cliente> clientes = new ArrayList<>();
 
-    public boolean registrar(Cliente cliente) {
-        if (cliente == null || cliente.getCedula() == null || cliente.getCedula().isBlank()) {
-            return false;
-        }
-        if (buscarPorCedula(cliente.getCedula()) != null) {
-            return false;
-        }
+    @Override
+    public boolean saveCliente(Cliente cliente) {
+
         clientes.add(cliente);
-        //lanzo evento que recibe modulocarga y creo al cliente en se modulo
+
+        em.persist(cliente);
         return true;
     }
-
+    @Override
     public boolean actualizar(Cliente cliente) {
         if (cliente == null || cliente.getCedula() == null) {
             return false;
@@ -38,7 +41,8 @@ public class ClienteRepositorioImpl implements ClienteRepositorio {
         return false;
     }
 
-    public Cliente buscarPorCedula(String cedula) {
+    @Override
+    public Cliente buscarCliente(String cedula) {
         if (cedula == null) {
             return null;
         }
@@ -48,15 +52,17 @@ public class ClienteRepositorioImpl implements ClienteRepositorio {
                 .orElse(null);
     }
 
-    public List<Cliente> obtenerTodos() {
+    @Override
+    public List<Cliente> allcliente() {
         return new ArrayList<>(clientes);
     }
 
-    public Reclamos hacerReclamo(String asunto, String descripcion, String ci){
-        Cliente cli=buscarPorCedula(ci);
-        Reclamos rec = null;
+    @Override
+    public Reclamo saveReclamo(String asunto, String descripcion, String ci){
+        Cliente cli=buscarCliente(ci);
+        Reclamo rec = null;
         if (cli != null){
-            rec = new Reclamos(asunto,descripcion,cli);
+            rec = new Reclamo(asunto,descripcion,cli);
             //como manejo memoria lo guardo en la lista de cliente
             cli.getReclamos().add(rec);
         }

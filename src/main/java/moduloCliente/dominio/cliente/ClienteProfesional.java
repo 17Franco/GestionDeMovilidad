@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import moduloCliente.dominio.MedioPago;
+import moduloCliente.dominio.Tarjeta;
 import moduloCliente.dominio.TipoProfesional;
 
 import java.util.ArrayList;
@@ -22,9 +23,6 @@ public class ClienteProfesional extends Cliente{
 
     private float porcentajeDescuento;
 
-    //esto es porque cada medio de pago ya tiene relacion con cliente
-    @Transient
-    private List<MedioPago> metodosPago = new ArrayList<>();
 
     public ClienteProfesional(String cedula, String nombre, String apellido, String numTel, String contra, TipoProfesional tipo, float porcentajeDescuento) {
         super(cedula, nombre, apellido, numTel, contra);

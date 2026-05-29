@@ -18,7 +18,6 @@ import java.time.LocalDate;
 public abstract class MedioPago {
     @Id
     private int id;
-    private String ciCli; //relacionamos el medioPagoCon el cliente
     private LocalDate fechaCreacion;
     
     public abstract String getTipoMedioPago(); //creo esta funcion abstracta para retornar el tipo me medioPago

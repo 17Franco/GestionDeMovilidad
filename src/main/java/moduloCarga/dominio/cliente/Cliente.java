@@ -7,6 +7,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import moduloCarga.dominio.Carga;
 import moduloCarga.dominio.HistorialDeCargas;
+import moduloCarga.dominio.medioPago.Tarjeta;
+
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -18,11 +23,13 @@ import moduloCarga.dominio.HistorialDeCargas;
 public abstract class Cliente {
     @Id
     private String cedula;
-
     private String nombre;
     private String apellido;
     private String numTel;
     private String contra;
+
+    @OneToMany(mappedBy = "cliente")
+    private List<Tarjeta> tarjetas = new ArrayList<>();
 
     public Cliente(String cedula, String nombre, String apellido,String numTel, String contra) {
         this.cedula = cedula;
@@ -32,9 +39,11 @@ public abstract class Cliente {
         this.contra = contra;
     }
     //carga actual, (la ultima carga del historial)
+    @Transient //quitar porque sino no mapea
     Carga cargaActual;
     //cada cliente tiene un historial de cargas asociado
     //@OneToMany
+    @Transient
     HistorialDeCargas historialAsociado;
 
     //cuando este la bd implementada en ves de pedirle al cliente su
