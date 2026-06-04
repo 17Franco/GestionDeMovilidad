@@ -10,5 +10,5 @@ public interface ClienteRepositorio {
     boolean actualizar(Cliente cliente);
     Cliente buscarCliente(String cedula);
     List<Cliente> allcliente();
-    Reclamo saveReclamo(String asunto, String descripcion, String ci);
+    boolean saveReclamo(Reclamo reclamo);
 }

@@ -21,9 +21,10 @@ public class ClienteRepositorioImpl implements ClienteRepositorio {
 
     @Override
     public boolean saveCliente(Cliente cliente) {
-
+        if(cliente == null){
+            return false;
+        }
         clientes.add(cliente);
-
         em.persist(cliente);
         return true;
     }
@@ -58,14 +59,16 @@ public class ClienteRepositorioImpl implements ClienteRepositorio {
     }
 
     @Override
-    public Reclamo saveReclamo(String asunto, String descripcion, String ci){
-        Cliente cli=buscarCliente(ci);
-        Reclamo rec = null;
-        if (cli != null){
-            rec = new Reclamo(asunto,descripcion,cli);
-            //como manejo memoria lo guardo en la lista de cliente
-            cli.getReclamos().add(rec);
+    public boolean saveReclamo(Reclamo reclamo){
+
+        if(reclamo == null){
+            return false;
         }
-        return rec;
+
+            reclamo.getCliente().getReclamos().add(reclamo);
+            em.persist(reclamo);
+            //em.persist(reclamo.getCliente());
+
+        return true;
     }
 }

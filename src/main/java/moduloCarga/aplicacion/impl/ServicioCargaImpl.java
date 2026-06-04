@@ -20,6 +20,7 @@ import moduloCarga.dominio.HistorialDeCargas;
 import moduloCarga.dominio.cliente.Cliente;
 import moduloCarga.dominio.medioPago.MedioPago;
 import moduloCarga.dominio.repositorio.RepoCarga;
+import moduloCliente.dominio.cliente.ClienteComun;
 
 @ApplicationScoped
 public class ServicioCargaImpl implements ServicioCarga {
@@ -176,6 +177,16 @@ public class ServicioCargaImpl implements ServicioCarga {
 
     @Override
     public boolean altaCliente(Cliente cli){
+
+        //verifico que el cliente que viene de la api no sea null
+        if(cli == null){
+            throw new IllegalArgumentException("Cliente no puede ser null");
+        }
+        //verifico que no exista ya ese cliente
+        Cliente  cliente = repo.buscarPorCedula(cli.getCedula());
+        if(cliente != null){
+            throw new RuntimeException("Cliente ya existe");
+        }
 
         return repo.registrarCliente(cli);
 

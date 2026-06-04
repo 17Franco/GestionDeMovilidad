@@ -6,12 +6,16 @@ import jakarta.transaction.Transactional;
 import moduloCliente.aplicacion.ServicioCliente;
 import moduloCliente.dominio.CuentaUTE;
 import moduloCliente.dominio.MedioPago;
+import moduloCliente.dominio.Reclamo;
 import moduloCliente.dominio.Tarjeta;
 import moduloCliente.dominio.cliente.Cliente;
 import moduloCliente.dominio.cliente.ClienteComun;
 import moduloCliente.dominio.cliente.ClienteProfesional;
 import moduloCliente.dominio.repositorio.ClienteRepositorio;
 import moduloCliente.interfaz.evento.out.PublicadorEventoCliente;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @ApplicationScoped
 public class ServicioClienteImpl implements ServicioCliente {
@@ -23,6 +27,7 @@ public class ServicioClienteImpl implements ServicioCliente {
     private PublicadorEventoCliente evento;
 
     @Transactional // hace que todo el metodo sea una transacción
+    @Override
     public boolean registrarCliente(Cliente cliente) {
         //verifico que el cliente que viene de la api no sea null
         if(cliente == null){
@@ -85,8 +90,26 @@ public class ServicioClienteImpl implements ServicioCliente {
         }
     }
 
-    public void realizarReclamo(String asunto, String descripcion,String ci) {
+    @Override
+    @Transactional
+    public Reclamo realizarReclamo(String asunto, String descripcion, String ci) {
+
+        //verifico ci si existe en el cliente
+        Cliente c = repo.buscarCliente(ci);
+        Reclamo reclamo = null;
+        if(c != null){
+            //creamos reclamo y mandamos a guardar persistir
+            reclamo = new Reclamo(asunto,descripcion,c);
+            repo.saveReclamo(reclamo);
+        }
         //llamo a repo creo el objeto reclamo y se lo asigno
-        repo.saveReclamo(asunto,descripcion,ci);
+
+       return  reclamo;
+    }
+
+    @Override
+    @Transactional
+    public List<Reclamo> obtenerReclamos(String ci){
+        return new ArrayList<>();
     }
 }

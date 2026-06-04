@@ -1,6 +1,8 @@
 package moduloCarga.infraestructura.persistencia;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import moduloCarga.dominio.Cargador;
 import moduloCarga.dominio.EstacionCarga;
 import moduloCarga.dominio.cliente.Cliente;
@@ -17,6 +19,8 @@ import java.util.List;
 @ApplicationScoped
 public class CargaRepoImpl implements RepoCarga {
 
+    @PersistenceContext
+    private EntityManager em;
 
     private final List<EstacionCarga> estaciones = new ArrayList<>();
 
@@ -75,18 +79,11 @@ public class CargaRepoImpl implements RepoCarga {
 
     @Override
     public boolean registrarCliente(Cliente cliente){
-
-        if (cliente == null || cliente.getCedula() == null || cliente.getCedula().isBlank()) {
-            System.out.println("entre vacio");
+        if(cliente == null){
             return false;
         }
-
-        if (buscarPorCedula(cliente.getCedula()) != null) {
-            return false;
-        }
-
         clientes.add(cliente);
-
+        em.persist(cliente);
         return true;
 
     }

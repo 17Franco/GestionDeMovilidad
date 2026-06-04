@@ -7,6 +7,8 @@ import moduloPago.dominio.pagoRealizado;
 import moduloPago.dominio.repositorio.RepoPago;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @ApplicationScoped
 public class ServicioPagoImpl implements ServicioPago {
@@ -34,9 +36,8 @@ public class ServicioPagoImpl implements ServicioPago {
     }
 
     @Override
-    public void consultarPagos(
-            String cedulaCliente,
-            LocalDate fechaIni,
-            LocalDate fechaFin
-    ){}
+   public List<pagoRealizado> consultarPagos(String cedulaCliente, LocalDate fechaIni, LocalDate fechaFin){
+
+        return repo.getPagosPorFecha(cedulaCliente,fechaFin,fechaFin);
+    }
 }
