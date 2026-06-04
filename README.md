@@ -112,6 +112,18 @@ Antes de ejecutar el proyecto es necesario tener instalado:
 
 ## 🌐 API / Endpoints
 
+### Endpoints de ModuloCliente
+
+| Método | Endpoint | Descripción |
+|---|---|---|
+| POST | movilidad/clientes  | Permite registrar un usuario  |  
+| POST | movilidad/clientes/reclamos  | Permite a un usuario realizar un reclamo |  
+| Post | movilidad/clientes/metodoPago | Permite agregar un metodo de pago al cliente |  
+| GET | movilidad/clientes | Permite listar a todos lo usuarios |
+| GET | movilidad/clientes/metodoPago | Permite listar los metodos de pago del cliente | 
+---
+
+
 ## 📊 Diagrama del Sistema
 
 ![Diagrama del Sistema](imgReadme/Diagrama%20De%20modulos.drawio.png)
