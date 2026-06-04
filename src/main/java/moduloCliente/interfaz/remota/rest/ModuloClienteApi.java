@@ -7,6 +7,7 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import moduloCliente.aplicacion.ServicioCliente;
+import moduloCliente.dominio.Reclamo;
 import moduloCliente.dominio.cliente.Cliente;
 // URL http://localhost:8080/GestionDeMovilidad/movilidad/clientes
 /*JSON*/
@@ -58,6 +59,8 @@ public class ModuloClienteApi {
             } else {
                 throw new IllegalArgumentException("Tipo de cliente inválido");
             }
+
+
             boolean resu = servicioCliente.registrarCliente(cliente);
             //si todo sale bienn devuelvo mensaje de usuario se registro
             if (resu) {
@@ -82,11 +85,37 @@ public class ModuloClienteApi {
 
     }
 
-   /* @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    public Reclamos registrarReclamo(Reclamos reclamo){
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)//recibe JSON
+    @Produces(MediaType.APPLICATION_JSON)//devuelve JSON
+    @Path("/reclamos")
+    public Response registrarReclamo(ReclamoDTO reclamo){
+        try{
+            Reclamo r = servicioCliente.realizarReclamo(reclamo.getAsunto(),reclamo.getDescripcion(),reclamo.getClienteCi());
+            if(r != null){
+                ReclamoDTO reclamoDTO= new ReclamoDTO();
+                reclamoDTO.setId(r.getId());
+                reclamoDTO.setAsunto(r.getAsunto());
+                reclamoDTO.setDescripcion(r.getDescripcion());
+                reclamoDTO.setClienteCi(r.getCliente().getCedula());
+                return Response
+                        .status(Response.Status.CREATED)
+                        .entity(reclamoDTO)
+                        .build();
+            }
 
-    }*/
+            return Response
+                    .status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("{\"error\":\"No se pudo agregar el reclamo\"}")
+                    .build();
+
+        }catch(Exception e){
+            return Response
+                    .status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("{\"error\":\"Error interno: " + e.getMessage() + "\"}")
+                    .build();
+        }
+    }
 
    /* @GET
     @Produces(MediaType.APPLICATION_JSON)
