@@ -114,15 +114,26 @@ Antes de ejecutar el proyecto es necesario tener instalado:
 
 ### Endpoints de ModuloCliente
 
-| Método | Endpoint | Descripción |
-|---|---|---|
-| POST | movilidad/clientes  | Permite registrar un usuario  |  
-| POST | movilidad/clientes/reclamos  | Permite a un usuario realizar un reclamo |  
-| POST | movilidad/clientes/metodoPago | Permite agregar un metodo de pago al cliente |  
-| GET | movilidad/clientes | Permite listar a todos lo usuarios |
-| GET | movilidad/clientes/metodoPago | Permite listar los metodos de pago del cliente | 
+| Método | Endpoint | Descripción | Consumido Por |
+|---|---|---|---|
+| POST | movilidad/clientes  | Permite registrar un usuario  | app móvil | 
+| POST | movilidad/clientes/reclamos  | Permite a un usuario realizar un reclamo | app móvil |
+| POST | movilidad/clientes/metodoPago | Permite agregar un metodo de pago al cliente | app móvil |
+| GET | movilidad/clientes | Permite listar a todos lo usuarios | gestor web |
 ---
+### Endpoints de ModuloCarga
+| Método | Endpoint | Descripción | Consumido Por |
+|---|---|---|---|
+| | | | | 
+---
+### Endpoints de ModuloPago
+| Método | Endpoint | Descripción | Consumido Por |
+|---|---|---|---|
+| | | | | 
+---
+## Autenticación
 
+Los endpoints consumidos por la appMovil requieren autenticación mediante usuario y contraseña.
 
 ## 📊 Diagrama del Sistema
 
