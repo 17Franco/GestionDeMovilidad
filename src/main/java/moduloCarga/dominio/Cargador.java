@@ -1,9 +1,17 @@
 package moduloCarga.dominio;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Getter
+@Setter
+@NoArgsConstructor
 public class Cargador {
+
     private TipoCargador tipo;
     private boolean tieneCable;
     private TipoConector tipoConector;
