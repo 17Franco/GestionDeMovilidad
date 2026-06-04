@@ -2,12 +2,13 @@ package moduloPago.aplicacion.impl;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import moduloCliente.dominio.MedioPago;
-import moduloCliente.dominio.cliente.Cliente;
 import moduloPago.aplicacion.ServicioPago;
+import moduloPago.dominio.pagoRealizado;
 import moduloPago.dominio.repositorio.RepoPago;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @ApplicationScoped
 public class ServicioPagoImpl implements ServicioPago {
@@ -16,31 +17,27 @@ public class ServicioPagoImpl implements ServicioPago {
     private RepoPago repo;
 
     @Override
-    public void pagarCarga(Cliente cliente, float importe, MedioPago medioPago){
+    public void pagarCarga(
+            String cedulaCliente,
+            int idCarga,
+            float importe,
+            String medioPago
+    ){
 
-        if (cliente == null || medioPago == null) {
-            return;
-        }
+        pagoRealizado pago = new pagoRealizado();
 
-        System.out.println("Procesando pago...");
-
-        System.out.println(
-                "Cliente: " +
-                cliente.getNombre() +
-                " " +
-                cliente.getApellido()
-        );
-
-        System.out.println("Importe total: $" + importe);
-
-        System.out.println(
-                "Medio de pago utilizado: " +
-                medioPago.getClass().getSimpleName()
-        );
+        pago.setCedulaCliente(cedulaCliente);
+        pago.setIdCarga(idCarga);
+        pago.setMonto(importe);
+        pago.setFecha(LocalDate.now());
+        pago.setMedioPago(medioPago);
 
         System.out.println("Pago realizado correctamente");
     }
 
     @Override
-    public void consultarPagos(Cliente cliente, LocalDate fechaIni, LocalDate fechaFin){}
+   public List<pagoRealizado> consultarPagos(String cedulaCliente, LocalDate fechaIni, LocalDate fechaFin){
+
+        return repo.getPagosPorFecha(cedulaCliente,fechaFin,fechaFin);
+    }
 }
