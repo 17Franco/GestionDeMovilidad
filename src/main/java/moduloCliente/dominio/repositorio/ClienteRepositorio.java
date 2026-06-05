@@ -12,3 +12,4 @@ public interface ClienteRepositorio {
     List<Cliente> allcliente();
     boolean saveReclamo(Reclamo reclamo);
 
+}

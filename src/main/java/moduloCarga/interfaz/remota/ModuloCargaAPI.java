@@ -10,6 +10,10 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import moduloCarga.aplicacion.ServicioCarga;
 import moduloCarga.dominio.cliente.Cliente;
+import moduloCarga.dominio.cliente.ClienteProfesional;
+import moduloCarga.dominio.medioPago.CuentaUTE;
+import moduloCarga.dominio.medioPago.MedioPago;
+import moduloCarga.dominio.medioPago.Tarjeta;
 import moduloCarga.dominio.repositorio.RepoCarga;
 
 
@@ -35,6 +39,8 @@ public class ModuloCargaAPI {
     public Response iniciarCarga(iniciarCargaDatos datos) {               //"datos" es el json que me llega por http, el framwork jakarta lo traduce automaticamente al dto que yo le meta, podria trabajar con string, pero justamente el framework es para facilitarme esto
         //busco el cliente, si existe y el metodo de pago es correcto inicio la carga
         //tengo que verificar que el cliente tenga ese metodo de pago asociado, tambien tengo que verificar que no puede pasar que sea un cliente profesional y quiera pagar con FacutaUTE
+        
+        //valido la existencia del cliente
         String cedulaCliente = datos.getCedulaCliente();
         Cliente clienteBuscado = repoCarga.buscarPorCedula(cedulaCliente);
         if(clienteBuscado == null){
@@ -44,11 +50,51 @@ public class ModuloCargaAPI {
                 .build();
         }
 
+        //si el cliente existe en la base de datos
         else{
+            //pregunto si me manda los medios de pago que acepto
+            String medioPagoString = datos.getMetodoPago();
+            if(medioPagoString != "TARJETA" || medioPagoString != "Cuenta_UTE"){
+                return Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .entity("{\"error\":\"El metodo de pago " + medioPagoString + " no es valido" + "\"}")
+                    .build();
+            }
+
+            //pregunto si me esta pasando un cliente profesional con el metodo de pago que no puede
+            if(medioPagoString == "CuentaUTE" && clienteBuscado instanceof ClienteProfesional){
+                return Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .entity("{\"error\":\"El metodo de pago " + medioPagoString + " no es valido para el tipo de cliente seleccionado (Profesional)" + "\"}")
+                    .build();
+            }
+
+            //si luego de todo esto, me pasa el cliente con el metodo de pago adecuado, busco si realmente tiene ese metodo de pago en la base de datos
+            /*if(){
+
+            }
+            */
+            //Tengo que transformar el string a un objeto de tipo MedioPago
+            MedioPago medioPago = null;
+            if(medioPagoString == "TARJETA"){
+                medioPago = new Tarjeta();
+            }
+            else if(medioPagoString == "CUENTA_UTE"){
+                medioPago = new CuentaUTE();
+            }
+            //se supone que si llego hasta acá es porque paso por todos los controles de arriba, asi que eu confio
+            serivcioCarga.iniciarCarga(clienteBuscado, medioPago);
             return Response
-                .status(Response.Status.NOT_FOUND)
-                .entity("{\"error\":\"TE RESPONDO LO MISMO WACHIIIIIIN " + cedulaCliente + "\"}")
+                .status(Response.Status.CREATED)
+                .entity("{\"mensaje\":\"Carga iniciada correctamente\"}")
                 .build();
         }
+
+       
+
+
+
+
+        
     }
 }

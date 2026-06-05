@@ -1,8 +1,11 @@
 package moduloCarga.dominio.repositorio;
 
 
+import moduloCarga.dominio.Carga;
 import moduloCarga.dominio.Cargador;
+import moduloCarga.dominio.ElementoHistorial;
 import moduloCarga.dominio.EstacionCarga;
+import moduloCarga.dominio.HistorialDeCargas;
 import moduloCarga.dominio.cliente.Cliente;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,4 +26,10 @@ public interface RepoCarga {
     List<Cliente> obtenerTodos();
 
     boolean registrarCliente(Cliente cli);
+
+    void persistirCarga(Carga cargaNueva);
+    void persistirOActualizarHistorial(HistorialDeCargas historial);
+    void persistirElementoHistorial(ElementoHistorial elemento);
+    void ActualizarCliente(Cliente cli);
+
 }

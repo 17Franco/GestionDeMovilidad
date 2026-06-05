@@ -3,17 +3,16 @@ package moduloCarga.infraestructura.persistencia;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
+
+import moduloCarga.dominio.Carga;
 import moduloCarga.dominio.Cargador;
+import moduloCarga.dominio.ElementoHistorial;
 import moduloCarga.dominio.EstacionCarga;
+import moduloCarga.dominio.HistorialDeCargas;
 import moduloCarga.dominio.cliente.Cliente;
 import moduloCarga.dominio.repositorio.RepoCarga;
-import moduloCarga.dominio.Cargador;
-import moduloCarga.dominio.EstacionCarga;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import java.util.ArrayList;
 import java.util.List;
 
 @ApplicationScoped
@@ -22,69 +21,95 @@ public class CargaRepoImpl implements RepoCarga {
     @PersistenceContext
     private EntityManager em;
 
-    private final List<EstacionCarga> estaciones = new ArrayList<>();
-
-    private final List<Cargador> cargadores = new ArrayList<>();
-
-
-    private final List<Cliente> clientes = new ArrayList<>();
-    
     @Override
+    @Transactional
     public void guardarEstacion(EstacionCarga estacion) {
-        estaciones.add(estacion);
+        em.persist(estacion);
     }
 
     @Override
+    @Transactional
     public void guardarCargador(Cargador cargador) {
-        cargadores.add(cargador); 
+        em.persist(cargador);
     }
 
-   
     @Override
+    @Transactional
     public void registrarEstacion(EstacionCarga estacion) {
         if (estacion != null) {
-            estaciones.add(estacion);
+            em.persist(estacion);
         }
     }
 
     @Override
+    @Transactional
     public void registrarCargador(Cargador cargador) {
         if (cargador != null) {
-            cargadores.add(cargador);
+            em.persist(cargador);
         }
     }
 
     @Override
     public List<EstacionCarga> obtenerEstaciones() {
-        return new ArrayList<>(estaciones);
+        return em.createQuery(
+                "SELECT e FROM EstacionCarga e",
+                EstacionCarga.class
+        ).getResultList();
     }
 
     @Override
     public Cliente buscarPorCedula(String cedula) {
-
-        if (cedula == null) {
+        if (cedula == null || cedula.isBlank()) {
             return null;
         }
 
-        return clientes.stream()
-                .filter(c -> cedula.equals(c.getCedula()))
-                .findFirst()
-                .orElse(null);
+        return em.find(Cliente.class, cedula);
     }
 
     @Override
     public List<Cliente> obtenerTodos() {
-        return new ArrayList<>(clientes);
+        return em.createQuery(
+                "SELECT c FROM Cliente_Carga c",
+                Cliente.class
+        ).getResultList();
     }
 
     @Override
-    public boolean registrarCliente(Cliente cliente){
-        if(cliente == null){
+    @Transactional
+    public boolean registrarCliente(Cliente cli) {
+        if (cli == null) {
             return false;
         }
-        clientes.add(cliente);
-        em.persist(cliente);
-        return true;
 
+        em.persist(cli);
+        return true;
+    }
+
+    @Override
+    @Transactional
+    public void persistirCarga(Carga cargaNueva) {
+        em.persist(cargaNueva);
+    }
+
+    @Override
+    @Transactional
+    public void persistirOActualizarHistorial(HistorialDeCargas historial) {
+        if (historial.getId() == 0) {
+            em.persist(historial);
+        } else {
+            em.merge(historial);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void persistirElementoHistorial(ElementoHistorial elemento) {
+        em.persist(elemento);
+    }
+
+    @Override
+    @Transactional
+    public void ActualizarCliente(Cliente cli) {
+        em.merge(cli);
     }
 }
