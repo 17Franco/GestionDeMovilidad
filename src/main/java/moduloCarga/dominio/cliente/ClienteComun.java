@@ -10,7 +10,7 @@ import moduloCarga.dominio.medioPago.CuentaUTE;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity (name = "ClienteComun_Carga")
+@Entity (name = "MCarga_ClienteComun")
 @Getter
 @Setter
 @NoArgsConstructor

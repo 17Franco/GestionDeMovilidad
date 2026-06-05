@@ -54,7 +54,7 @@ public class ModuloCargaAPI {
         else{
             //pregunto si me manda los medios de pago que acepto
             String medioPagoString = datos.getMetodoPago();
-            if(medioPagoString != "TARJETA" || medioPagoString != "Cuenta_UTE"){
+            if(!medioPagoString.equals("TARJETA") && !medioPagoString.equals("CUENTA_UTE")){
                 return Response
                     .status(Response.Status.BAD_REQUEST)
                     .entity("{\"error\":\"El metodo de pago " + medioPagoString + " no es valido" + "\"}")
@@ -62,7 +62,7 @@ public class ModuloCargaAPI {
             }
 
             //pregunto si me esta pasando un cliente profesional con el metodo de pago que no puede
-            if(medioPagoString == "CuentaUTE" && clienteBuscado instanceof ClienteProfesional){
+            if(medioPagoString.equals("CuentaUTE") && clienteBuscado instanceof ClienteProfesional){
                 return Response
                     .status(Response.Status.BAD_REQUEST)
                     .entity("{\"error\":\"El metodo de pago " + medioPagoString + " no es valido para el tipo de cliente seleccionado (Profesional)" + "\"}")
@@ -75,12 +75,16 @@ public class ModuloCargaAPI {
             }
             */
             //Tengo que transformar el string a un objeto de tipo MedioPago
-            MedioPago medioPago = null;
-            if(medioPagoString == "TARJETA"){
+            MedioPago medioPago;
+            if ("TARJETA".equals(medioPagoString)) {
                 medioPago = new Tarjeta();
-            }
-            else if(medioPagoString == "CUENTA_UTE"){
+            } else if ("CUENTA_UTE".equals(medioPagoString)) {
                 medioPago = new CuentaUTE();
+            } else {
+                return Response
+                        .status(Response.Status.BAD_REQUEST)
+                        .entity("{\"error\":\"Método de pago inválido\"}")
+                        .build();
             }
             //se supone que si llego hasta acá es porque paso por todos los controles de arriba, asi que eu confio
             serivcioCarga.iniciarCarga(clienteBuscado, medioPago);

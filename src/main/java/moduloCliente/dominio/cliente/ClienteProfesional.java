@@ -11,7 +11,7 @@ import moduloCliente.dominio.TipoProfesional;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
+@Entity (name="MCliente_ClienteProfesional")
 @Getter
 @Setter
 @NoArgsConstructor

@@ -11,6 +11,8 @@ import moduloCarga.dominio.ElementoHistorial;
 import moduloCarga.dominio.EstacionCarga;
 import moduloCarga.dominio.HistorialDeCargas;
 import moduloCarga.dominio.cliente.Cliente;
+import moduloCarga.dominio.cliente.ClienteComun;
+import moduloCarga.dominio.cliente.ClienteProfesional;
 import moduloCarga.dominio.repositorio.RepoCarga;
 
 import java.util.List;
@@ -58,13 +60,25 @@ public class CargaRepoImpl implements RepoCarga {
     }
 
     @Override
-    public Cliente buscarPorCedula(String cedula) {
-        if (cedula == null || cedula.isBlank()) {
-            return null;
-        }
-
-        return em.find(Cliente.class, cedula);
+public Cliente buscarPorCedula(String cedula) {
+    if (cedula == null || cedula.isBlank()) {
+        return null;
     }
+
+    Cliente clienteComun = em.find(ClienteComun.class, cedula);
+
+    if (clienteComun != null) {
+        return clienteComun;
+    }
+
+    Cliente clienteProfesional = em.find(ClienteProfesional.class, cedula);
+
+    if (clienteProfesional != null) {
+        return clienteProfesional;
+    }
+
+    return null;
+}
 
     @Override
     public List<Cliente> obtenerTodos() {

@@ -9,7 +9,7 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity(name = "ClienteProfesional_Carga")
+@Entity(name = "MCarga_ClienteProfesional")
 @Getter
 @Setter
 @NoArgsConstructor
