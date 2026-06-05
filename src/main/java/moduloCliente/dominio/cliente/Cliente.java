@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import moduloCliente.dominio.Grupo;
 import moduloCliente.dominio.Reclamo;
 import moduloCliente.dominio.Tarjeta;
 
@@ -32,11 +33,23 @@ public abstract class Cliente {
     @OneToMany(mappedBy = "cliente")
     private List<Tarjeta> tarjetas = new ArrayList<>();
 
+    @ManyToMany (fetch = FetchType.EAGER)
+    private List<Grupo> grupos;
+
     public Cliente(String cedula, String nombre, String apellido,String numTel, String contra) {
         this.cedula = cedula;
         this.nombre = nombre;
         this.apellido = apellido;
         this.numTel = numTel;
         this.contra = contra;
+    }
+
+    public List<String> gruposAsString() {
+        List<String> grupos = new ArrayList<String>();
+        for (Grupo grupo : this.grupos) {
+            grupos.add(grupo.getNombre());
+        }
+        //System.out.println("Lista de grupos:" + grupos.toString());
+        return grupos;
     }
 }

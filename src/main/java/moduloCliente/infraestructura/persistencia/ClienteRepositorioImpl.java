@@ -3,6 +3,7 @@ package moduloCliente.infraestructura.persistencia;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import moduloCliente.dominio.Grupo;
 import moduloCliente.dominio.Reclamo;
 import moduloCliente.dominio.cliente.Cliente;
 import moduloCliente.dominio.repositorio.ClienteRepositorio;
@@ -24,6 +25,17 @@ public class ClienteRepositorioImpl implements ClienteRepositorio {
         if(cliente == null){
             return false;
         }
+        Grupo g = em.find(Grupo.class, "appMovil");
+        if (g == null) {
+            throw new RuntimeException("Grupo no existe");
+        }
+
+        if (cliente.getGrupos() == null) {
+            cliente.setGrupos(new ArrayList<>());
+        }
+
+        cliente.getGrupos().add(g);
+
         clientes.add(cliente);
         em.persist(cliente);
         return true;

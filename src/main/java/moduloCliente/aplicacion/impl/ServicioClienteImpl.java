@@ -38,6 +38,7 @@ public class ServicioClienteImpl implements ServicioCliente {
         if(cli != null){
             throw new RuntimeException("Cliente ya existe");
         }
+
         boolean resu = repo.saveCliente(cliente);
 
         if(resu){

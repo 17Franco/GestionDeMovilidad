@@ -2,10 +2,13 @@ package moduloCliente.interfaz.remota.rest;
 
 import jakarta.annotation.security.DenyAll;
 import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.SecurityContext;
 import moduloCliente.aplicacion.ServicioCliente;
 import moduloCliente.dominio.Reclamo;
 import moduloCliente.dominio.cliente.Cliente;
@@ -36,14 +39,18 @@ import moduloCliente.dominio.cliente.Cliente;
 }
 */
 
-
-
-@Path("/clientes")
+@ApplicationScoped
 @DenyAll
+@Path("/clientes")
 public class ModuloClienteApi {
 
     @Inject
     private ServicioCliente servicioCliente;
+
+    @Inject
+    SecurityContext securityContext;
+
+
 
     @POST
     @PermitAll
@@ -85,11 +92,21 @@ public class ModuloClienteApi {
 
     }
 
+    /*
+    * curl -v -u 49876541:1234 -H "Content-Type: application/json" -X POST -d '{
+      "asunto": "PrimerReclamo",
+      "descripcion": "Hola este es el primer reclamo",
+      "clienteCi": "49876541"
+    }' http://localhost:8080/GestionDeMovilidad/movilidad/clientes/reclamos/
+    */
+
     @POST
     @Consumes(MediaType.APPLICATION_JSON)//recibe JSON
     @Produces(MediaType.APPLICATION_JSON)//devuelve JSON
     @Path("/reclamos")
+    @RolesAllowed("appMovil")//enpoint se fija si el usuario tiene este rol si lo tiene sigue si no manda forbidden
     public Response registrarReclamo(ReclamoDTO reclamo){
+
         try{
             Reclamo r = servicioCliente.realizarReclamo(reclamo.getAsunto(),reclamo.getDescripcion(),reclamo.getClienteCi());
             if(r != null){
