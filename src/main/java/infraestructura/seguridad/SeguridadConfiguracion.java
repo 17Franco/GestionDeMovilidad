@@ -1,4 +1,4 @@
-package moduloCliente.infraestructura.seguridad;
+package infraestructura.seguridad;
 
 import jakarta.annotation.security.DeclareRoles;
 import jakarta.enterprise.context.ApplicationScoped;

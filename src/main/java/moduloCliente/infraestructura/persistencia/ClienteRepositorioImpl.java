@@ -7,6 +7,8 @@ import moduloCliente.dominio.Grupo;
 import moduloCliente.dominio.Reclamo;
 import moduloCliente.dominio.cliente.Cliente;
 import moduloCliente.dominio.repositorio.ClienteRepositorio;
+import moduloCliente.exepciones.ClienteInvalidoException;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,24 +23,19 @@ public class ClienteRepositorioImpl implements ClienteRepositorio {
     private final List<Cliente> clientes = new ArrayList<>();
 
     @Override
-    public boolean saveCliente(Cliente cliente) {
+    public void saveCliente(Cliente cliente) {
         if(cliente == null){
-            return false;
-        }
-        Grupo g = em.find(Grupo.class, "appMovil");
-        if (g == null) {
-            throw new RuntimeException("Grupo no existe");
+            throw new ClienteInvalidoException("Cliente no puede ser null");
         }
 
-        if (cliente.getGrupos() == null) {
-            cliente.setGrupos(new ArrayList<>());
-        }
-
-        cliente.getGrupos().add(g);
 
         clientes.add(cliente);
         em.persist(cliente);
-        return true;
+
+    }
+
+    public Grupo findGroup(String grupo){
+        return em.find(Grupo.class, grupo);
     }
     @Override
     public boolean actualizar(Cliente cliente) {
@@ -76,10 +73,8 @@ public class ClienteRepositorioImpl implements ClienteRepositorio {
         if(reclamo == null){
             return false;
         }
-
-            reclamo.getCliente().getReclamos().add(reclamo);
-            em.persist(reclamo);
-            //em.persist(reclamo.getCliente());
+        em.persist(reclamo);
+        //em.persist(reclamo.getCliente());
 
         return true;
     }
