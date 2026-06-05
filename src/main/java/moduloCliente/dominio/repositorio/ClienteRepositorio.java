@@ -8,7 +8,8 @@ import java.util.List;
 public interface ClienteRepositorio {
     boolean registrar(Cliente cliente);
     boolean actualizar(Cliente cliente);
-    Cliente buscarPorCedula(String cedula);
-    List<Cliente> obtenerTodos();
-    Reclamos hacerReclamo(String asunto,String descripcion,String ci);
+    Cliente buscarCliente(String cedula);
+    List<Cliente> allcliente();
+    boolean saveReclamo(Reclamo reclamo);
+    
 }

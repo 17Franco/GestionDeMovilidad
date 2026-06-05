@@ -31,11 +31,14 @@ public abstract class Cliente {
         this.numTel = numTel;
         this.contra = contra;
     }
-    //carga actual, (la ultima carga del historial)
-    Carga cargaActual;
-    //cada cliente tiene un historial de cargas asociado
-    //@OneToMany
-    HistorialDeCargas historialAsociado;
+   // carga actual del cliente
+    @OneToOne
+    @JoinColumn(name = "carga_actual_id")
+    private Carga cargaActual;
+
+    // cada cliente tiene un historial de cargas asociado
+    @OneToOne(mappedBy = "clienteAsociado", cascade = CascadeType.ALL)
+    private HistorialDeCargas historialAsociado;
 
     //cuando este la bd implementada en ves de pedirle al cliente su
     //carga se lo pido al manejador de persistencia pasandole
