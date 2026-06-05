@@ -9,9 +9,12 @@ import moduloCarga.aplicacion.ServicioCarga;
 import moduloCarga.dominio.Cargador;
 import moduloCarga.dominio.EstacionCarga;
 
+import moduloCarga.interfaz.remota.rest.EstacionDTO;
+import moduloCarga.interfaz.remota.rest.CargadorDTO;
+
 @ApplicationScoped
 @Path("/carga")
-public class ModuloCargaApi {
+public class ModuloCargaRestApi {
 
     @Inject
     private ServicioCarga servicioCarga;
