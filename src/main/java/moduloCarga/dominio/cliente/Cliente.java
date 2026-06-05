@@ -7,6 +7,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import moduloCarga.dominio.Carga;
 import moduloCarga.dominio.HistorialDeCargas;
+import moduloCarga.dominio.medioPago.Tarjeta;
+
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -18,11 +23,13 @@ import moduloCarga.dominio.HistorialDeCargas;
 public abstract class Cliente {
     @Id
     private String cedula;
-
     private String nombre;
     private String apellido;
     private String numTel;
     private String contra;
+
+    @OneToMany(mappedBy = "cliente")
+    private List<Tarjeta> tarjetas = new ArrayList<>();
 
     public Cliente(String cedula, String nombre, String apellido,String numTel, String contra) {
         this.cedula = cedula;
@@ -31,6 +38,7 @@ public abstract class Cliente {
         this.numTel = numTel;
         this.contra = contra;
     }
+  
    // carga actual del cliente
     @OneToOne
     @JoinColumn(name = "carga_actual_id")
@@ -39,11 +47,6 @@ public abstract class Cliente {
     // cada cliente tiene un historial de cargas asociado
     @OneToOne(mappedBy = "clienteAsociado", cascade = CascadeType.ALL)
     private HistorialDeCargas historialAsociado;
-
-    //cuando este la bd implementada en ves de pedirle al cliente su
-    //carga se lo pido al manejador de persistencia pasandole
-    //cliente y que me de su clave asociada
-
 
     
 }

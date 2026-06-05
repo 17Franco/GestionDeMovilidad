@@ -1,5 +1,9 @@
 package moduloCarga.dominio;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +31,7 @@ public class Cargador {
     
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo_cargador", nullable = false)
+
     private TipoCargador tipo;
 
     @Column(name = "tiene_cable", nullable = false)

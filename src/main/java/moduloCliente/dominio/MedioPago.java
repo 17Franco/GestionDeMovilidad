@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import moduloCliente.dominio.cliente.Cliente;
 
 import java.time.LocalDate;
 
@@ -18,7 +19,6 @@ import java.time.LocalDate;
 public abstract class MedioPago {
     @Id
     private int id;
-    private String ciCli; //relacionamos el medioPagoCon el cliente
     private LocalDate fechaCreacion;
 
 }

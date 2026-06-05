@@ -1,10 +1,12 @@
 package moduloCliente.dominio;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import moduloCliente.dominio.cliente.ClienteComun;
 
 @Entity
 @Getter
@@ -13,4 +15,7 @@ import lombok.Setter;
 @Table(name = "MCliente_CuentUte")
 public class CuentaUTE extends MedioPago {
     private String numeroCuenta;
+
+    @OneToOne(mappedBy = "formaPago")
+    private ClienteComun cliente;
 }

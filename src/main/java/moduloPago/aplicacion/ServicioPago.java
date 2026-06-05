@@ -1,13 +1,13 @@
 package moduloPago.aplicacion;
 
-import moduloCliente.dominio.MedioPago;
-import moduloCliente.dominio.cliente.Cliente;
+import moduloPago.dominio.pagoRealizado;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public interface ServicioPago {
 
-    void pagarCarga(Cliente cliente, float importe, MedioPago medioPago);
+    void pagarCarga(String cedulaCliente, int idCarga, float importe, String medioPago);
 
-    void consultarPagos(Cliente cliente, LocalDate fechaIni, LocalDate fechaFin);
+    List<pagoRealizado> consultarPagos(String cedulaCliente, LocalDate fechaIni, LocalDate fechaFin);
 }
