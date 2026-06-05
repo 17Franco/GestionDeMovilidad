@@ -11,4 +11,4 @@ public interface ClienteRepositorio {
     Cliente buscarCliente(String cedula);
     List<Cliente> allcliente();
     boolean saveReclamo(Reclamo reclamo);
-}
+
