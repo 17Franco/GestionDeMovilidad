@@ -8,7 +8,6 @@ import jakarta.security.enterprise.credential.Credential;
 import jakarta.security.enterprise.credential.UsernamePasswordCredential;
 import jakarta.security.enterprise.identitystore.CredentialValidationResult;
 import jakarta.security.enterprise.identitystore.IdentityStore;
-import moduloCliente.dominio.cliente.Cliente;
 import moduloCliente.dominio.repositorio.ClienteRepositorio;
 
 @ApplicationScoped
@@ -26,7 +25,7 @@ public class ValidadorCredenciales implements IdentityStore {
         String pass = credencial.getPasswordAsString(); //y su pass
 
         //ahora llamo a repo
-        Cliente cliente = repo.buscarCliente(usr);
+        moduloCliente.dominio.cliente.Cliente cliente = repo.buscarCliente(usr);
         System.out.println(usr);
         if(cliente != null){
             //si existe compruebo contrasenia

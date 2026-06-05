@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import moduloCliente.dominio.cliente.Cliente;
 
 import java.time.LocalDate;
 

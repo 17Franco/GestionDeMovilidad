@@ -4,12 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import moduloCliente.dominio.MedioPago;
-import moduloCliente.dominio.Tarjeta;
 import moduloCliente.dominio.TipoProfesional;
 
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter

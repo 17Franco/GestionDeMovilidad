@@ -5,7 +5,6 @@ import moduloCarga.aplicacion.impl.ServicioCargaImpl;
 import moduloCarga.dominio.EstadoCarga;
 import moduloCarga.dominio.cliente.Cliente;
 import moduloCarga.dominio.cliente.ClienteComun;
-import moduloCarga.dominio.medioPago.CuentaUTE;
 import moduloCarga.dominio.medioPago.MedioPago;
 import moduloCarga.dominio.medioPago.Tarjeta;
 

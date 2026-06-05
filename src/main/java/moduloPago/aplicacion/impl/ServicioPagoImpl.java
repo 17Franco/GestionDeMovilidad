@@ -7,7 +7,6 @@ import moduloPago.dominio.pagoRealizado;
 import moduloPago.dominio.repositorio.RepoPago;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @ApplicationScoped

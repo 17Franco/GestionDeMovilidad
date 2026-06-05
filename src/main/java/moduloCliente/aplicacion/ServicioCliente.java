@@ -11,7 +11,7 @@ public interface ServicioCliente {
     //y persistimos
     boolean registrarCliente(Cliente cliente);
     boolean altaMedioPago(String ci, MedioPago formaPago);
-    void obtenerClientes();
+    List<Cliente> obtenerClientes();
     Reclamo realizarReclamo(String asunto, String descripcion, String ci);
     List<Reclamo> obtenerReclamos(String ci);
 }

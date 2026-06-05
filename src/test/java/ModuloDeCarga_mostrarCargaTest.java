@@ -2,7 +2,6 @@ import jakarta.inject.Inject;
 
 import moduloCarga.aplicacion.ServicioCarga;
 import moduloCarga.aplicacion.impl.ServicioCargaImpl;
-import moduloCarga.dominio.Carga;
 import moduloCarga.dominio.cliente.Cliente;
 import moduloCarga.dominio.cliente.ClienteComun;
 import moduloCarga.dominio.medioPago.MedioPago;

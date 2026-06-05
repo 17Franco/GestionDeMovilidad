@@ -4,7 +4,6 @@ package moduloCliente.interfaz.evento.out;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import moduloCarga.dominio.cliente.TipoProfesional;
 
 @Getter
 @Setter

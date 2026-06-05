@@ -37,8 +37,8 @@ public class ModuloCargaApi {
 
         Cargador cargador = new Cargador();
 
-        cargador.setTieneCable(cargadorDTO.isTieneCable());
-        cargador.setPotenciaMinima(cargadorDTO.getPotenciaMinima());
+        //cargador.setTieneCable(cargadorDTO.isTieneCable());
+        //cargador.setPotenciaMinima(cargadorDTO.getPotenciaMinima());
 
         servicioCarga.altaCargador(cargador);
     }

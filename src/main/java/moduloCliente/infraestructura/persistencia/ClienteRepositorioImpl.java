@@ -67,7 +67,7 @@ public class ClienteRepositorioImpl implements ClienteRepositorio {
 
     @Override
     public List<Cliente> allcliente() {
-        return new ArrayList<>(clientes);
+            return em.createQuery("SELECT c FROM Cliente c", Cliente.class).getResultList();
     }
 
     @Override

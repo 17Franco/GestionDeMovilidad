@@ -20,7 +20,6 @@ import moduloCarga.dominio.HistorialDeCargas;
 import moduloCarga.dominio.cliente.Cliente;
 import moduloCarga.dominio.medioPago.MedioPago;
 import moduloCarga.dominio.repositorio.RepoCarga;
-import moduloCliente.dominio.cliente.ClienteComun;
 
 @ApplicationScoped
 public class ServicioCargaImpl implements ServicioCarga {

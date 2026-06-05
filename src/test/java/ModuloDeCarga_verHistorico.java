@@ -2,7 +2,6 @@ import jakarta.inject.Inject;
 
 import moduloCarga.aplicacion.ServicioCarga;
 import moduloCarga.aplicacion.impl.ServicioCargaImpl;
-import moduloCarga.dominio.Carga;
 import moduloCarga.dominio.cliente.Cliente;
 import moduloCarga.dominio.cliente.ClienteComun;
 import moduloCarga.dominio.medioPago.CuentaUTE;
@@ -12,8 +11,6 @@ import CargadorMock.aplicacion.Impl.CargadorInterfaceMOCKImpl;
 import moduloCarga.infraestructura.persistencia.CargaRepoImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
-
-import java.time.LocalDate;
 
 import org.jboss.weld.junit5.auto.AddPackages;
 import org.jboss.weld.junit5.auto.EnableAutoWeld;

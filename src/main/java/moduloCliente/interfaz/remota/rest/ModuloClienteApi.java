@@ -12,6 +12,9 @@ import jakarta.ws.rs.core.SecurityContext;
 import moduloCliente.aplicacion.ServicioCliente;
 import moduloCliente.dominio.Reclamo;
 import moduloCliente.dominio.cliente.Cliente;
+import moduloCliente.dominio.cliente.ClienteProfesional;
+import java.util.ArrayList;
+import java.util.List;
 // URL http://localhost:8080/GestionDeMovilidad/movilidad/clientes
 /*JSON*/
 //clienteComun
@@ -134,11 +137,39 @@ public class ModuloClienteApi {
         }
     }
 
-   /* @GET
+    @GET
+    @PermitAll
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Cliente> verClientes(){
-        return servicioCliente.obtenerClientes();
+    @Path("/obtener")
+    public Response obtenerClientes(){
+        try{
+            List<Cliente> clientes = servicioCliente.obtenerClientes();
+            List<ClienteDTO> clientesDTO = new ArrayList<>();
+            for(Cliente c : clientes){
+                ClienteDTO dto = new ClienteDTO();
+                dto.setCedula(c.getCedula());
+                dto.setNombre(c.getNombre());
+                dto.setApellido(c.getApellido());
+                dto.setNumTel(c.getNumTel());
+                // no devolvemos la contraseña
+                dto.setContra(null);
+                if(c instanceof ClienteProfesional){
+                    dto.setTipoCliente("PROFESIONAL");
+                    ClienteProfesional cp = (ClienteProfesional) c;
+                    dto.setTipoProfesional(cp.getTipo());
+                    dto.setPorcentajeDescuento(cp.getPorcentajeDescuento());
+                } else {
+                    dto.setTipoCliente("COMUN");
+                }
+                clientesDTO.add(dto);
+            }
+            return Response.ok(clientesDTO).build();
+        }catch (Exception e){
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("{\"error\":\"Error interno: " + e.getMessage() + "\"}")
+                    .build();
+        }
     }
-    */
+    
 
 }
