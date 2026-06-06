@@ -18,7 +18,6 @@ public class ModuloCargaApi {
 
     @Inject
     private ServicioCarga servicioCarga;
-
     @POST
     @Path("/estacion")
     @Produces(MediaType.APPLICATION_JSON)
@@ -33,7 +32,6 @@ public class ModuloCargaApi {
         estacion.setDepartamento(estacionDTO.getDepartamento());
         estacion.setLongitud(estacionDTO.getLongitud());
         estacion.setLatitud(estacionDTO.getLatitud());
-
         servicioCarga.altaEstacion(estacion);
 
         return Response.ok("{\"mensaje\":\"Estacion creada\"}").build();
