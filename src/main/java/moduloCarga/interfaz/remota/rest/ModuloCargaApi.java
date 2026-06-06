@@ -1,5 +1,4 @@
 package moduloCarga.interfaz.remota.rest;
-
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.POST;
@@ -7,7 +6,6 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-
 import moduloCarga.aplicacion.ServicioCarga;
 import moduloCarga.dominio.Cargador;
 import moduloCarga.dominio.EstacionCarga;
