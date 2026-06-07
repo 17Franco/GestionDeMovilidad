@@ -46,7 +46,7 @@ public class ModuloDeCarga_iniciarCargaTest {
 	@Test
     void test(){
         cargarDatosTest();
-        servicioCargaImpl.iniciarCarga(clientePrueba, medioPago);
+        servicioCargaImpl.iniciarCarga(clientePrueba, medioPago, 2);
         System.out.print("El cliente " + clientePrueba.getNombre() + " " + clientePrueba.getApellido() +
             " inició una carga" + "\n" + "Realizó el pago con " + medioPago + "\n");
         if (clientePrueba.getCargaActual().getEstado() == EstadoCarga.ENPROGRESO){

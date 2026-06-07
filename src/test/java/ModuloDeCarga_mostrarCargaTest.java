@@ -40,7 +40,7 @@ public class ModuloDeCarga_mostrarCargaTest {
         //2: creo el medio de pago
         MedioPago tarjeta = new Tarjeta();
         //3: creo una carga de prueba
-        servicioCargaImpl.iniciarCarga(clientePrueba, tarjeta);
+        servicioCargaImpl.iniciarCarga(clientePrueba, tarjeta, 2);
         //3: traigo la carga utilizando la interface
         servicioCargaImpl.verCargaActual(clientePrueba);
     }

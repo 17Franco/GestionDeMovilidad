@@ -36,5 +36,5 @@ public interface RepoCarga {
 
     Tarjeta buscarTarjetaClienteCI(String CedulaCliente, String numeroTarjeta);
     Cargador getCargador(Integer idCargador);
-
+    HistorialDeCargas buscarHistorialPorCedula(String cedula);
 }

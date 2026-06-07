@@ -43,9 +43,9 @@ public class ModuloDeCarga_verHistorico {
         MedioPago tarjeta = new Tarjeta();
         MedioPago cuentaUTE = new CuentaUTE();
         //3: creo una carga de prueba
-        servicioCargaImpl.iniciarCarga(clientePrueba, tarjeta);
-        servicioCargaImpl.iniciarCarga(clientePrueba, cuentaUTE);
-        servicioCargaImpl.iniciarCarga(clientePrueba, tarjeta);
+        servicioCargaImpl.iniciarCarga(clientePrueba, tarjeta,2);
+        servicioCargaImpl.iniciarCarga(clientePrueba, cuentaUTE,2);
+        servicioCargaImpl.iniciarCarga(clientePrueba, tarjeta,2);
         //5: muestro la carga usando la interface
         String fechaInicio = "2026-05-01";
         String fechaFin = "2026-05-31"; 

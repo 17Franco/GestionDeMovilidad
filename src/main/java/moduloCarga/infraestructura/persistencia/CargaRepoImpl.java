@@ -171,4 +171,24 @@ public Cliente buscarPorCedula(String cedula) {
 
         return em.find(Cargador.class, idCargador);
     }
+
+
+    
+    @Override
+    public HistorialDeCargas buscarHistorialPorCedula(String cedula) {
+        List<HistorialDeCargas> resultado = em.createQuery(
+                "SELECT DISTINCT h FROM HistorialDeCargas h " +
+                "LEFT JOIN FETCH h.historialCargas " +
+                "WHERE h.clienteAsociado.cedula = :cedula",
+                HistorialDeCargas.class
+        )
+        .setParameter("cedula", cedula)
+        .getResultList();
+
+        if (resultado.isEmpty()) {
+            return null;
+        }
+
+        return resultado.get(0);
+    }
 }

@@ -134,6 +134,14 @@
             <version>3.5.3.Final</version>
             <scope>provided</scope>
         </dependency>
+        <!--
+            Bucket4j, para el rate limiter
+        -->
+        <dependency>
+            <groupId>com.bucket4j</groupId>
+            <artifactId>bucket4j-core</artifactId>
+            <version>8.10.1</version>
+        </dependency>
     </dependencies>
 
     <build>

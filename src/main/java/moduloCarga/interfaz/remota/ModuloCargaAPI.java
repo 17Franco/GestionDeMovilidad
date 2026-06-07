@@ -1,5 +1,9 @@
 package moduloCarga.interfaz.remota;
 
+import java.util.ArrayList;
+import java.util.List;
+
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.Produces;
 import jakarta.inject.Inject;
@@ -12,13 +16,15 @@ import jakarta.ws.rs.core.Response;
 import moduloCarga.aplicacion.ServicioCarga;
 import moduloCarga.dominio.Carga;
 import moduloCarga.dominio.Cargador;
+import moduloCarga.dominio.ElementoHistorial;
+import moduloCarga.dominio.HistorialDeCargas;
 import moduloCarga.dominio.cliente.Cliente;
 import moduloCarga.dominio.cliente.ClienteComun;
 import moduloCarga.dominio.cliente.ClienteProfesional;
-import moduloCarga.dominio.medioPago.CuentaUTE;
-import moduloCarga.dominio.medioPago.MedioPago;
+
 import moduloCarga.dominio.medioPago.Tarjeta;
 import moduloCarga.dominio.repositorio.RepoCarga;
+
 
 
 
@@ -39,9 +45,7 @@ public class ModuloCargaAPI {
         return numeroTarjeta !=null && numeroTarjeta.matches("\\d{8}");
     }
     
-    
-    //MANDAR EL ID DEL CARGADOOOOOOR
-    //CONTROLAR ESOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+
     /*
        el JSON para tarjeta sería:
         head-> http://localhost:8080/GestionDeMovilidad/movilidad/cargas/iniciar
@@ -62,17 +66,6 @@ public class ModuloCargaAPI {
         "metodoPago": "CUENTA_UTE"
         }
     */
-
-    @GET
-    @Path("/info")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response obtenerInfo(){
-        return Response
-                .status(Response.Status.OK)
-                .entity("{\"Para usar la URL 'http://localhost:8080/GestionDeMovilidad/movilidad/cargas/iniciar' \":\"\"}")
-                .build();
-    }
 
     /*
     -Como requisito debes tener:
@@ -239,32 +232,57 @@ public class ModuloCargaAPI {
     }
 
 
-
     
-    
-    @GET
+   
+    @POST
     @Path("verHistorial")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response verHistorialCliente(verHistorialClienteDatos datos){
         String cedulaCliente = datos.getCedulaCliente();
 
+        //Verifico que me llegue una cedula en el formato adecuado
         if (!verificarFormatoCedula(cedulaCliente)){
             return Response
                     .status(Response.Status.BAD_REQUEST)
                     .entity("{\"error\":\"El formato de cedula enviado no es correcto, el formato esperado es '1234567-8'" + "\"}")
                     .build();
         }
-        else{
+        //Verifico que el cliente exista
+        Cliente clienteBuscado = repoCarga.buscarPorCedula(cedulaCliente);
+        if(clienteBuscado == null){
             return Response
-                    .status(Response.Status.BAD_REQUEST)
-                    .entity("{\"error\":\"El formato de cedula enviado no es correcto, el formato esperado es '1234567-8'" + "\"}")
+            .status(Response.Status.NOT_FOUND)
+            .entity("{\"error\":\"El cliente solicitado no existe" + "\"}")
+            .build();
+        }
+        
+        //Verifico que el Historial exista
+        HistorialDeCargas historialBuscado = repoCarga.buscarHistorialPorCedula(cedulaCliente);
+        if (historialBuscado == null || historialBuscado.getHistorialCargas().isEmpty()) {
+            return Response
+                    .status(Response.Status.OK)
+                    .entity("{\"mensaje\":\"El cliente no tiene cargas en el historial\"}")
                     .build();
         }
-    
-    
+        
+        //uso esta lista para poder mostrar el historial como JSON
+        List<ElementoHistorialDTO> historialDTO = new ArrayList<>();
+        //esta lista es la lista de elemento de historial dentro del hisotiral
+        List<ElementoHistorial> listaDeCargas = historialBuscado.getHistorialCargas();
+        for (ElementoHistorial elemento : listaDeCargas) {
+            historialDTO.add(new ElementoHistorialDTO(elemento));
+        }
+       
+
+        return Response
+            .status(Response.Status.OK)
+            .entity(historialDTO)
+            .build();
     
     }
+    
+    
 
 
 

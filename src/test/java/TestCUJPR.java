@@ -52,7 +52,7 @@ public class TestCUJPR {
         cargarDatosTest();
 
         // inicia una carga
-        servicioCargaImpl.iniciarCarga(cliente, medioPago);
+        servicioCargaImpl.iniciarCarga(cliente, medioPago,2);
 
         // obtiene la carga actual
         Carga carga = cliente.getCargaActual();
