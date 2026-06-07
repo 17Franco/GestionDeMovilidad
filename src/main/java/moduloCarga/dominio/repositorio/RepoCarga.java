@@ -7,6 +7,8 @@ import moduloCarga.dominio.ElementoHistorial;
 import moduloCarga.dominio.EstacionCarga;
 import moduloCarga.dominio.HistorialDeCargas;
 import moduloCarga.dominio.cliente.Cliente;
+import moduloCarga.dominio.medioPago.Tarjeta;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,5 +33,8 @@ public interface RepoCarga {
     void persistirOActualizarHistorial(HistorialDeCargas historial);
     void persistirElementoHistorial(ElementoHistorial elemento);
     void ActualizarCliente(Cliente cli);
+
+    Tarjeta buscarTarjetaClienteCI(String CedulaCliente, String numeroTarjeta);
+    Cargador getCargador(Integer idCargador);
 
 }

@@ -1,4 +1,4 @@
-package CargadorMock.aplicacion.DTOs;
+package FuncionalidadCargadorMOCK.aplicacion.DTOs;
 
 public enum DTOEstadoCarga {
     TERMINADO,

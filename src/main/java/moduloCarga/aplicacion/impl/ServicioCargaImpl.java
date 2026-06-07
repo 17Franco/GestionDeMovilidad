@@ -5,9 +5,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import CargadorMock.aplicacion.CargadorInterfaceMOCK;
-//puedo importar los DTO del Cargador y sigue estando desacoplado porque es una respuesta de la interface
-import CargadorMock.aplicacion.DTOs.*;
+import FuncionalidadCargadorMOCK.aplicacion.FuncionalidadCargadorInterfaceMOCK;
+import FuncionalidadCargadorMOCK.aplicacion.DTOs.*;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import moduloCarga.aplicacion.ServicioCarga;
@@ -29,7 +28,7 @@ public class ServicioCargaImpl implements ServicioCarga {
     private RepoCarga repo;
 
     @Inject
-    private CargadorInterfaceMOCK cargadorMock;
+    private FuncionalidadCargadorInterfaceMOCK cargadorMock;
     
     //esta funcion es para convertir el dtoEstado en un estado valido en el modulo de carga
     //aunque es lo mismo realmente el package es distinto asi que esperar cosas "distintas"
@@ -57,45 +56,49 @@ public class ServicioCargaImpl implements ServicioCarga {
         
         return cargaNueva;
     }
-   @Override
-public void iniciarCarga(Cliente cli, MedioPago formaPago) {
-    DTOCarga dtoCarga = cargadorMock.iniciarCarga();
+    @Override
+    public void iniciarCarga(Cliente cli, MedioPago formaPago, Integer idCargador) {
+        DTOCarga dtoCarga = cargadorMock.iniciarCarga();
 
-    // 1. Creo la carga
-    Carga cargaNueva = convertirDTOCarga_a_Carga(dtoCarga);
+        // 1. Creo la carga
+        Carga cargaNueva = convertirDTOCarga_a_Carga(dtoCarga);
 
-    // 2. Asocio la carga al cliente
-    cargaNueva.setClienteAsociado(cli);
+        // 2. Asocio la carga al cliente
+        cargaNueva.setClienteAsociado(cli);
 
-    // 3. La carga pasa a ser la actual del cliente
-    cli.setCargaActual(cargaNueva);
+        //3. Asocio el Cargador que me paso por id al cliente (no lo controlo porque eso lo hago en la API)
+        Cargador cargador = repo.getCargador(idCargador);
+        cargaNueva.setCargador(cargador);
 
-    // 4. Busco historial
-    HistorialDeCargas historial = cli.getHistorialAsociado();
+        // 4. La carga pasa a ser la actual del cliente
+        cli.setCargaActual(cargaNueva);
 
-    // 5. Si no existe, lo creo
-    if (historial == null) {
-        historial = new HistorialDeCargas();
-        historial.setClienteAsociado(cli);
-        cli.setHistorialAsociado(historial);
-    }
+        // 5. Busco historial
+        HistorialDeCargas historial = cli.getHistorialAsociado();
 
-    // 6. Creo elemento historial
-    ElementoHistorial elemento = new ElementoHistorial();
+        // 6. Si no existe, lo creo
+        if (historial == null) {
+            historial = new HistorialDeCargas();
+            historial.setClienteAsociado(cli);
+            cli.setHistorialAsociado(historial);
+        }
 
-    // 7. Asocio carga, medio de pago e historial
-    elemento.setCarga(cargaNueva);
-    elemento.setMedioPago(formaPago);
-    elemento.setHistorialAsociado(historial);
+        // 7. Creo elemento historial
+        ElementoHistorial elemento = new ElementoHistorial();
 
-    // 8. Agrego el elemento al historial
-    historial.getHistorialCargas().add(elemento);
+        // 8. Asocio carga, medio de pago e historial
+        elemento.setCarga(cargaNueva);
+        elemento.setMedioPago(formaPago);
+        elemento.setHistorialAsociado(historial);
 
-    // 9. Persisto
-    repo.persistirCarga(cargaNueva);
-    repo.persistirOActualizarHistorial(historial);
-    repo.persistirElementoHistorial(elemento);
-    repo.ActualizarCliente(cli);//me acavki de dar cuenta que esto tiene que se actualizar unicamente, no persisitir, sino creo un usuario nuevo al iniciar una carga si lo hace un usuario sin registrar
+        // 9. Agrego el elemento al historial
+        historial.getHistorialCargas().add(elemento);
+
+        // 10. Persisto
+        repo.persistirCarga(cargaNueva);
+        repo.persistirOActualizarHistorial(historial);
+        repo.persistirElementoHistorial(elemento);
+        repo.ActualizarCliente(cli);//me acavki de dar cuenta que esto tiene que se actualizar unicamente, no persisitir, sino creo un usuario nuevo al iniciar una carga si lo hace un usuario sin registrar
 }
 
 

@@ -1,4 +1,3 @@
-import CargadorMock.aplicacion.Impl.CargadorInterfaceMOCKImpl;
 import jakarta.inject.Inject;
 import moduloCarga.aplicacion.ServicioCarga;
 import moduloCarga.aplicacion.impl.ServicioCargaImpl;
@@ -16,6 +15,8 @@ import org.jboss.weld.junit5.auto.EnableAutoWeld;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import FuncionalidadCargadorMOCK.aplicacion.Impl.FuncionalidadCargadorInterfaceMOCKImpl;
+
 @EnableAutoWeld
 @AddPackages({
         ServicioClienteImpl.class,
@@ -24,7 +25,7 @@ import org.junit.jupiter.api.Test;
         CargaRepoImpl.class,
         ObserverModuloCarga.class,
         ServicioCarga.class,
-        CargadorInterfaceMOCKImpl.class,
+        FuncionalidadCargadorInterfaceMOCKImpl.class,
 })
 public class TestModuloCliente {
     @Inject

@@ -1,8 +1,6 @@
 package moduloCarga.aplicacion;
 
-//importo la respuesta de la interface Cargador
-import CargadorMock.aplicacion.DTOs.*;
-
+import FuncionalidadCargadorMOCK.aplicacion.DTOs.*;
 import moduloCarga.dominio.Carga;
 import moduloCarga.dominio.Cargador;
 import moduloCarga.dominio.EstacionCarga;
@@ -15,7 +13,7 @@ public interface ServicioCarga {
     //para probar nomas
     void obtenerClientes();
 
-    void iniciarCarga(Cliente cli, MedioPago formaPago);
+    void iniciarCarga(Cliente cli, MedioPago formaPago , Integer idCargador);
 
     void verCargaActual(Cliente cli);      //no estoy seguro si mosrar por consola directo con un void o traer la carga y mostrarla en el test, la letra no especifica
 

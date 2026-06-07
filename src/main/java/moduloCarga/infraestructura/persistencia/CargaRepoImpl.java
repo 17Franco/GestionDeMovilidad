@@ -13,6 +13,7 @@ import moduloCarga.dominio.HistorialDeCargas;
 import moduloCarga.dominio.cliente.Cliente;
 import moduloCarga.dominio.cliente.ClienteComun;
 import moduloCarga.dominio.cliente.ClienteProfesional;
+import moduloCarga.dominio.medioPago.Tarjeta;
 import moduloCarga.dominio.repositorio.RepoCarga;
 
 import java.util.List;
@@ -118,12 +119,56 @@ public Cliente buscarPorCedula(String cedula) {
     @Override
     @Transactional
     public void persistirElementoHistorial(ElementoHistorial elemento) {
-        em.persist(elemento);
+        em.merge(elemento);
     }
 
     @Override
     @Transactional
     public void ActualizarCliente(Cliente cli) {
         em.merge(cli);
+    }
+
+
+    @Override
+    public Tarjeta buscarTarjetaClienteCI(String cedulaCliente, String numeroTarjeta) {
+
+        if (cedulaCliente == null || cedulaCliente.isBlank()) {
+            return null;
+        }
+
+        if (numeroTarjeta == null || !numeroTarjeta.matches("\\d{8}")) {
+            return null;
+        }
+
+        Cliente clienteAux = this.buscarPorCedula(cedulaCliente);
+
+        if (clienteAux == null) {
+            return null;
+        }
+
+        List<Tarjeta> tarjetas = em.createQuery(
+                "SELECT t FROM Tarjeta_Carga t " +
+                "WHERE t.cliente = :cliente " +
+                "AND t.numero = :numero",
+                Tarjeta.class
+        )
+        .setParameter("cliente", clienteAux)
+        .setParameter("numero", numeroTarjeta)
+        .getResultList();
+
+        if (tarjetas.isEmpty()) {
+            return null;
+        }
+
+        return tarjetas.get(0); //retorno el 0 porque es la primera que encuentro que es la que cumple la conficion, y es la unica ya que el numero de tarjeta es unico
+    }
+
+    @Override
+    public Cargador getCargador(Integer idCargador) {
+        if (idCargador == null) {
+            return null;
+        }
+
+        return em.find(Cargador.class, idCargador);
     }
 }

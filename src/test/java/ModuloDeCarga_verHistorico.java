@@ -8,9 +8,11 @@ import moduloCarga.dominio.cliente.ClienteComun;
 import moduloCarga.dominio.medioPago.CuentaUTE;
 import moduloCarga.dominio.medioPago.MedioPago;
 import moduloCarga.dominio.medioPago.Tarjeta;
-import CargadorMock.aplicacion.Impl.CargadorInterfaceMOCKImpl;
 import moduloCarga.infraestructura.persistencia.CargaRepoImpl;
 import org.junit.jupiter.api.Test;
+
+import FuncionalidadCargadorMOCK.aplicacion.Impl.FuncionalidadCargadorInterfaceMOCKImpl;
+
 import org.junit.jupiter.api.DisplayName;
 
 import java.time.LocalDate;
@@ -22,7 +24,7 @@ import org.jboss.weld.junit5.auto.EnableAutoWeld;
 @EnableAutoWeld
 @AddPackages({
     ServicioCargaImpl.class,
-    CargadorInterfaceMOCKImpl.class,
+    FuncionalidadCargadorInterfaceMOCKImpl.class,
     CargaRepoImpl.class
 })
 public class ModuloDeCarga_verHistorico {

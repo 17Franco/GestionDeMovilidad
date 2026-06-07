@@ -8,10 +8,10 @@ import moduloCarga.dominio.EstacionCarga;
 
 import moduloCarga.infraestructura.persistencia.CargaRepoImpl;
 
-import CargadorMock.aplicacion.Impl.CargadorInterfaceMOCKImpl;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import FuncionalidadCargadorMOCK.aplicacion.Impl.FuncionalidadCargadorInterfaceMOCKImpl;
 
 import org.jboss.weld.junit5.auto.AddPackages;
 import org.jboss.weld.junit5.auto.EnableAutoWeld;
@@ -20,7 +20,7 @@ import org.jboss.weld.junit5.auto.EnableAutoWeld;
 @AddPackages({
         ServicioCargaImpl.class,
         CargaRepoImpl.class,
-        CargadorInterfaceMOCKImpl.class
+        FuncionalidadCargadorInterfaceMOCKImpl.class
 })
 public class AltaCargaTest {
 
