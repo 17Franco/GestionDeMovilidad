@@ -11,21 +11,24 @@ import moduloCarga.dominio.medioPago.Tarjeta;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public interface RepoCarga {
   
-    void guardarEstacion(EstacionCarga estacion);
-    void guardarCargador(Cargador cargador);
+    //void guardarEstacion(EstacionCarga estacion);
+    //void guardarCargador(Cargador cargador);
 
     void registrarEstacion(EstacionCarga estacion);
 
     void registrarCargador(Cargador cargador);
 
+    EstacionCarga buscarEstacionPorId(int estacionId);
+
     List<EstacionCarga> obtenerEstaciones();
 
     Cliente buscarPorCedula(String cedula);
 
-    List<Cliente> obtenerTodos();
+    boolean actualizar(Cliente cliente);
 
     boolean registrarCliente(Cliente cli);
 

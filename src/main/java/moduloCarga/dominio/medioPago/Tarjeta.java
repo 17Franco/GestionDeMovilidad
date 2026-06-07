@@ -23,7 +23,6 @@ public class Tarjeta extends MedioPago {
 
     @Column(name="digitoVerificadocion")
     private String digitoVerificacion;
-
     @Enumerated(EnumType.STRING)
     private TipoTarjeta tipo;
 

@@ -170,11 +170,11 @@
                     <server-config>standalone-full.xml</server-config>
 
                     <commands>
+
                     <command>/subsystem=undertow/application-security-domain=other:write-attribute(name=integrated-jaspi,value=false)</command>
                     <command>reload</command>
                     </commands>
                     <add-user>
-
                         <users>
                             <user>
                                 <username>root</username>
@@ -183,12 +183,9 @@
                             </user>
                         </users>
                     </add-user>
-
                     <scripts>
-
                         <!--ver archivo config.cli que está en ./-->
                         <script>config.cli</script>
-
                     </scripts>
 
                 </configuration>

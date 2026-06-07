@@ -15,7 +15,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -24,16 +23,19 @@ import jakarta.persistence.Table;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name="MCarga_Cargadores")
+@Table(name = "MCarga_Cargadores")
+@Getter
+@Setter
+@NoArgsConstructor
 public class Cargador {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int id;
-    
+
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo_cargador", nullable = false)
-
     private TipoCargador tipo;
 
     @Column(name = "tiene_cable", nullable = false)
@@ -52,7 +54,7 @@ public class Cargador {
 
     @Column(name = "potencia_minima", nullable = false)
     private int potenciaMinima;
-    
+
     // Relación con EstacionCarga
     @ManyToOne
     @JoinColumn(name = "estacion_carga_id", nullable = false)

@@ -1,17 +1,19 @@
 package moduloCliente.aplicacion.impl;
 
+import infraestructura.seguridad.HashFunctionUtil;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import moduloCliente.aplicacion.ServicioCliente;
-import moduloCliente.dominio.CuentaUTE;
-import moduloCliente.dominio.MedioPago;
-import moduloCliente.dominio.Reclamo;
-import moduloCliente.dominio.Tarjeta;
+import moduloCliente.dominio.*;
 import moduloCliente.dominio.cliente.Cliente;
 import moduloCliente.dominio.cliente.ClienteComun;
 import moduloCliente.dominio.cliente.ClienteProfesional;
 import moduloCliente.dominio.repositorio.ClienteRepositorio;
+import moduloCliente.exepciones.ClienteInvalidoException;
+import moduloCliente.exepciones.ClienteNoExisteException;
+import moduloCliente.exepciones.ClienteYaExisteException;
+import moduloCliente.exepciones.GrupoNoExisteException;
 import moduloCliente.interfaz.evento.out.PublicadorEventoCliente;
 
 import java.util.ArrayList;
@@ -28,27 +30,34 @@ public class ServicioClienteImpl implements ServicioCliente {
 
     @Transactional // hace que todo el metodo sea una transacción
     @Override
-    public boolean registrarCliente(Cliente cliente) {
+    public void registrarCliente(Cliente cliente) {
         //verifico que el cliente que viene de la api no sea null
         if(cliente == null){
-            throw new IllegalArgumentException("Cliente no puede ser null");
+            throw new ClienteInvalidoException("Cliente no puede ser null");
         }
         //verifico que no exista ya ese cliente
         Cliente cli = repo.buscarCliente(cliente.getCedula());
         if(cli != null){
-            throw new RuntimeException("Cliente ya existe");
+            throw new ClienteYaExisteException("Cliente ya existe");
+        }
+        Grupo g = repo.findGroup("appMovil");
+        if (g == null) {
+            throw new GrupoNoExisteException("Grupo no existe");
+        }
+        if (cliente.getGrupos() == null) {
+            cliente.setGrupos(new ArrayList<>());
+        }
+        cliente.getGrupos().add(g);
+        String hash = HashFunctionUtil.convertToHas(cliente.getContra());// genero pass hasheada
+        cliente.setContra(hash);
+        repo.saveCliente(cliente);
+
+        if(cliente instanceof ClienteComun){
+            evento.publicarEventoClienteComun(cliente);
+        }else{
+            evento.publicarEventoClienteProfesional(cliente);
         }
 
-        boolean resu = repo.saveCliente(cliente);
-
-        if(resu){
-            if(cliente instanceof ClienteComun){
-                evento.publicarEventoClienteComun(cliente);
-            }else{
-                evento.publicarEventoClienteProfesional(cliente);
-            }
-        }
-        return resu;
     }
 
     public boolean altaMedioPago(String ci, MedioPago formaPago) {
@@ -66,7 +75,11 @@ public class ServicioClienteImpl implements ServicioCliente {
             if (formaPago instanceof CuentaUTE cuentaUTE) {
                 cuentaUTE.setCliente(clienteComun);
                 clienteComun.setFormaPago(cuentaUTE);
-                return repo.actualizar(clienteComun);
+                boolean resu = repo.actualizar(clienteComun);
+                if (resu){
+                    evento.publicarEventoClienteMetodoPago(cuentaUTE);
+                }
+                return resu;
             }
             return false;
         }
@@ -75,7 +88,11 @@ public class ServicioClienteImpl implements ServicioCliente {
             //cliente Profesional solo puede tener Tarjetas
             if (formaPago instanceof Tarjeta tarjeta) {
                 clienteProfesional.getTarjetas().add(tarjeta);
-                return repo.actualizar(clienteProfesional);
+                boolean resu = repo.actualizar(clienteProfesional);
+                if(resu){
+                    evento.publicarEventoClienteMetodoPago(tarjeta);
+                }
+                return resu;
             }
 
         }
@@ -97,14 +114,15 @@ public class ServicioClienteImpl implements ServicioCliente {
 
         //verifico ci si existe en el cliente
         Cliente c = repo.buscarCliente(ci);
-        Reclamo reclamo = null;
-        if(c != null){
-            //creamos reclamo y mandamos a guardar persistir
-            reclamo = new Reclamo(asunto,descripcion,c);
-            repo.saveReclamo(reclamo);
+        if( c == null){
+            throw new ClienteNoExisteException("Cliente no existe");
         }
+        Reclamo reclamo = null;
+        //creamos reclamo y mandamos a guardar persistir
+        reclamo = new Reclamo(asunto,descripcion,c);
+        c.getReclamos().add(reclamo);
+        repo.saveReclamo(reclamo);
         //llamo a repo creo el objeto reclamo y se lo asigno
-
        return  reclamo;
     }
 

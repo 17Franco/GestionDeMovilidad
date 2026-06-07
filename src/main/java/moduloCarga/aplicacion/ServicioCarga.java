@@ -8,10 +8,9 @@ import moduloCarga.dominio.cliente.Cliente;
 import moduloCarga.dominio.medioPago.MedioPago;
 
 public interface ServicioCarga {
-    boolean altaCliente(Cliente cli);
+    void altaCliente(Cliente cli);
 
-    //para probar nomas
-    void obtenerClientes();
+    boolean altaMedioPago(String ci, MedioPago formaPago);
 
     void iniciarCarga(Cliente cli, MedioPago formaPago , Integer idCargador);
 
@@ -23,7 +22,7 @@ public interface ServicioCarga {
 
     void altaEstacion(EstacionCarga datos);
 
-    void altaCargador(Cargador datos);
+    void altaCargador(int estacionId,Cargador datos);
 
     void obtenerEstaciones();
 

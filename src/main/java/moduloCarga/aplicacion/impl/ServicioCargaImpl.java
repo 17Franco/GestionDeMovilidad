@@ -17,9 +17,14 @@ import moduloCarga.dominio.EstacionCarga;
 import moduloCarga.dominio.EstadoCarga;
 import moduloCarga.dominio.HistorialDeCargas;
 import moduloCarga.dominio.cliente.Cliente;
+import moduloCarga.dominio.cliente.ClienteComun;
+import moduloCarga.dominio.cliente.ClienteProfesional;
+import moduloCarga.dominio.medioPago.CuentaUTE;
 import moduloCarga.dominio.medioPago.MedioPago;
+import moduloCarga.dominio.medioPago.Tarjeta;
 import moduloCarga.dominio.repositorio.RepoCarga;
-import moduloCliente.dominio.cliente.ClienteComun;
+
+
 
 @ApplicationScoped
 public class ServicioCargaImpl implements ServicioCarga {
@@ -160,11 +165,18 @@ public class ServicioCargaImpl implements ServicioCarga {
     }
 
     @Override
-    public void altaCargador(Cargador datos) {
-
-        if (datos != null) {
-            repo.registrarCargador(datos);
+    public void altaCargador(int estacionId,Cargador datos) {
+        if(datos == null ){
+            throw new IllegalArgumentException("El cargador no puede ser null");
         }
+        EstacionCarga estacion = repo.buscarEstacionPorId(estacionId);
+        if(estacion == null){
+            throw new IllegalArgumentException("La estacion no puede ser null");
+        }
+        datos.setEstacionCarga(estacion);
+        estacion.getCargadores().add(datos);
+        repo.registrarCargador(datos);
+
     }
 
     @Override
@@ -182,7 +194,7 @@ public class ServicioCargaImpl implements ServicioCarga {
     }
 
     @Override
-    public boolean altaCliente(Cliente cli){
+    public void altaCliente(Cliente cli){
 
         //verifico que el cliente que viene de la api no sea null
         if(cli == null){
@@ -194,22 +206,44 @@ public class ServicioCargaImpl implements ServicioCarga {
             throw new RuntimeException("Cliente ya existe");
         }
 
-        return repo.registrarCliente(cli);
+        repo.registrarCliente(cli);
 
     }
 
     @Override
-    public void obtenerClientes() {
-
-        var clientes = repo.obtenerTodos();
-
-        System.out.println("Clientes registrados Modulo Carga:");
-
-        for (Cliente cliente : clientes) {
-            System.out.printf("- %s %s %s\n",
-                    cliente.getCedula(),
-                    cliente.getNombre(),
-                    cliente.getApellido());
+    public boolean altaMedioPago(String ci, MedioPago formaPago) {
+        if (ci == null || ci.isBlank() || formaPago == null) {
+            return false;
         }
+
+        Cliente cliente = repo.buscarPorCedula(ci);
+        if (cliente == null) {
+            return false;
+        }
+
+        if (cliente instanceof ClienteComun clienteComun) {
+            //cliente comun puede tener una cuentaUte y muchas tarjetas
+            if (formaPago instanceof CuentaUTE cuentaUTE) {
+                cuentaUTE.setCliente(clienteComun);
+                clienteComun.setFormaPago(cuentaUTE);
+
+                return repo.actualizar(clienteComun);
+            }
+            return false;
+        }
+
+        if (cliente instanceof ClienteProfesional clienteProfesional) {
+            //cliente Profesional solo puede tener Tarjetas
+            if (formaPago instanceof Tarjeta tarjeta) {
+                clienteProfesional.getTarjetas().add(tarjeta);
+
+                return repo.actualizar(clienteProfesional);
+            }
+
+        }
+
+        return false;
     }
+
+
 }

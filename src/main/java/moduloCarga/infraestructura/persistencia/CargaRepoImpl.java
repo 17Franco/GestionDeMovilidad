@@ -43,7 +43,13 @@ public class CargaRepoImpl implements RepoCarga {
             em.persist(estacion);
         }
     }
-
+    @Override
+    public EstacionCarga buscarEstacionPorId(int estacionId){
+        return estaciones.stream()
+                .filter(c -> Objects.equals(c.getId(), estacionId))
+                .findFirst()
+                .orElse(null);
+    }
     @Override
     @Transactional
     public void registrarCargador(Cargador cargador) {
@@ -59,6 +65,7 @@ public class CargaRepoImpl implements RepoCarga {
                 EstacionCarga.class
         ).getResultList();
     }
+
 
     @Override
 public Cliente buscarPorCedula(String cedula) {
