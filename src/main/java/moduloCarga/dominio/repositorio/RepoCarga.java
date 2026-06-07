@@ -6,6 +6,7 @@ import moduloCarga.dominio.EstacionCarga;
 import moduloCarga.dominio.cliente.Cliente;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public interface RepoCarga {
   
@@ -20,6 +21,7 @@ public interface RepoCarga {
 
     Cliente buscarPorCedula(String cedula);
 
+    boolean actualizar(Cliente cliente);
 
     void registrarCliente(Cliente cli);
 }

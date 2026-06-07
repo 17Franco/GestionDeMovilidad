@@ -18,7 +18,6 @@ public class Tarjeta extends MedioPago {
     private String numero;
     private LocalDate fechaVencimiento;
     private String digitoVerificacion;
-
     @Enumerated(EnumType.STRING)
     private TipoTarjeta tipo;
 

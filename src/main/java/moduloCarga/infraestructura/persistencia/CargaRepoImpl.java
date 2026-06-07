@@ -10,11 +10,7 @@ import moduloCarga.dominio.repositorio.RepoCarga;
 import moduloCarga.dominio.Cargador;
 import moduloCarga.dominio.EstacionCarga;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @ApplicationScoped
 public class CargaRepoImpl implements RepoCarga {
@@ -75,5 +71,18 @@ public class CargaRepoImpl implements RepoCarga {
         em.persist(cliente);
 
 
+    }
+    @Override
+    public boolean actualizar(Cliente cliente) {
+        if (cliente == null || cliente.getCedula() == null) {
+            return false;
+        }
+        for (int i = 0; i < clientes.size(); i++) {
+            if (Objects.equals(clientes.get(i).getCedula(), cliente.getCedula())) {
+                clientes.set(i, cliente);
+                return true;
+            }
+        }
+        return false;
     }
 }
