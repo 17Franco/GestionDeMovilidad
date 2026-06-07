@@ -1,9 +1,14 @@
 package moduloCarga.dominio.repositorio;
 
 
+import moduloCarga.dominio.Carga;
 import moduloCarga.dominio.Cargador;
+import moduloCarga.dominio.ElementoHistorial;
 import moduloCarga.dominio.EstacionCarga;
+import moduloCarga.dominio.HistorialDeCargas;
 import moduloCarga.dominio.cliente.Cliente;
+import moduloCarga.dominio.medioPago.Tarjeta;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -25,5 +30,14 @@ public interface RepoCarga {
 
     boolean actualizar(Cliente cliente);
 
-    void registrarCliente(Cliente cli);
+    boolean registrarCliente(Cliente cli);
+
+    void persistirCarga(Carga cargaNueva);
+    void persistirOActualizarHistorial(HistorialDeCargas historial);
+    void persistirElementoHistorial(ElementoHistorial elemento);
+    void ActualizarCliente(Cliente cli);
+
+    Tarjeta buscarTarjetaClienteCI(String CedulaCliente, String numeroTarjeta);
+    Cargador getCargador(Integer idCargador);
+    HistorialDeCargas buscarHistorialPorCedula(String cedula);
 }

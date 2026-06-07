@@ -3,14 +3,8 @@ import jakarta.inject.Inject;
 import moduloCarga.aplicacion.ServicioCarga;
 import moduloCarga.aplicacion.impl.ServicioCargaImpl;
 
-import moduloCarga.dominio.Carga;
 import moduloCarga.dominio.Cargador;
-
-import moduloCarga.dominio.cliente.Cliente;
-import moduloCarga.dominio.cliente.ClienteComun;
-
-import moduloCarga.dominio.medioPago.MedioPago;
-import moduloCarga.dominio.medioPago.Tarjeta;
+import moduloCarga.dominio.EstacionCarga;
 
 import moduloCarga.infraestructura.persistencia.CargaRepoImpl;
 
@@ -28,40 +22,30 @@ import org.jboss.weld.junit5.auto.EnableAutoWeld;
         CargaRepoImpl.class,
         FuncionalidadCargadorInterfaceMOCKImpl.class
 })
-public class TestCUJPR {
+public class AltaCargaTest {
 
     @Inject
     ServicioCarga servicioCargaImpl;
 
-    private Cliente cliente = new ClienteComun();
-
-    private MedioPago medioPago = new Tarjeta();
+    private EstacionCarga estacion = new EstacionCarga();
 
     private Cargador cargador = new Cargador();
 
     public void cargarDatosTest() {
 
-        cliente.setNombre("Gabriel");
-        cliente.setApellido("Aramburu");
+        estacion.setDescripcion("Estacion Punta Shopping");
+        estacion.setCalle("Roosevelt");
     }
 
-    @DisplayName("Test finalizar carga")
+    @DisplayName("Test alta estacion y cargador")
     @Test
     void test() {
 
         cargarDatosTest();
 
-        // inicia una carga
-        servicioCargaImpl.iniciarCarga(cliente, medioPago,2);
+        servicioCargaImpl.altaEstacion(estacion);
 
-        // obtiene la carga actual
-        Carga carga = cliente.getCargaActual();
-
-        // finaliza la carga
-        servicioCargaImpl.finalizarCarga(cargador, carga, 100);
-
-        // muestra datos finales
-        System.out.println(carga);
+        servicioCargaImpl.altaCargador(cargador);
 
         System.out.println("Test ejecutado correctamente");
     }

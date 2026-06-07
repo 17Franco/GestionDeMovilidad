@@ -1,16 +1,16 @@
-package CargadorMock.aplicacion.Impl;
+package FuncionalidadCargadorMOCK.aplicacion.Impl;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import CargadorMock.aplicacion.CargadorInterfaceMOCK;
-import CargadorMock.aplicacion.DTOs.DTOCarga;
-import CargadorMock.aplicacion.DTOs.DTOEstadoCarga;
+import FuncionalidadCargadorMOCK.aplicacion.FuncionalidadCargadorInterfaceMOCK;
+import FuncionalidadCargadorMOCK.aplicacion.DTOs.DTOCarga;
+import FuncionalidadCargadorMOCK.aplicacion.DTOs.DTOEstadoCarga;
 import jakarta.enterprise.context.ApplicationScoped;
 
 
 @ApplicationScoped
-public class CargadorInterfaceMOCKImpl implements CargadorInterfaceMOCK{
+public class FuncionalidadCargadorInterfaceMOCKImpl implements FuncionalidadCargadorInterfaceMOCK{
     private void setContenidoCargaMock(DTOCarga cargaNueva){
         cargaNueva.setFecha(LocalDate.now());
         cargaNueva.setHoraInicio(LocalDateTime.now());

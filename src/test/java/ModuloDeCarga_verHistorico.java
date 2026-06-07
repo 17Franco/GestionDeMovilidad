@@ -8,9 +8,11 @@ import moduloCarga.dominio.cliente.ClienteComun;
 import moduloCarga.dominio.medioPago.CuentaUTE;
 import moduloCarga.dominio.medioPago.MedioPago;
 import moduloCarga.dominio.medioPago.Tarjeta;
-import CargadorMock.aplicacion.Impl.CargadorInterfaceMOCKImpl;
 import moduloCarga.infraestructura.persistencia.CargaRepoImpl;
 import org.junit.jupiter.api.Test;
+
+import FuncionalidadCargadorMOCK.aplicacion.Impl.FuncionalidadCargadorInterfaceMOCKImpl;
+
 import org.junit.jupiter.api.DisplayName;
 
 import java.time.LocalDate;
@@ -22,7 +24,7 @@ import org.jboss.weld.junit5.auto.EnableAutoWeld;
 @EnableAutoWeld
 @AddPackages({
     ServicioCargaImpl.class,
-    CargadorInterfaceMOCKImpl.class,
+    FuncionalidadCargadorInterfaceMOCKImpl.class,
     CargaRepoImpl.class
 })
 public class ModuloDeCarga_verHistorico {
@@ -41,9 +43,9 @@ public class ModuloDeCarga_verHistorico {
         MedioPago tarjeta = new Tarjeta();
         MedioPago cuentaUTE = new CuentaUTE();
         //3: creo una carga de prueba
-        servicioCargaImpl.iniciarCarga(clientePrueba, tarjeta);
-        servicioCargaImpl.iniciarCarga(clientePrueba, cuentaUTE);
-        servicioCargaImpl.iniciarCarga(clientePrueba, tarjeta);
+        servicioCargaImpl.iniciarCarga(clientePrueba, tarjeta,2);
+        servicioCargaImpl.iniciarCarga(clientePrueba, cuentaUTE,2);
+        servicioCargaImpl.iniciarCarga(clientePrueba, tarjeta,2);
         //5: muestro la carga usando la interface
         String fechaInicio = "2026-05-01";
         String fechaFin = "2026-05-31"; 

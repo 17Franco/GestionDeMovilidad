@@ -18,7 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "MCliente_Cliente")
-@Entity
+@Entity(name = "MCliente_Cliente")
 public abstract class Cliente {
     @Id
     private String cedula;

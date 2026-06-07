@@ -15,8 +15,13 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Table(name = "MCarga_Tarjeta")
 public class Tarjeta extends MedioPago {
+    @Column(name="numero")
     private String numero;
+    
+    @Column(name="fechaVencimiento")
     private LocalDate fechaVencimiento;
+
+    @Column(name="digitoVerificadocion")
     private String digitoVerificacion;
     @Enumerated(EnumType.STRING)
     private TipoTarjeta tipo;

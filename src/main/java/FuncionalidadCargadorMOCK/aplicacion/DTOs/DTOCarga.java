@@ -1,4 +1,4 @@
-package CargadorMock.aplicacion.DTOs;
+package FuncionalidadCargadorMOCK.aplicacion.DTOs;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

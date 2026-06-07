@@ -7,9 +7,11 @@ import moduloCarga.dominio.cliente.Cliente;
 import moduloCarga.dominio.cliente.ClienteComun;
 import moduloCarga.dominio.medioPago.MedioPago;
 import moduloCarga.dominio.medioPago.Tarjeta;
-import CargadorMock.aplicacion.Impl.CargadorInterfaceMOCKImpl;
 import moduloCarga.infraestructura.persistencia.CargaRepoImpl;
 import org.junit.jupiter.api.Test;
+
+import FuncionalidadCargadorMOCK.aplicacion.Impl.FuncionalidadCargadorInterfaceMOCKImpl;
+
 import org.junit.jupiter.api.DisplayName;
 
 
@@ -20,7 +22,7 @@ import org.jboss.weld.junit5.auto.EnableAutoWeld;
 @EnableAutoWeld
 @AddPackages({
     ServicioCargaImpl.class,
-    CargadorInterfaceMOCKImpl.class,
+    FuncionalidadCargadorInterfaceMOCKImpl.class,
     CargaRepoImpl.class
 })
 public class ModuloDeCarga_mostrarCargaTest {
@@ -38,7 +40,7 @@ public class ModuloDeCarga_mostrarCargaTest {
         //2: creo el medio de pago
         MedioPago tarjeta = new Tarjeta();
         //3: creo una carga de prueba
-        servicioCargaImpl.iniciarCarga(clientePrueba, tarjeta);
+        servicioCargaImpl.iniciarCarga(clientePrueba, tarjeta, 2);
         //3: traigo la carga utilizando la interface
         servicioCargaImpl.verCargaActual(clientePrueba);
     }

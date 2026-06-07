@@ -8,10 +8,11 @@ import moduloCarga.dominio.cliente.ClienteComun;
 import moduloCarga.dominio.medioPago.CuentaUTE;
 import moduloCarga.dominio.medioPago.MedioPago;
 import moduloCarga.dominio.medioPago.Tarjeta;
-
-import CargadorMock.aplicacion.Impl.CargadorInterfaceMOCKImpl;
 import moduloCarga.infraestructura.persistencia.CargaRepoImpl;
 import org.junit.jupiter.api.Test;
+
+import FuncionalidadCargadorMOCK.aplicacion.Impl.FuncionalidadCargadorInterfaceMOCKImpl;
+
 import org.junit.jupiter.api.DisplayName;
 import org.jboss.weld.junit5.auto.AddPackages;
 import org.jboss.weld.junit5.auto.EnableAutoWeld;
@@ -20,7 +21,7 @@ import org.jboss.weld.junit5.auto.EnableAutoWeld;
 @EnableAutoWeld
 @AddPackages({
     ServicioCargaImpl.class,
-    CargadorInterfaceMOCKImpl.class,
+    FuncionalidadCargadorInterfaceMOCKImpl.class,
     CargaRepoImpl.class
 })
 public class ModuloDeCarga_iniciarCargaTest {
@@ -45,7 +46,7 @@ public class ModuloDeCarga_iniciarCargaTest {
 	@Test
     void test(){
         cargarDatosTest();
-        servicioCargaImpl.iniciarCarga(clientePrueba, medioPago);
+        servicioCargaImpl.iniciarCarga(clientePrueba, medioPago, 2);
         System.out.print("El cliente " + clientePrueba.getNombre() + " " + clientePrueba.getApellido() +
             " inició una carga" + "\n" + "Realizó el pago con " + medioPago + "\n");
         if (clientePrueba.getCargaActual().getEstado() == EstadoCarga.ENPROGRESO){

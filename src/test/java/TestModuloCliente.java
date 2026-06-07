@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         CargaRepoImpl.class,
         ObserverModuloCarga.class,
         ServicioCarga.class,
-        CargadorInterfaceMOCKImpl.class,
+        FuncionalidadCargadorInterfaceMOCKImpl.class,
 })
 public class TestModuloCliente {
     //para estos test no uso libreria mockito, sino que uso weld-junit + MockBean yo creo implementaciones falsas manuales y las injecto al servicio
