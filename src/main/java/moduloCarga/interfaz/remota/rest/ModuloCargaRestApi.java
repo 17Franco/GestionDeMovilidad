@@ -46,11 +46,13 @@ public class ModuloCargaRestApi {
         System.out.println("ENTRÓ CARGADOR");
 
         Cargador cargador = new Cargador();
-
+        cargador.setId(1);
+        //cargador.setTipo();
         cargador.setTieneCable(cargadorDTO.isTieneCable());
+        //cargador.setTipoConector();
         cargador.setPotenciaMinima(cargadorDTO.getPotenciaMinima());
 
-        servicioCarga.altaCargador(cargador);
+        servicioCarga.altaCargador(cargadorDTO.getEstacionCarga(),cargador);
 
         return Response.ok("{\"mensaje\":\"Cargador creado\"}").build();
     }

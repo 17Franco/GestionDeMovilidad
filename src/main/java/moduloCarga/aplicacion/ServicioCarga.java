@@ -24,7 +24,7 @@ public interface ServicioCarga {
 
     void altaEstacion(EstacionCarga datos);
 
-    void altaCargador(Cargador datos);
+    void altaCargador(int estacionId,Cargador datos);
 
     void obtenerEstaciones();
 
