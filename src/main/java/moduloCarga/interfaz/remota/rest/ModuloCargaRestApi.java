@@ -1,10 +1,11 @@
 package moduloCarga.interfaz.remota.rest;
-
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
-
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import moduloCarga.aplicacion.ServicioCarga;
 import moduloCarga.dominio.Cargador;
 import moduloCarga.dominio.EstacionCarga;
@@ -18,10 +19,12 @@ public class ModuloCargaRestApi {
 
     @Inject
     private ServicioCarga servicioCarga;
-
     @POST
     @Path("/estacion")
-    public void altaEstacion(EstacionDTO estacionDTO) {
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response altaEstacion(EstacionDTO estacionDTO) {
+
+        System.out.println("ENTRÓ ESTACION");
 
         EstacionCarga estacion = new EstacionCarga();
 
@@ -30,13 +33,17 @@ public class ModuloCargaRestApi {
         estacion.setDepartamento(estacionDTO.getDepartamento());
         estacion.setLongitud(estacionDTO.getLongitud());
         estacion.setLatitud(estacionDTO.getLatitud());
-
         servicioCarga.altaEstacion(estacion);
+
+        return Response.ok("{\"mensaje\":\"Estacion creada\"}").build();
     }
 
     @POST
     @Path("/cargador")
-    public void altaCargador(CargadorDTO cargadorDTO) {
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response altaCargador(CargadorDTO cargadorDTO) {
+
+        System.out.println("ENTRÓ CARGADOR");
 
         Cargador cargador = new Cargador();
 
@@ -44,5 +51,7 @@ public class ModuloCargaRestApi {
         cargador.setPotenciaMinima(cargadorDTO.getPotenciaMinima());
 
         servicioCarga.altaCargador(cargador);
+
+        return Response.ok("{\"mensaje\":\"Cargador creado\"}").build();
     }
 }
