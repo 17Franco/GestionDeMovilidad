@@ -103,8 +103,8 @@ public class ServicioCargaImpl implements ServicioCarga {
 
 
     @Override
-    public void verCargaActual(Cliente cli) {
-        System.out.print(cli.getCargaActual());
+    public Carga verCargaActual(Cliente cli) {
+        return cli.getCargaActual();
     }
 
 
