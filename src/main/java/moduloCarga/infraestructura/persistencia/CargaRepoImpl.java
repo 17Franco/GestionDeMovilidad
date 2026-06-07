@@ -25,24 +25,29 @@ public class CargaRepoImpl implements RepoCarga {
 
     private final List<Cliente> clientes = new ArrayList<>();
     
-    @Override
+   /* @Override
     public void guardarEstacion(EstacionCarga estacion) {
         estaciones.add(estacion);
-    }
+    }*/
 
-    @Override
+    /* @Override
     public void guardarCargador(Cargador cargador) {
         cargadores.add(cargador); 
-    }
+    }*/
 
-   
     @Override
     public void registrarEstacion(EstacionCarga estacion) {
         if (estacion != null) {
             estaciones.add(estacion);
         }
     }
-
+    @Override
+    public EstacionCarga buscarEstacionPorId(int estacionId){
+        return estaciones.stream()
+                .filter(c -> Objects.equals(c.getId(), estacionId))
+                .findFirst()
+                .orElse(null);
+    }
     @Override
     public void registrarCargador(Cargador cargador) {
         if (cargador != null) {

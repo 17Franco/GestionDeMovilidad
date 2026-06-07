@@ -142,11 +142,18 @@ public class ServicioCargaImpl implements ServicioCarga {
     }
 
     @Override
-    public void altaCargador(Cargador datos) {
-
-        if (datos != null) {
-            repo.registrarCargador(datos);
+    public void altaCargador(int estacionId,Cargador datos) {
+        if(datos == null ){
+            throw new IllegalArgumentException("El cargador no puede ser null");
         }
+        EstacionCarga estacion = repo.buscarEstacionPorId(estacionId);
+        if(estacion == null){
+            throw new IllegalArgumentException("La estacion no puede ser null");
+        }
+        datos.setEstacionCarga(estacion);
+        estacion.getCargadores().add(datos);
+        repo.registrarCargador(datos);
+
     }
 
     @Override

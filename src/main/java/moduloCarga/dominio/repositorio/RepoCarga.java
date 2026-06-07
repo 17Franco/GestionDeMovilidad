@@ -10,12 +10,14 @@ import java.util.Objects;
 
 public interface RepoCarga {
   
-    void guardarEstacion(EstacionCarga estacion);
-    void guardarCargador(Cargador cargador);
+    //void guardarEstacion(EstacionCarga estacion);
+    //void guardarCargador(Cargador cargador);
 
     void registrarEstacion(EstacionCarga estacion);
 
     void registrarCargador(Cargador cargador);
+
+    EstacionCarga buscarEstacionPorId(int estacionId);
 
     List<EstacionCarga> obtenerEstaciones();
 
