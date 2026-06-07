@@ -159,7 +159,7 @@ public class ServicioCargaImpl implements ServicioCarga {
     }
 
     @Override
-    public boolean altaCliente(Cliente cli){
+    public void altaCliente(Cliente cli){
 
         //verifico que el cliente que viene de la api no sea null
         if(cli == null){
@@ -171,22 +171,9 @@ public class ServicioCargaImpl implements ServicioCarga {
             throw new RuntimeException("Cliente ya existe");
         }
 
-        return repo.registrarCliente(cli);
+        repo.registrarCliente(cli);
 
     }
 
-    @Override
-    public void obtenerClientes() {
 
-        var clientes = repo.obtenerTodos();
-
-        System.out.println("Clientes registrados Modulo Carga:");
-
-        for (Cliente cliente : clientes) {
-            System.out.printf("- %s %s %s\n",
-                    cliente.getCedula(),
-                    cliente.getNombre(),
-                    cliente.getApellido());
-        }
-    }
 }

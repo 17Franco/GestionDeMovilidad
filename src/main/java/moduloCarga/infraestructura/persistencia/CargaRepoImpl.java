@@ -59,32 +59,21 @@ public class CargaRepoImpl implements RepoCarga {
         return new ArrayList<>(estaciones);
     }
 
+
     @Override
     public Cliente buscarPorCedula(String cedula) {
 
-        if (cedula == null) {
-            return null;
-        }
-
-        return clientes.stream()
-                .filter(c -> cedula.equals(c.getCedula()))
-                .findFirst()
-                .orElse(null);
+        return em.find(Cliente.class, cedula);
     }
 
     @Override
-    public List<Cliente> obtenerTodos() {
-        return new ArrayList<>(clientes);
-    }
-
-    @Override
-    public boolean registrarCliente(Cliente cliente){
+    public void registrarCliente(Cliente cliente){
         if(cliente == null){
-            return false;
+            throw new IllegalArgumentException("Cliente no puede ser null");
         }
         clientes.add(cliente);
         em.persist(cliente);
-        return true;
+
 
     }
 }

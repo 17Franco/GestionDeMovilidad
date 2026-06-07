@@ -28,7 +28,6 @@ public class ClienteRepositorioImpl implements ClienteRepositorio {
             throw new ClienteInvalidoException("Cliente no puede ser null");
         }
 
-
         clientes.add(cliente);
         em.persist(cliente);
 
@@ -37,6 +36,7 @@ public class ClienteRepositorioImpl implements ClienteRepositorio {
     public Grupo findGroup(String grupo){
         return em.find(Grupo.class, grupo);
     }
+
     @Override
     public boolean actualizar(Cliente cliente) {
         if (cliente == null || cliente.getCedula() == null) {
@@ -53,13 +53,7 @@ public class ClienteRepositorioImpl implements ClienteRepositorio {
 
     @Override
     public Cliente buscarCliente(String cedula) {
-        if (cedula == null) {
-            return null;
-        }
-        return clientes.stream()
-                .filter(c -> cedula.equals(c.getCedula()))
-                .findFirst()
-                .orElse(null);
+        return em.find(Cliente.class, cedula);
     }
 
     @Override

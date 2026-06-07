@@ -20,7 +20,6 @@ public interface RepoCarga {
 
     Cliente buscarPorCedula(String cedula);
 
-    List<Cliente> obtenerTodos();
 
-    boolean registrarCliente(Cliente cli);
+    void registrarCliente(Cliente cli);
 }

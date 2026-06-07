@@ -10,6 +10,7 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+import jakarta.ws.rs.core.SecurityContext;
 import moduloCliente.aplicacion.ServicioCliente;
 import moduloCliente.dominio.Reclamo;
 import moduloCliente.dominio.cliente.Cliente;
@@ -48,9 +49,8 @@ public class ModuloClienteApi {
     @Inject
     private ServicioCliente servicioCliente;
 
-    //@Inject
-    //SecurityContext securityContext;
-
+    @Inject
+    SecurityContext securityContext;
 
 
     @POST
@@ -75,7 +75,7 @@ public class ModuloClienteApi {
     * curl -v -u 49876541:1234 -H "Content-Type: application/json" -X POST -d '{
       "asunto": "PrimerReclamo",
       "descripcion": "Hola este es el primer reclamo",
-      "clienteCi": "49876541"
+
     }' http://localhost:8080/GestionDeMovilidad/movilidad/clientes/reclamos/
     */
 
@@ -85,7 +85,8 @@ public class ModuloClienteApi {
     @Path("/reclamos")
     @RolesAllowed("appMovil")//enpoint se fija si el usuario tiene este rol si lo tiene sigue si no manda forbidden
     public Response registrarReclamo(ReclamoDTO reclamo){
-        Reclamo r = servicioCliente.realizarReclamo(reclamo.getAsunto(),reclamo.getDescripcion(),reclamo.getClienteCi());
+        String ci = securityContext.getUserPrincipal().getName(); //obtengo ci
+        Reclamo r = servicioCliente.realizarReclamo(reclamo.getAsunto(),reclamo.getDescripcion(),ci);
         ReclamoDTO reclamoDTO = new ReclamoDTO();
         reclamoDTO.setId(r.getId());
         reclamoDTO.setAsunto(r.getAsunto());
