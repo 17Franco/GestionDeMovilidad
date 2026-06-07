@@ -8,6 +8,11 @@ import moduloCarga.aplicacion.ServicioCarga;
 import moduloCarga.dominio.cliente.ClienteComun;
 import moduloCarga.dominio.cliente.ClienteProfesional;
 import moduloCarga.dominio.cliente.TipoProfesional;
+import moduloCarga.dominio.medioPago.CuentaUTE;
+import moduloCarga.dominio.medioPago.Tarjeta;
+
+import moduloCarga.dominio.medioPago.TipoTarjeta;
+import moduloCliente.interfaz.evento.out.ClienteMetodoDePago;
 import moduloCliente.interfaz.evento.out.ClienteNuevoClienteComun;
 import moduloCliente.interfaz.evento.out.ClienteNuevoClienteProfesional;
 
@@ -36,4 +41,32 @@ public class ObserverModuloCarga {
         );
         servicioCarga.altaCliente(cli);
     }
+
+    public void accept(@Observes ClienteMetodoDePago event) {
+        //log.infof("Evento procesado: GestionNuevoVehiculo: %s", event.toString());
+        //TipoProfesional tipo = TipoProfesional.valueOf(event.getTipo());
+        if("CUENTA_UTE".equals(event.getTipoMedioPago())){
+            CuentaUTE cuenta = new CuentaUTE();
+            cuenta.setId(event.getId());
+            cuenta.setFechaCreacion(event.getFechaCreacion());
+            cuenta.setNumeroCuenta(event.getNumeroCuenta());
+
+            servicioCarga.altaMedioPago(event.getClienteCUte(),cuenta);
+        }else if("TARJETA".equals(event.getTipoMedioPago())){
+            Tarjeta tarjeta = new Tarjeta();
+            tarjeta.setId(event.getId());
+            tarjeta.setFechaCreacion(event.getFechaCreacion());
+            tarjeta.setNumero(event.getNumero());
+            tarjeta.setFechaVencimiento(event.getFechaVencimiento());
+            tarjeta.setDigitoVerificacion(event.getDigitoVerificacion());
+            TipoTarjeta tipo = TipoTarjeta.valueOf(event.getTipo());
+            tarjeta.setTipo(tipo);
+
+            servicioCarga.altaMedioPago(event.getClienteCUte(),tarjeta);
+
+        }
+
+        //servicioCarga.altaCliente(cli);
+    }
+
 }

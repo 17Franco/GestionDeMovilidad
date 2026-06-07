@@ -18,9 +18,14 @@ import moduloCarga.dominio.EstacionCarga;
 import moduloCarga.dominio.EstadoCarga;
 import moduloCarga.dominio.HistorialDeCargas;
 import moduloCarga.dominio.cliente.Cliente;
+import moduloCarga.dominio.cliente.ClienteComun;
+import moduloCarga.dominio.cliente.ClienteProfesional;
+import moduloCarga.dominio.medioPago.CuentaUTE;
 import moduloCarga.dominio.medioPago.MedioPago;
+import moduloCarga.dominio.medioPago.Tarjeta;
 import moduloCarga.dominio.repositorio.RepoCarga;
-import moduloCliente.dominio.cliente.ClienteComun;
+
+
 
 @ApplicationScoped
 public class ServicioCargaImpl implements ServicioCarga {
@@ -173,6 +178,41 @@ public class ServicioCargaImpl implements ServicioCarga {
 
         repo.registrarCliente(cli);
 
+    }
+
+    @Override
+    public boolean altaMedioPago(String ci, MedioPago formaPago) {
+        if (ci == null || ci.isBlank() || formaPago == null) {
+            return false;
+        }
+
+        Cliente cliente = repo.buscarPorCedula(ci);
+        if (cliente == null) {
+            return false;
+        }
+
+        if (cliente instanceof ClienteComun clienteComun) {
+            //cliente comun puede tener una cuentaUte y muchas tarjetas
+            if (formaPago instanceof CuentaUTE cuentaUTE) {
+                cuentaUTE.setCliente(clienteComun);
+                clienteComun.setFormaPago(cuentaUTE);
+
+                return repo.actualizar(clienteComun);
+            }
+            return false;
+        }
+
+        if (cliente instanceof ClienteProfesional clienteProfesional) {
+            //cliente Profesional solo puede tener Tarjetas
+            if (formaPago instanceof Tarjeta tarjeta) {
+                clienteProfesional.getTarjetas().add(tarjeta);
+
+                return repo.actualizar(clienteProfesional);
+            }
+
+        }
+
+        return false;
     }
 
 

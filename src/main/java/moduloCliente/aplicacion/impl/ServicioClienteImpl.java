@@ -75,7 +75,11 @@ public class ServicioClienteImpl implements ServicioCliente {
             if (formaPago instanceof CuentaUTE cuentaUTE) {
                 cuentaUTE.setCliente(clienteComun);
                 clienteComun.setFormaPago(cuentaUTE);
-                return repo.actualizar(clienteComun);
+                boolean resu = repo.actualizar(clienteComun);
+                if (resu){
+                    evento.publicarEventoClienteMetodoPago(cuentaUTE);
+                }
+                return resu;
             }
             return false;
         }
@@ -84,7 +88,11 @@ public class ServicioClienteImpl implements ServicioCliente {
             //cliente Profesional solo puede tener Tarjetas
             if (formaPago instanceof Tarjeta tarjeta) {
                 clienteProfesional.getTarjetas().add(tarjeta);
-                return repo.actualizar(clienteProfesional);
+                boolean resu = repo.actualizar(clienteProfesional);
+                if(resu){
+                    evento.publicarEventoClienteMetodoPago(tarjeta);
+                }
+                return resu;
             }
 
         }
