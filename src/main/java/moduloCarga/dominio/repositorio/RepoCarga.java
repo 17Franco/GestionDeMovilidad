@@ -14,9 +14,7 @@ import java.util.List;
 import java.util.Objects;
 
 public interface RepoCarga {
-  
-    //void guardarEstacion(EstacionCarga estacion);
-    //void guardarCargador(Cargador cargador);
+
 
     void registrarEstacion(EstacionCarga estacion);
 
@@ -30,7 +28,7 @@ public interface RepoCarga {
 
     boolean actualizar(Cliente cliente);
 
-    boolean registrarCliente(Cliente cli);
+    void registrarCliente(Cliente cli);
 
     void persistirCarga(Carga cargaNueva);
     void persistirOActualizarHistorial(HistorialDeCargas historial);

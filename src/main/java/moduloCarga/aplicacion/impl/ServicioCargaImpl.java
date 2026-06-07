@@ -9,6 +9,7 @@ import FuncionalidadCargadorMOCK.aplicacion.FuncionalidadCargadorInterfaceMOCK;
 import FuncionalidadCargadorMOCK.aplicacion.DTOs.*;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import moduloCarga.aplicacion.ServicioCarga;
 import moduloCarga.dominio.Carga;
 import moduloCarga.dominio.Cargador;
@@ -194,6 +195,7 @@ public class ServicioCargaImpl implements ServicioCarga {
     }
 
     @Override
+    @Transactional
     public void altaCliente(Cliente cli){
 
         //verifico que el cliente que viene de la api no sea null

@@ -1,4 +1,5 @@
-import CargadorMock.aplicacion.Impl.CargadorInterfaceMOCKImpl;
+
+import FuncionalidadCargadorMOCK.aplicacion.Impl.FuncionalidadCargadorInterfaceMOCKImpl;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.spi.Bean;
 import jakarta.inject.Inject;

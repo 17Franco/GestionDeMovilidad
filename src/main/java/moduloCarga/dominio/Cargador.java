@@ -19,9 +19,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
-@Getter
-@Setter
-@NoArgsConstructor
+
 @Entity
 @Table(name = "MCarga_Cargadores")
 @Getter

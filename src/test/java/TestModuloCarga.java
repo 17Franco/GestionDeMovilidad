@@ -1,5 +1,5 @@
-import CargadorMock.aplicacion.CargadorInterfaceMOCK;
-import CargadorMock.aplicacion.Impl.CargadorInterfaceMOCKImpl;
+
+import FuncionalidadCargadorMOCK.aplicacion.Impl.FuncionalidadCargadorInterfaceMOCKImpl;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.spi.Bean;
 import jakarta.inject.Inject;
@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @EnableWeld
 @AddPackages({
         ServicioCargaImpl.class,
-        CargadorInterfaceMOCKImpl.class,
+        FuncionalidadCargadorInterfaceMOCKImpl.class,
         CargaRepoImpl.class,
         ObserverModuloCarga.class
 })
@@ -74,9 +74,9 @@ public class TestModuloCarga {
 
     private Bean<?> crearMockCargadorImpl() {
         return MockBean.builder()
-                .types(CargadorInterfaceMOCK.class) //esto lo saco del @inject de ServicioPeajeImpl
+                .types(FuncionalidadCargadorInterfaceMOCKImpl.class) //esto lo saco del @inject de ServicioPeajeImpl
                 .scope(ApplicationScoped.class)
-                .creating(new CargadorInterfaceMOCKImpl())  //aca construyo la implementación que será usasa en este test
+                .creating(new FuncionalidadCargadorInterfaceMOCKImpl())  //aca construyo la implementación que será usasa en este test
                 .build();
     }
 

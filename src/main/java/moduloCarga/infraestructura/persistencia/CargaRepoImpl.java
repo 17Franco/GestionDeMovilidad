@@ -15,26 +15,16 @@ import moduloCarga.dominio.cliente.ClienteComun;
 import moduloCarga.dominio.cliente.ClienteProfesional;
 import moduloCarga.dominio.medioPago.Tarjeta;
 import moduloCarga.dominio.repositorio.RepoCarga;
+import moduloCliente.exepciones.ClienteInvalidoException;
 
 import java.util.List;
+import java.util.Objects;
 
 @ApplicationScoped
 public class CargaRepoImpl implements RepoCarga {
 
     @PersistenceContext
     private EntityManager em;
-
-    @Override
-    @Transactional
-    public void guardarEstacion(EstacionCarga estacion) {
-        em.persist(estacion);
-    }
-
-    @Override
-    @Transactional
-    public void guardarCargador(Cargador cargador) {
-        em.persist(cargador);
-    }
 
     @Override
     @Transactional
@@ -45,10 +35,7 @@ public class CargaRepoImpl implements RepoCarga {
     }
     @Override
     public EstacionCarga buscarEstacionPorId(int estacionId){
-        return estaciones.stream()
-                .filter(c -> Objects.equals(c.getId(), estacionId))
-                .findFirst()
-                .orElse(null);
+        return null;
     }
     @Override
     @Transactional
@@ -68,43 +55,22 @@ public class CargaRepoImpl implements RepoCarga {
 
 
     @Override
-public Cliente buscarPorCedula(String cedula) {
-    if (cedula == null || cedula.isBlank()) {
-        return null;
-    }
-
-    Cliente clienteComun = em.find(ClienteComun.class, cedula);
-
-    if (clienteComun != null) {
-        return clienteComun;
-    }
-
-    Cliente clienteProfesional = em.find(ClienteProfesional.class, cedula);
-
-    if (clienteProfesional != null) {
-        return clienteProfesional;
-    }
-
-    return null;
-}
-
-    @Override
-    public List<Cliente> obtenerTodos() {
-        return em.createQuery(
-                "SELECT c FROM Cliente_Carga c",
-                Cliente.class
-        ).getResultList();
+    public Cliente buscarPorCedula(String cedula) {
+            return em.find(Cliente.class, cedula);
     }
 
     @Override
-    @Transactional
-    public boolean registrarCliente(Cliente cli) {
-        if (cli == null) {
-            return false;
+    public boolean actualizar(Cliente cliente) {
+       return true;
+    }
+
+    @Override
+    public void registrarCliente(Cliente cli) {
+        if(cli == null){
+            throw new ClienteInvalidoException("Cliente no puede ser null");
         }
-
+        //cli.add(cli);
         em.persist(cli);
-        return true;
     }
 
     @Override
