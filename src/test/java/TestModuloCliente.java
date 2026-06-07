@@ -54,9 +54,8 @@ public class TestModuloCliente {
         //pruebo que si se agrego cliente al repo de moduloCliente
         servicios.obtenerClientes();
 
-        //pruebo que si se agrego cliente al repo de moduloCarga
-        //aca verifico que se lanzan los eventos y que el observer fuciona
-        serviciosCarga.obtenerClientes();
+
+
 
 
     }

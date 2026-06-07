@@ -26,3 +26,5 @@ connect
     catch
         echo "No se crea datasource, ya existe"
     end-try
+    #para que wilfly lo levante tambien
+    deploy sistemasExternosMocks/MockPagoCuentaUte.war --force

@@ -10,10 +10,7 @@ import moduloCarga.dominio.cliente.Cliente;
 import moduloCarga.dominio.medioPago.MedioPago;
 
 public interface ServicioCarga {
-    boolean altaCliente(Cliente cli);
-
-    //para probar nomas
-    void obtenerClientes();
+    void altaCliente(Cliente cli);
 
     void iniciarCarga(Cliente cli, MedioPago formaPago);
 
