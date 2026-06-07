@@ -3,9 +3,12 @@ package moduloCliente.infraestructura.persistencia;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import moduloCliente.dominio.Grupo;
 import moduloCliente.dominio.Reclamo;
 import moduloCliente.dominio.cliente.Cliente;
 import moduloCliente.dominio.repositorio.ClienteRepositorio;
+import moduloCliente.exepciones.ClienteInvalidoException;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,13 +23,19 @@ public class ClienteRepositorioImpl implements ClienteRepositorio {
     private final List<Cliente> clientes = new ArrayList<>();
 
     @Override
-    public boolean saveCliente(Cliente cliente) {
+    public void saveCliente(Cliente cliente) {
         if(cliente == null){
-            return false;
+            throw new ClienteInvalidoException("Cliente no puede ser null");
         }
+
+
         clientes.add(cliente);
         em.persist(cliente);
-        return true;
+
+    }
+
+    public Grupo findGroup(String grupo){
+        return em.find(Grupo.class, grupo);
     }
     @Override
     public boolean actualizar(Cliente cliente) {
@@ -64,10 +73,8 @@ public class ClienteRepositorioImpl implements ClienteRepositorio {
         if(reclamo == null){
             return false;
         }
-
-            reclamo.getCliente().getReclamos().add(reclamo);
-            em.persist(reclamo);
-            //em.persist(reclamo.getCliente());
+        em.persist(reclamo);
+        //em.persist(reclamo.getCliente());
 
         return true;
     }

@@ -59,38 +59,25 @@ public class ServicioCargaImpl implements ServicioCarga {
     }
     @Override
     public void iniciarCarga(Cliente cli, MedioPago formaPago) {
-        //el cargador me devuleve un DTO de la carga
         DTOCarga DTOCarga = cargadorMock.iniciarCarga();
-        //creo la carga nueva
         Carga cargaNueva = new Carga();
-        //ahora vuelco los datos el DTO en la carga nueva con la funcion que cree arriba
         cargaNueva = convertirDTOCarga_a_Carga(DTOCarga);
-        //ahora le seteo el cliente
         cli.setCargaActual(cargaNueva);
-        //pido el Historial de cargas del cliente
-        //si el historial asociado es null es porque es la primer carga que genero, asi que tambien le tengo que generar un historial
         if (cli.getHistorialAsociado() == null){
             HistorialDeCargas nuevoHistorial = new HistorialDeCargas();
-            //tambien tengo que hacer la asociacion inversa, asociarle al historial el cliente
             nuevoHistorial.setClienteAsociado(cli);
-            //le agrego la carga nueva al historial que no existía
             nuevoHistorial.agregarCarga(cargaNueva , formaPago);
             cli.setHistorialAsociado(nuevoHistorial);
         }
         else{
             HistorialDeCargas historial = cli.getHistorialAsociado();
-            //si es la primera carga que genero no tendra cliente asociado en el historial asi que lo agrego, si ya hay cliente no
             if (historial.getClienteAsociado() == null){
                 historial.setClienteAsociado(cli);
             }
-            //agrego la carga nueva al historial
             historial.agregarCarga(cargaNueva, formaPago);
         }
     }
 
-
-
-   
 
     @Override
     public void verCargaActual(Cliente cli) {
@@ -101,16 +88,13 @@ public class ServicioCargaImpl implements ServicioCarga {
     @Override
     public void verHistorico(Cliente cli, String fechaIni, String fechaFin) {
         HistorialDeCargas historial =  cli.getHistorialAsociado();
-        List<ElementoHistorial> listaHistorial = historial.getHisorialCargas();
+        List<ElementoHistorial> listaHistorial = historial.getHistorialCargas();
         //parseo las fechas de string a LocalDate
         LocalDate fechaInicio = LocalDate.parse(fechaIni);
         LocalDate fechaFinal = LocalDate.parse(fechaFin);
 
-        //creo la lista que contendrá las cargas que esten entre fechaIni y fechaFin
         List<ElementoHistorial> listaCargasEnFecha = new ArrayList<>();
-        //busco las cargas que coincidan y las agrego
         for (ElementoHistorial elemento_aux : listaHistorial) {
-            //obtengo la fecha de la carga del elemento de historial
             LocalDate fechaCarga = elemento_aux.getCarga().getFecha();
             if (
             (fechaCarga.isEqual(fechaInicio) || fechaCarga.isAfter(fechaInicio))
@@ -118,7 +102,6 @@ public class ServicioCargaImpl implements ServicioCarga {
             (fechaCarga.isEqual(fechaFinal) || fechaCarga.isBefore(fechaFinal))
             ) {
                 listaCargasEnFecha.add(elemento_aux);
-                //muesto el elemento con la funcion toString, esto muestra los datos de la carga y el medio de pago utilizado
                 System.out.print(elemento_aux);
             }
         }

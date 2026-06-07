@@ -46,6 +46,7 @@
             <groupId>org.jboss.weld.se</groupId>
             <artifactId>weld-se-shaded</artifactId>
             <version>${weld.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <!-- Motor principal de JUnit 5 -->
@@ -64,6 +65,13 @@
             <artifactId>junit-jupiter-params</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.security.enterprise</groupId>
+            <artifactId>jakarta.security.enterprise-api</artifactId>
+            <scope>provided</scope>
+            <version>3.0.0</version>
         </dependency>
 
         <!-- Mockito core -->
@@ -152,6 +160,11 @@
                 <configuration>
                     <version>${wildfly.version}</version>
                     <server-config>standalone-full.xml</server-config>
+
+                    <commands>
+                    <command>/subsystem=undertow/application-security-domain=other:write-attribute(name=integrated-jaspi,value=false)</command>
+                    <command>reload</command>
+                    </commands>
                     <add-user>
 
                         <users>
@@ -169,6 +182,7 @@
                         <script>config.cli</script>
 
                     </scripts>
+
                 </configuration>
             </plugin>
         </plugins>

@@ -1,6 +1,8 @@
-package moduloCliente.infraestructura.seguridad;
+package infraestructura.seguridad;
 
+import java.util.HashSet;
 import jakarta.enterprise.context.ApplicationScoped;
+
 import jakarta.inject.Inject;
 import jakarta.security.enterprise.credential.Credential;
 import jakarta.security.enterprise.credential.UsernamePasswordCredential;
@@ -25,12 +27,14 @@ public class ValidadorCredenciales implements IdentityStore {
 
         //ahora llamo a repo
         Cliente cliente = repo.buscarCliente(usr);
-
+        System.out.println(usr);
         if(cliente != null){
             //si existe compruebo contrasenia
-            if(pass.equals(cliente.getContra())){
+            String hashPass = HashFunctionUtil.convertToHas(pass);
+            if(hashPass.equals(cliente.getContra())){
                 //si es correcto
-                resultado =  new CredentialValidationResult(usr);
+                resultado =  new CredentialValidationResult
+                        (usr, new HashSet<>(cliente.gruposAsString()));
             }else {
                 System.out.println("password incorrecta");
             }

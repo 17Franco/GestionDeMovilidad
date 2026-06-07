@@ -3,6 +3,16 @@ package moduloCarga.dominio;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import moduloCarga.dominio.cliente.Cliente;
 import moduloCarga.dominio.medioPago.MedioPago;
 import lombok.AllArgsConstructor;
@@ -15,18 +25,35 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
+@Table(name="MCarga_HistorialesDeCargas")
 public class HistorialDeCargas {
-    
-//@ManyToOne
-private Cliente clienteAsociado;    //relación con el cliente
-private List<ElementoHistorial> hisorialCargas = new ArrayList<>();  //lista donde las guarda (luego va a ser en la bd), la inicializo porque sino no puedo hacer add
 
-//uso un elemento_aux para poder guardar el medio de pago utilizado en la carga
-public void agregarCarga(Carga cargaNueva, MedioPago medioPago) {
-    ElementoHistorial elemento_aux = new ElementoHistorial();
-    elemento_aux.setCarga(cargaNueva);
-    elemento_aux.setMedioPago(medioPago);
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private int id;
+        
+    @OneToOne
+    @JoinColumn(name = "cliente_cedula", nullable = false, unique = true)
+    private Cliente clienteAsociado;
 
-    hisorialCargas.add(elemento_aux);
-}
+    @OneToMany(
+            mappedBy = "historialAsociado",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<ElementoHistorial> historialCargas = new ArrayList<>();
+
+
+    //uso un elemento_aux para poder guardar el medio de pago utilizado en la carga
+    public void agregarCarga(Carga cargaNueva, MedioPago medioPago) {
+        ElementoHistorial elementoAux = new ElementoHistorial();
+
+        elementoAux.setCarga(cargaNueva);
+        elementoAux.setMedioPago(medioPago);
+        elementoAux.setHistorialAsociado(this);
+
+        historialCargas.add(elementoAux);
+    }
 }
