@@ -1,4 +1,5 @@
 
+import FuncionalidadCargadorMOCK.aplicacion.FuncionalidadCargadorInterfaceMOCK;
 import FuncionalidadCargadorMOCK.aplicacion.Impl.FuncionalidadCargadorInterfaceMOCKImpl;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.spi.Bean;
@@ -74,7 +75,7 @@ public class TestModuloCarga {
 
     private Bean<?> crearMockCargadorImpl() {
         return MockBean.builder()
-                .types(FuncionalidadCargadorInterfaceMOCKImpl.class) //esto lo saco del @inject de ServicioPeajeImpl
+                .types(FuncionalidadCargadorInterfaceMOCK.class) //esto lo saco del @inject de ServicioPeajeImpl
                 .scope(ApplicationScoped.class)
                 .creating(new FuncionalidadCargadorInterfaceMOCKImpl())  //aca construyo la implementación que será usasa en este test
                 .build();
