@@ -148,11 +148,9 @@ Los endpoints consumidos por la appMovil requieren autenticación mediante usuar
 El proyecto incluye pruebas para validar el correcto funcionamiento de los principales casos de uso implementados:
 
 - **TestModuloCarga**
-  - Verifica la creación de estaciones y cargadores.
+  - Verifica la creación de estaciones, cargadores, IniciarCarga, VerHistorial Carga, eventos, y FinalizarCarga.
 
 - **TestModuloCliente**
-  - Verifica la cracion del cliente y funcionamiento de evento y observer en el modulo carga.
+  - Verifica la cracion del cliente y Medio de Pagos.
     
-- **TestCUJPR**
-  - Comprueba el funcionamiento de la finalización de una carga.
 
