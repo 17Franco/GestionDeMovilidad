@@ -4,12 +4,11 @@ import FuncionalidadCargadorMOCK.aplicacion.Impl.FuncionalidadCargadorInterfaceM
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.spi.Bean;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import moduloCarga.aplicacion.ServicioCarga;
 import moduloCarga.aplicacion.impl.ServicioCargaImpl;
 
-import moduloCarga.dominio.Cargador;
-import moduloCarga.dominio.EstacionCarga;
-import moduloCarga.dominio.EstadoCarga;
+import moduloCarga.dominio.*;
 import moduloCarga.dominio.cliente.Cliente;
 import moduloCarga.dominio.medioPago.CuentaUTE;
 import moduloCarga.dominio.medioPago.Tarjeta;
@@ -88,6 +87,8 @@ public class TestModuloCarga {
             private final List<Cliente> clientes = new ArrayList<>();
             private final List<EstacionCarga> estaciones = new ArrayList<>();
             private final List<Cargador> cargadores = new ArrayList<>();
+            private final List<Carga> carga = new ArrayList<>();
+            private final List<HistorialDeCargas> historialCarga = new ArrayList<>();
 
 
             @Override
@@ -118,6 +119,13 @@ public class TestModuloCarga {
                 return new ArrayList<>(estaciones);
             }
 
+            @Override
+            public Cargador getCargador(Integer idCargador) {
+                return cargadores.stream()
+                        .filter(c -> Objects.equals(c.getId(), idCargador))
+                        .findFirst()
+                        .orElse(null);
+            }
 
             @Override
             public Cliente buscarPorCedula(String cedula) {
@@ -147,6 +155,27 @@ public class TestModuloCarga {
                     }
                 }
                 return false;
+            }
+            @Override
+            public void persistirCarga(Carga cargaNueva) {
+                if (cargaNueva != null){
+                    carga.add(cargaNueva);
+                }
+            }
+            @Override
+            public void persistirOActualizarHistorial(HistorialDeCargas historial) {
+                if (historial != null){
+                    historialCarga.add(historial);
+                }
+            }
+            @Override
+            public void persistirElementoHistorial(ElementoHistorial elemento) {
+
+            }
+
+            @Override
+            public void ActualizarCliente(Cliente cli) {
+
             }
 
         };
@@ -329,7 +358,7 @@ public class TestModuloCarga {
     @Test
     @DisplayName("Iniciar Carga Cliente Comun")
     void iniciarCargaClienteComun(){
-     /*   //Creo Cliente
+       //Creo Cliente
         ClienteComun cl = new ClienteComun(
                 "12345678",
                 "Franco",
@@ -349,11 +378,34 @@ public class TestModuloCarga {
         //Llamo a servicio
         boolean resu = servicioCarga.altaMedioPago("12345678", cuenta);
 
+        //Creo objeto Estacion
+        EstacionCarga estacion = new EstacionCarga();
+        estacion.setId(1);
+        estacion.setDescripcion("Estacion Test");
+        estacion.setCalle("Probando Calle");
+        estacion.setDepartamento("Probando Departamento");
+        estacion.setLongitud(111111);
+        estacion.setLatitud(222222);
+
+        //Llamo a servicio
+        servicioCarga.altaEstacion(estacion);
+
+        //Creo Objeto Cargador
+        Cargador cargador = new Cargador();
+        cargador.setId(1);
+        //cargador.setTipo();
+        cargador.setTieneCable(true);
+        //cargador.setTipoConector();
+        //cargador.setEstado();
+        cargador.setPotenciaMinima(50);
+
+        servicioCarga.altaCargador(1,cargador);
+
 
         //Llamo a iniciarCarga
         //traigo al usuario
         Cliente cli =fakeRepo.buscarPorCedula("12345678");
-        servicioCarga.iniciarCarga(cli, cuenta);
+        servicioCarga.iniciarCarga(cli, cuenta,1);
         System.out.print("El cliente " + cli.getNombre() + " " + cli.getApellido() +
                 " inició una carga" + "\n" + "Realizó el pago con " + cuenta.getNumeroCuenta() + "\n");
         if (cli.getCargaActual().getEstado() == EstadoCarga.ENPROGRESO){
@@ -366,36 +418,182 @@ public class TestModuloCarga {
             System.out.print("Error inesperado, llame a soporte");
         }
 
-      */
+
     }
 
     @Test
-    @DisplayName("Iniciar Carga Cliente Profesional")
-    void iniciarCargaClienteProfesional(){
-     /*  //Creo un cliente Professional
-        ClienteProfesional clienteP = new ClienteProfesional(
-                "12345679",
+    @DisplayName("Test ver carga actual")
+    void verCargaActual(){
+        //Creo Cliente
+        ClienteComun cl = new ClienteComun(
+                "12345678",
                 "Franco",
                 "Echaide",
                 "099123456",
-                "1234",
-                TipoProfesional.PREMIUM,
-                15.0f
+                "1234"
         );
         //Lanzo evento
-        evento.publicarEventoClienteProfesional(clienteP);
+        evento.publicarEventoClienteComun(cl);
 
-        //Creo un Medio de pago TARJETA
-        Tarjeta tarjeta = new Tarjeta();
-        tarjeta.setId(1);
-        tarjeta.setFechaCreacion(LocalDate.now());
-        tarjeta.setNumero("2222222");
-        tarjeta.setFechaVencimiento(LocalDate.now());
-        tarjeta.setDigitoVerificacion("327");
-        //tarjeta.setTipo(TipoTarjeta);
+        //Creo un Medio de pago CuentaUTE
+        CuentaUTE cuenta = new CuentaUTE();
+        cuenta.setId(1);
+        cuenta.setFechaCreacion(LocalDate.now());
+        cuenta.setNumeroCuenta("11111111");
 
         //Llamo a servicio
-        boolean resu = servicioCarga.altaMedioPago("12345679", tarjeta);*/
+        boolean resu = servicioCarga.altaMedioPago("12345678", cuenta);
+
+        //Creo objeto Estacion
+        EstacionCarga estacion = new EstacionCarga();
+        estacion.setId(1);
+        estacion.setDescripcion("Estacion Test");
+        estacion.setCalle("Probando Calle");
+        estacion.setDepartamento("Probando Departamento");
+        estacion.setLongitud(111111);
+        estacion.setLatitud(222222);
+
+        //Llamo a servicio
+        servicioCarga.altaEstacion(estacion);
+
+        //Creo Objeto Cargador
+        Cargador cargador = new Cargador();
+        cargador.setId(1);
+        //cargador.setTipo();
+        cargador.setTieneCable(true);
+        //cargador.setTipoConector();
+        //cargador.setEstado();
+        cargador.setPotenciaMinima(50);
+
+        servicioCarga.altaCargador(1,cargador);
+
+        //traigo al usuario
+        Cliente cli =fakeRepo.buscarPorCedula("12345678");
+        //Llamo a iniciarCarga
+        servicioCarga.iniciarCarga(cli, cuenta,1);
+        Carga carga = servicioCarga.verCargaActual(cli);
+        assertNotNull(carga);
+        assertEquals(1,carga.getCargador().getId());
+        assertEquals("Probando Departamento",carga.getCargador().getEstacionCarga().getDepartamento());
+
+    }
+
+    @Test
+    @DisplayName("Test ver historico cargas del cliente")
+    void verHistoricoDeCargas(){
+        //Creo Cliente
+        ClienteComun cl = new ClienteComun(
+                "12345678",
+                "Franco",
+                "Echaide",
+                "099123456",
+                "1234"
+        );
+        //Lanzo evento
+        evento.publicarEventoClienteComun(cl);
+
+        //Creo un Medio de pago CuentaUTE
+        CuentaUTE cuenta = new CuentaUTE();
+        cuenta.setId(1);
+        cuenta.setFechaCreacion(LocalDate.now());
+        cuenta.setNumeroCuenta("11111111");
+
+        //Llamo a servicio
+        boolean resu = servicioCarga.altaMedioPago("12345678", cuenta);
+
+        //Creo objeto Estacion
+        EstacionCarga estacion = new EstacionCarga();
+        estacion.setId(1);
+        estacion.setDescripcion("Estacion Test");
+        estacion.setCalle("Probando Calle");
+        estacion.setDepartamento("Probando Departamento");
+        estacion.setLongitud(111111);
+        estacion.setLatitud(222222);
+
+        //Llamo a servicio
+        servicioCarga.altaEstacion(estacion);
+
+        //Creo Objeto Cargador
+        Cargador cargador = new Cargador();
+        cargador.setId(1);
+        //cargador.setTipo();
+        cargador.setTieneCable(true);
+        //cargador.setTipoConector();
+        //cargador.setEstado();
+        cargador.setPotenciaMinima(50);
+
+        servicioCarga.altaCargador(1,cargador);
+
+        //Llamo a iniciarCarga
+        //traigo al usuario
+        Cliente cli =fakeRepo.buscarPorCedula("12345678");
+        servicioCarga.iniciarCarga(cli, cuenta,1);
+        servicioCarga.iniciarCarga(cli, cuenta,1);
+        String fechaInicio = "2026-06-07";
+        String fechaFin = "2026-06-10";
+        servicioCarga.verHistorico(cli, fechaInicio, fechaFin);
+
+
+    }
+
+    @Test
+    @DisplayName("Test finalizar carga")
+    void finalizarCarga(){
+        //Creo Cliente
+        ClienteComun cl = new ClienteComun(
+                "12345678",
+                "Franco",
+                "Echaide",
+                "099123456",
+                "1234"
+        );
+        //Lanzo evento
+        evento.publicarEventoClienteComun(cl);
+
+        //Creo un Medio de pago CuentaUTE
+        CuentaUTE cuenta = new CuentaUTE();
+        cuenta.setId(1);
+        cuenta.setFechaCreacion(LocalDate.now());
+        cuenta.setNumeroCuenta("11111111");
+
+        //Llamo a servicio
+        boolean resu = servicioCarga.altaMedioPago("12345678", cuenta);
+
+        //Creo objeto Estacion
+        EstacionCarga estacion = new EstacionCarga();
+        estacion.setId(1);
+        estacion.setDescripcion("Estacion Test");
+        estacion.setCalle("Probando Calle");
+        estacion.setDepartamento("Probando Departamento");
+        estacion.setLongitud(111111);
+        estacion.setLatitud(222222);
+
+        //Llamo a servicio
+        servicioCarga.altaEstacion(estacion);
+
+        //Creo Objeto Cargador
+        Cargador cargador = new Cargador();
+        cargador.setId(1);
+        //cargador.setTipo();
+        cargador.setTieneCable(true);
+        //cargador.setTipoConector();
+        //cargador.setEstado();
+        cargador.setPotenciaMinima(50);
+
+        servicioCarga.altaCargador(1,cargador);
+
+        //Llamo a iniciarCarga
+        //traigo al usuario
+        Cliente cli =fakeRepo.buscarPorCedula("12345678");
+        servicioCarga.iniciarCarga(cli, cuenta,1);
+
+        Carga carga = cli.getCargaActual();
+
+        // finaliza la carga
+        servicioCarga.finalizarCarga(cargador, carga, 100);
+
+        // muestra datos finales
+        System.out.println(carga);
     }
 
 
