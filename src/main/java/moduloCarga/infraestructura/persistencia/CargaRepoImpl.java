@@ -35,8 +35,9 @@ public class CargaRepoImpl implements RepoCarga {
     }
     @Override
     public EstacionCarga buscarEstacionPorId(int estacionId){
-        return null;
+        return em.find(EstacionCarga.class, estacionId);
     }
+
     @Override
     @Transactional
     public void registrarCargador(Cargador cargador) {
