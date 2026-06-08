@@ -152,7 +152,9 @@ public class CargaRepoImpl implements RepoCarga {
     public HistorialDeCargas buscarHistorialPorCedula(String cedula) {
         List<HistorialDeCargas> resultado = em.createQuery(
                 "SELECT DISTINCT h FROM HistorialDeCargas h " +
-                "LEFT JOIN FETCH h.historialCargas " +
+                "LEFT JOIN FETCH h.historialCargas elementos " +
+                "LEFT JOIN FETCH elementos.carga " +
+                "LEFT JOIN FETCH elementos.medioPago " +
                 "WHERE h.clienteAsociado.cedula = :cedula",
                 HistorialDeCargas.class
         )
@@ -164,5 +166,20 @@ public class CargaRepoImpl implements RepoCarga {
         }
 
         return resultado.get(0);
+    }
+
+    @Override
+    public List<ElementoHistorial> buscarElementosHistorialPorCedula(String cedula) {
+        return em.createQuery(
+                "SELECT e FROM ElementoHistorial e " +
+                "JOIN FETCH e.carga " +
+                "JOIN FETCH e.medioPago " +
+                "JOIN e.historialAsociado h " +
+                "WHERE h.clienteAsociado.cedula = :cedula " +
+                "ORDER BY e.carga.fecha, e.carga.horaInicio",
+                ElementoHistorial.class
+        )
+        .setParameter("cedula", cedula)
+        .getResultList();
     }
 }

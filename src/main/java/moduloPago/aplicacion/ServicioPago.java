@@ -9,5 +9,8 @@ public interface ServicioPago {
 
     void pagarCarga(String cedulaCliente, int idCarga, float importe, String medioPago);
 
+    boolean pagarConTarjetaServicioExterno(String clienteId, String numeroTarjeta, float monto);
+
+
     List<pagoRealizado> consultarPagos(String cedulaCliente, LocalDate fechaIni, LocalDate fechaFin);
 }

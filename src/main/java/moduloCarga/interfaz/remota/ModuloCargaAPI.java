@@ -17,7 +17,6 @@ import moduloCarga.aplicacion.ServicioCarga;
 import moduloCarga.dominio.Carga;
 import moduloCarga.dominio.Cargador;
 import moduloCarga.dominio.ElementoHistorial;
-import moduloCarga.dominio.HistorialDeCargas;
 import moduloCarga.dominio.cliente.Cliente;
 import moduloCarga.dominio.cliente.ClienteComun;
 import moduloCarga.dominio.cliente.ClienteProfesional;
@@ -233,7 +232,12 @@ public class ModuloCargaAPI {
 
 
     
-   
+   /*
+    head-> http://localhost:8080/GestionDeMovilidad/movilidad/cargas/verHistorial
+    body->{
+            "cedulaCliente":"7654321."
+            }
+    */
     @POST
     @Path("verHistorial")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -257,9 +261,8 @@ public class ModuloCargaAPI {
             .build();
         }
         
-        //Verifico que el Historial exista
-        HistorialDeCargas historialBuscado = repoCarga.buscarHistorialPorCedula(cedulaCliente);
-        if (historialBuscado == null || historialBuscado.getHistorialCargas().isEmpty()) {
+        List<ElementoHistorial> listaDeCargas = repoCarga.buscarElementosHistorialPorCedula(cedulaCliente);
+        if (listaDeCargas.isEmpty()) {
             return Response
                     .status(Response.Status.OK)
                     .entity("{\"mensaje\":\"El cliente no tiene cargas en el historial\"}")
@@ -268,8 +271,6 @@ public class ModuloCargaAPI {
         
         //uso esta lista para poder mostrar el historial como JSON
         List<ElementoHistorialDTO> historialDTO = new ArrayList<>();
-        //esta lista es la lista de elemento de historial dentro del hisotiral
-        List<ElementoHistorial> listaDeCargas = historialBuscado.getHistorialCargas();
         for (ElementoHistorial elemento : listaDeCargas) {
             historialDTO.add(new ElementoHistorialDTO(elemento));
         }

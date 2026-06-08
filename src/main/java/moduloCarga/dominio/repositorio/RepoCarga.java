@@ -9,9 +9,7 @@ import moduloCarga.dominio.HistorialDeCargas;
 import moduloCarga.dominio.cliente.Cliente;
 import moduloCarga.dominio.medioPago.Tarjeta;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public interface RepoCarga {
 
@@ -38,4 +36,5 @@ public interface RepoCarga {
     Tarjeta buscarTarjetaClienteCI(String CedulaCliente, String numeroTarjeta);
     Cargador getCargador(Integer idCargador);
     HistorialDeCargas buscarHistorialPorCedula(String cedula);
+    List<ElementoHistorial> buscarElementosHistorialPorCedula(String cedula);
 }

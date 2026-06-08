@@ -3,7 +3,7 @@ package moduloCarga.interfaz.remota;
 public class iniciarCargaDatos {
     private String cedulaCliente;
     private String metodoPago;
-    private String numeroTarjerta;
+    private String numeroTarjeta;
     private Integer cargadorID;
 
     public String getCedulaCliente(){
@@ -15,7 +15,7 @@ public class iniciarCargaDatos {
     }
 
     public String getNumeroTarjeta() {
-        return numeroTarjerta;
+        return numeroTarjeta;
     }
 
     public Integer getCargadorID(){
@@ -30,8 +30,16 @@ public class iniciarCargaDatos {
         this.metodoPago = metodoPago;
     }
 
+    public void setNumeroTarjeta(String numeroTarjeta) {
+        this.numeroTarjeta = numeroTarjeta;
+    }
+
+    public void setNumeroTarjerta(String numeroTarjerta) {
+        this.numeroTarjeta = numeroTarjerta;
+    }
+
     public void setNumerTarjerta(String numeroTarjerta) {
-        this.numeroTarjerta = numeroTarjerta;
+        this.numeroTarjeta = numeroTarjerta;
     }
 
     public void setCargadorID(Integer cargadorID) {

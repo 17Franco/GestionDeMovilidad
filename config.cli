@@ -28,3 +28,4 @@ connect
     end-try
     #para que wilfly lo levante tambien
     deploy sistemasExternosMocks/MockPagoCuentaUte.war --force
+    deploy sistemasExternosMocks/ServicioMedioPagoMock.war --force
