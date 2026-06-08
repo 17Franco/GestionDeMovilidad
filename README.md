@@ -123,8 +123,9 @@ Antes de ejecutar el proyecto es necesario tener instalado:
 ---
 ### Endpoints de ModuloCarga
 | Método | Endpoint | Descripción | Consumido Por |
-|---|---|---|---|
-| | | | | 
+|POST|movilidad/cargas/iniciar|Permite generar una carga nueva|app móvil|
+|GET|movilidad/cargas/verCarga|Retorna la carga actual del cliente consultado|app móvil|
+|GET|movilidad/cargas/verHistorial|Retorna el historial de cargas del cliente consultado|app móvil|
 ---
 ### Endpoints de ModuloPago
 | Método | Endpoint | Descripción | Consumido Por |
