@@ -10,7 +10,7 @@ public interface ClienteRepositorio {
     void saveCliente(Cliente cliente);
     boolean actualizar(Cliente cliente);
     Cliente buscarCliente(String cedula);
-    List<Cliente> allcliente();
+    List<Cliente> obtenerClientes();
     boolean saveReclamo(Reclamo reclamo);
     Grupo findGroup(String grupo);
 }

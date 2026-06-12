@@ -9,7 +9,6 @@ import moduloCliente.dominio.cliente.Cliente;
 import moduloCliente.dominio.repositorio.ClienteRepositorio;
 import moduloCliente.exepciones.ClienteInvalidoException;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -24,7 +23,7 @@ public class ClienteRepositorioImpl implements ClienteRepositorio {
 
     @Override
     public void saveCliente(Cliente cliente) {
-        if(cliente == null){
+        if (cliente == null) {
             throw new ClienteInvalidoException("Cliente no puede ser null");
         }
 
@@ -33,7 +32,7 @@ public class ClienteRepositorioImpl implements ClienteRepositorio {
 
     }
 
-    public Grupo findGroup(String grupo){
+    public Grupo findGroup(String grupo) {
         return em.find(Grupo.class, grupo);
     }
 
@@ -57,18 +56,19 @@ public class ClienteRepositorioImpl implements ClienteRepositorio {
     }
 
     @Override
-    public List<Cliente> allcliente() {
-        return new ArrayList<>(clientes);
+    public List<Cliente> obtenerClientes() {
+        return em.createQuery("SELECT c FROM MCliente_Cliente c", Cliente.class)
+                .getResultList();
     }
 
     @Override
-    public boolean saveReclamo(Reclamo reclamo){
+    public boolean saveReclamo(Reclamo reclamo) {
 
-        if(reclamo == null){
+        if (reclamo == null) {
             return false;
         }
         em.persist(reclamo);
-        //em.persist(reclamo.getCliente());
+        // em.persist(reclamo.getCliente());
 
         return true;
     }

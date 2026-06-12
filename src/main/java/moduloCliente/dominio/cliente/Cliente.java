@@ -12,6 +12,9 @@ import moduloCliente.dominio.Tarjeta;
 import java.util.ArrayList;
 import java.util.List;
 
+//evitar ciclo infinito al serializar
+import jakarta.json.bind.annotation.JsonbTransient;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -28,9 +31,11 @@ public abstract class Cliente {
     private String contra;
 
     @OneToMany(mappedBy = "cliente")
+    @JsonbTransient
     private List<Reclamo> reclamos = new ArrayList<>();
 
     @OneToMany(mappedBy = "cliente")
+    @JsonbTransient
     private List<Tarjeta> tarjetas = new ArrayList<>();
 
     @ManyToMany (fetch = FetchType.EAGER)

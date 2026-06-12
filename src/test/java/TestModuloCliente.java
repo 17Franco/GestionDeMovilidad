@@ -149,11 +149,6 @@ public class TestModuloCliente {
             }
 
             @Override
-            public List<Cliente> allcliente() {
-                return new ArrayList<>(clientes);
-            }
-
-            @Override
             public boolean saveReclamo(Reclamo reclamo) {
 
                 if (reclamo == null) {

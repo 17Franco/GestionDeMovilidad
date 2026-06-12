@@ -12,7 +12,7 @@ import moduloCliente.dominio.cliente.ClienteComun;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "MCliente_CuentUte")
+@Table(name = "MCliente_CuentaUte")
 public class CuentaUTE extends MedioPago {
     private String numeroCuenta;
 

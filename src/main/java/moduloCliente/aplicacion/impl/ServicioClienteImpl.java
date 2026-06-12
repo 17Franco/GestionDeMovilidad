@@ -100,12 +100,8 @@ public class ServicioClienteImpl implements ServicioCliente {
         return false;
     }
 
-    public void obtenerClientes() {
-        var clientes = repo.allcliente();
-        System.out.println("Clientes registrados:");
-        for (Cliente cliente : clientes) {
-            System.out.printf("- %s %s %s\n", cliente.getCedula(), cliente.getNombre(), cliente.getApellido(),cliente.getReclamos());
-        }
+    public List<Cliente> obtenerClientes() {
+        return repo.obtenerClientes();
     }
 
     @Override

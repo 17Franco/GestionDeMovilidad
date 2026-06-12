@@ -29,9 +29,10 @@ public class ValidadorCredenciales implements IdentityStore {
         Cliente cliente = repo.buscarCliente(usr);
         System.out.println(usr);
         if(cliente != null){
+
             //si existe compruebo contrasenia
             String hashPass = HashFunctionUtil.convertToHas(pass);
-            if(hashPass.equals(cliente.getContra())){
+            if(hashPass.equals(cliente.getContra()) || pass.equals(cliente.getContra())){
                 //si es correcto
                 resultado =  new CredentialValidationResult
                         (usr, new HashSet<>(cliente.gruposAsString()));

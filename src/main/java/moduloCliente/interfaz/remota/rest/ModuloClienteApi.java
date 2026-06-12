@@ -1,5 +1,7 @@
 package moduloCliente.interfaz.remota.rest;
 
+import java.util.List;
+
 import jakarta.annotation.security.DenyAll;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
@@ -99,11 +101,13 @@ public class ModuloClienteApi {
                 .build();
     }
 
-   /* @GET
+    @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @Path("/obtener")
+    @RolesAllowed("appMovil")
     public List<Cliente> verClientes(){
         return servicioCliente.obtenerClientes();
     }
-    */
+    
 
 }
