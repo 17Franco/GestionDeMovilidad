@@ -120,6 +120,7 @@ Antes de ejecutar el proyecto es necesario tener instalado:
 | POST | movilidad/clientes/reclamos  | Permite a un usuario realizar un reclamo | app móvil |
 | POST | movilidad/clientes/metodoPago | Permite agregar un metodo de pago al cliente | app móvil |
 | GET | movilidad/clientes/obtener | Permite listar a todos los usuarios | app movil |
+| POST | movilidad/clientes/medioPago | Permite cargar nuevos medios de pago | app movil |
 ---
 ### Endpoints de ModuloCarga
 
