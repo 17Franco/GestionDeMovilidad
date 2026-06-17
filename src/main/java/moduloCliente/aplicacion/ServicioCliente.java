@@ -9,7 +9,7 @@ import java.util.List;
 public interface ServicioCliente {
 
     void registrarCliente(Cliente cliente);
-    boolean altaMedioPago(String ci, MedioPago formaPago);
+    boolean altaMedioPago(String ci, MedioPago medioPago);
     List<Cliente> obtenerClientes();
     Reclamo realizarReclamo(String asunto, String descripcion, String ci);
     List<Reclamo> obtenerReclamos(String ci);

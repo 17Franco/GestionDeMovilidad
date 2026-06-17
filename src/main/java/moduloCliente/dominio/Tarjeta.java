@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import moduloCliente.dominio.cliente.Cliente;
+import moduloCliente.dominio.TipoTarjeta;
 
 import java.time.LocalDate;
 

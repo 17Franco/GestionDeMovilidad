@@ -17,6 +17,8 @@ import moduloCarga.dominio.medioPago.Tarjeta;
 import moduloCarga.dominio.repositorio.RepoCarga;
 import moduloCliente.exepciones.ClienteInvalidoException;
 
+import moduloCarga.dominio.medioPago.MedioPago;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -60,10 +62,15 @@ public class CargaRepoImpl implements RepoCarga {
             return em.find(Cliente.class, cedula);
     }
 
-    @Override
-    public boolean actualizar(Cliente cliente) {
-       return true;
+@Override
+public boolean actualizar(Cliente cliente) {
+    if (cliente == null) {
+        return false;
     }
+
+    em.merge(cliente);
+    return true;
+}
 
     @Override
     public void registrarCliente(Cliente cli) {
@@ -182,4 +189,10 @@ public class CargaRepoImpl implements RepoCarga {
         .setParameter("cedula", cedula)
         .getResultList();
     }
+
+    @Override
+public void saveMedioPago(MedioPago medioPago) {
+    em.persist(medioPago);
+}
+
 }

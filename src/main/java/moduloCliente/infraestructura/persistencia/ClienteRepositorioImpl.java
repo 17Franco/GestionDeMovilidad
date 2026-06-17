@@ -3,6 +3,7 @@ package moduloCliente.infraestructura.persistencia;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import moduloCliente.dominio.MedioPago;
 import moduloCliente.dominio.Grupo;
 import moduloCliente.dominio.Reclamo;
 import moduloCliente.dominio.cliente.Cliente;
@@ -38,16 +39,12 @@ public class ClienteRepositorioImpl implements ClienteRepositorio {
 
     @Override
     public boolean actualizar(Cliente cliente) {
-        if (cliente == null || cliente.getCedula() == null) {
+        if (cliente == null) {
             return false;
         }
-        for (int i = 0; i < clientes.size(); i++) {
-            if (Objects.equals(clientes.get(i).getCedula(), cliente.getCedula())) {
-                clientes.set(i, cliente);
-                return true;
-            }
-        }
-        return false;
+
+        em.merge(cliente);
+        return true;
     }
 
     @Override
@@ -72,4 +69,11 @@ public class ClienteRepositorioImpl implements ClienteRepositorio {
 
         return true;
     }
+
+    // altamediopago
+    @Override
+    public void saveMedioPago(MedioPago medioPago) {
+        em.persist(medioPago);
+    }
+
 }

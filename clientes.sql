@@ -55,4 +55,15 @@ INSERT INTO MCliente_Cliente_Grupo
 VALUES
     (@cedula_profesional, 'appMovil');
 
+-- Para que ande la carga de de metodo de pago en modulo de carga se necesitan los clientes en ese modulo tamb.
+INSERT INTO MCarga_Cliente
+    (cedula, nombre, apellido, numTel, contra, carga_actual_id)
+VALUES
+    ('1111111-1', 'Cliente', 'Prueba', '099111111', '1234', NULL);
+
+INSERT INTO MCarga_ClienteComun
+    (cedula, forma_pago_id)
+VALUES
+    ('1111111-1', NULL);
+
 COMMIT;

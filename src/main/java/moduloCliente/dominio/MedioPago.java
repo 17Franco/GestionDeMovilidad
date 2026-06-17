@@ -18,6 +18,7 @@ import java.time.LocalDate;
 @Table(name = "MCliente_MedioPago")
 public abstract class MedioPago {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private LocalDate fechaCreacion;
 

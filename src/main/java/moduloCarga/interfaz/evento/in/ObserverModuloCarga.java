@@ -42,31 +42,42 @@ public class ObserverModuloCarga {
         servicioCarga.altaCliente(cli);
     }
 
-    public void accept(@Observes ClienteMetodoDePago event) {
-        //log.infof("Evento procesado: GestionNuevoVehiculo: %s", event.toString());
-        //TipoProfesional tipo = TipoProfesional.valueOf(event.getTipo());
-        if("CUENTA_UTE".equals(event.getTipoMedioPago())){
-            CuentaUTE cuenta = new CuentaUTE();
-            cuenta.setId(event.getId());
-            cuenta.setFechaCreacion(event.getFechaCreacion());
-            cuenta.setNumeroCuenta(event.getNumeroCuenta());
+public void accept(@Observes ClienteMetodoDePago event) {
 
-            servicioCarga.altaMedioPago(event.getClienteCUte(),cuenta);
-        }else if("TARJETA".equals(event.getTipoMedioPago())){
-            Tarjeta tarjeta = new Tarjeta();
-            tarjeta.setId(event.getId());
-            tarjeta.setFechaCreacion(event.getFechaCreacion());
-            tarjeta.setNumero(event.getNumero());
-            tarjeta.setFechaVencimiento(event.getFechaVencimiento());
-            tarjeta.setDigitoVerificacion(event.getDigitoVerificacion());
-            TipoTarjeta tipo = TipoTarjeta.valueOf(event.getTipo());
-            tarjeta.setTipo(tipo);
+    System.out.println("========= OBSERVER CARGA RECIBIO MEDIO DE PAGO =========");
+    System.out.println("Tipo medio pago = " + event.getTipoMedioPago());
+    System.out.println("Id = " + event.getId());
+    System.out.println("Cliente UTE = " + event.getClienteCUte());
+    System.out.println("Cliente Tarjeta = " + event.getClienteTarjeta());
+    System.out.println("Numero cuenta = " + event.getNumeroCuenta());
+    System.out.println("Numero tarjeta = " + event.getNumero());
+    System.out.println("Tipo tarjeta = " + event.getTipo());
 
-            servicioCarga.altaMedioPago(event.getClienteCUte(),tarjeta);
+    if ("CUENTA_UTE".equals(event.getTipoMedioPago())) {
 
-        }
+        CuentaUTE cuenta = new CuentaUTE();
+        cuenta.setId(event.getId());
+        cuenta.setFechaCreacion(event.getFechaCreacion());
+        cuenta.setNumeroCuenta(event.getNumeroCuenta());
 
-        //servicioCarga.altaCliente(cli);
+        boolean resu = servicioCarga.altaMedioPago(event.getClienteCUte(), cuenta);
+        System.out.println("Resultado alta medio pago carga UTE = " + resu);
+
+    } else if ("TARJETA".equals(event.getTipoMedioPago())) {
+
+        Tarjeta tarjeta = new Tarjeta();
+        tarjeta.setId(event.getId());
+        tarjeta.setFechaCreacion(event.getFechaCreacion());
+        tarjeta.setNumero(event.getNumero());
+        tarjeta.setFechaVencimiento(event.getFechaVencimiento());
+        tarjeta.setDigitoVerificacion(event.getDigitoVerificacion());
+
+        TipoTarjeta tipo = TipoTarjeta.valueOf(event.getTipo());
+        tarjeta.setTipo(tipo);
+
+        boolean resu = servicioCarga.altaMedioPago(event.getClienteTarjeta(), tarjeta);
+        System.out.println("Resultado alta medio pago carga tarjeta = " + resu);
     }
+}
 
 }

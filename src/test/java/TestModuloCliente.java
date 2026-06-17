@@ -29,8 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 
 @EnableWeld
 @AddPackages({
@@ -43,25 +41,26 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         FuncionalidadCargadorInterfaceMOCKImpl.class,
 })
 public class TestModuloCliente {
-    //para estos test no uso libreria mockito, sino que uso weld-junit + MockBean yo creo implementaciones falsas manuales y las injecto al servicio
+    // para estos test no uso libreria mockito, sino que uso weld-junit + MockBean
+    // yo creo implementaciones falsas manuales y las injecto al servicio
     @Inject
     private ServicioCliente servicioCliente;
 
     private ClienteRepositorio fakeRepo;
 
-    //aca estoy configuracdo weld para que al iniciar me injeccto las implementaciones falsas en mi servicio
+    // aca estoy configuracdo weld para que al iniciar me injeccto las
+    // implementaciones falsas en mi servicio
     @WeldSetup
-    public WeldInitiator weld =
-            WeldInitiator.from(ServicioClienteImpl.class)
-                    .addBeans(crearMockRepositorioImpl())
-                    .addBeans(crearMockPublicadorEventoFake())
-                    .build();
+    public WeldInitiator weld = WeldInitiator.from(ServicioClienteImpl.class)
+            .addBeans(crearMockRepositorioImpl())
+            .addBeans(crearMockPublicadorEventoFake())
+            .build();
 
     private Bean<?> crearMockRepositorioImpl() {
         return MockBean.builder()
-                .types(ClienteRepositorio.class) //esto lo saco del @inject de ServicioPeajeImpl
+                .types(ClienteRepositorio.class) // esto lo saco del @inject de ServicioPeajeImpl
                 .scope(ApplicationScoped.class)
-                .creating(crearRepoModuloClienteImpl())  //aca construyo la implementación que será usasa en este test
+                .creating(crearRepoModuloClienteImpl()) // aca construyo la implementación que será usasa en este test
                 .build();
     }
 
@@ -73,31 +72,29 @@ public class TestModuloCliente {
                 .build();
     }
 
-
-    //no quiero probar el evento en test unitarios luego tendra su popio test
+    // no quiero probar el evento en test unitarios luego tendra su popio test
     private PublicadorEventoCliente crearPublicadorEvento() {
         return new PublicadorEventoCliente() {
 
-
             @Override
             public void publicarEventoClienteComun(Cliente cliente) {
-                //System.out.println("Se ejecutó lanzador Eventos Fake");
+                // System.out.println("Se ejecutó lanzador Eventos Fake");
             }
 
             @Override
             public void publicarEventoClienteProfesional(Cliente cliente) {
-                //System.out.println("Se ejecutó lanzador Eventos Fake");
+                // System.out.println("Se ejecutó lanzador Eventos Fake");
             }
 
             @Override
             public void publicarEventoClienteMetodoPago(MedioPago medioPago) {
-                //System.out.println("Se ejecutó lanzador Eventos Fake");
+                // System.out.println("Se ejecutó lanzador Eventos Fake");
             }
 
         };
     }
 
-    //creo una implementacion fake del repo o sea uso memoria
+    // creo una implementacion fake del repo o sea uso memoria
     private ClienteRepositorio crearRepoModuloClienteImpl() {
         fakeRepo = new ClienteRepositorioImpl() {
             private final List<Cliente> clientes = new ArrayList<>();
@@ -106,7 +103,7 @@ public class TestModuloCliente {
 
             @Override
             public void saveCliente(Cliente cliente) {
-                //System.out.println("Estoy usando repo fake");
+                // System.out.println("Estoy usando repo fake");
                 if (cliente != null) {
                     clientes.add(cliente);
                 }
@@ -160,6 +157,12 @@ public class TestModuloCliente {
 
                 return true;
             }
+
+            @Override
+            public void saveMedioPago(MedioPago medioPago) {
+                // Fake para tests: no usa EntityManager
+            }
+
         };
         return fakeRepo;
     }
@@ -172,7 +175,7 @@ public class TestModuloCliente {
         Cliente cliente = fakeRepo.buscarCliente("12345678");
         assertNotNull(cliente);
         assertEquals("12345678", cliente.getCedula());
-        //verifico que se le agrege el grupo appMovil
+        // verifico que se le agrege el grupo appMovil
         assertTrue(cliente.getGrupos().stream().anyMatch(g -> g.getNombre().equals("appMovil")));
     }
 
@@ -186,8 +189,7 @@ public class TestModuloCliente {
                 "099123456",
                 "1234",
                 TipoProfesional.PREMIUM,
-                15.0f
-        );
+                15.0f);
         servicioCliente.registrarCliente(clienteP);
 
         Cliente cliente = fakeRepo.buscarCliente("12345679");
@@ -203,29 +205,28 @@ public class TestModuloCliente {
     @Test
     @DisplayName("Registro MedioPagoCuentaUte")
     void altaMedioPagoCuentaUte() {
-        //Creo un cliente comun
+        // Creo un cliente comun
         ClienteComun cl = new ClienteComun(
                 "12345678",
                 "Franco",
                 "Echaide",
                 "099123456",
-                "1234"
-        );
-        //Creo un Medio de pago CuentaUTE
+                "1234");
+        // Creo un Medio de pago CuentaUTE
         CuentaUTE cuenta = new CuentaUTE();
         cuenta.setId(1);
         cuenta.setFechaCreacion(LocalDate.now());
         cuenta.setNumeroCuenta("11111111");
 
-        //Llamo a servicio
+        // Llamo a servicio
         servicioCliente.registrarCliente(cl);
         boolean resu = servicioCliente.altaMedioPago("12345678", cuenta);
 
-        //verificar
+        // verificar
         Cliente cliente = fakeRepo.buscarCliente("12345678");
         ClienteComun cliC = (ClienteComun) cliente;
         assertTrue(resu);
-        //compruebo que tiene el método de pago que le agrege
+        // compruebo que tiene el método de pago que le agrege
         assertEquals("11111111", cliC.getFormaPago().getNumeroCuenta());
 
     }
@@ -233,7 +234,7 @@ public class TestModuloCliente {
     @Test
     @DisplayName("Registro MedioPagoTarjeta")
     void altaMedioPagoTarjeta() {
-        //Creo un cliente Professional
+        // Creo un cliente Professional
         ClienteProfesional clienteP = new ClienteProfesional(
                 "12345679",
                 "Franco",
@@ -241,22 +242,21 @@ public class TestModuloCliente {
                 "099123456",
                 "1234",
                 TipoProfesional.PREMIUM,
-                15.0f
-        );
-        //Creo un Medio de pago TARJETA
+                15.0f);
+        // Creo un Medio de pago TARJETA
         Tarjeta tarjeta = new Tarjeta();
         tarjeta.setId(1);
         tarjeta.setFechaCreacion(LocalDate.now());
         tarjeta.setNumero("2222222");
         tarjeta.setFechaVencimiento(LocalDate.now());
         tarjeta.setDigitoVerificacion("327");
-        //tarjeta.setTipo(TipoTarjeta);
+        // tarjeta.setTipo(TipoTarjeta);
 
-        //Llamo a servicio
+        // Llamo a servicio
         servicioCliente.registrarCliente(clienteP);
         boolean resu = servicioCliente.altaMedioPago("12345679", tarjeta);
 
-        //verificar
+        // verificar
         Cliente cliente = fakeRepo.buscarCliente("12345679");
         assertTrue(resu);
         assertEquals(1, cliente.getTarjetas().size());
@@ -265,34 +265,34 @@ public class TestModuloCliente {
     @Test
     @DisplayName("Registro listarClientes")
     void listarCliente() {
-        //crear varios clientes
-        //comprobar si los trae
+        // crear varios clientes
+        // comprobar si los trae
     }
 
     @Test
     @DisplayName("Registro Reclamo Para ClienteComun")
     void hacerReclamoParaClienteComun() {
-        //Creo un cliente comun
+        // Creo un cliente comun
         ClienteComun cl = new ClienteComun(
                 "12345678",
                 "Franco",
                 "Echaide",
                 "099123456",
-                "1234"
-        );
-        //Llamo a servicio
+                "1234");
+        // Llamo a servicio
         servicioCliente.registrarCliente(cl);
-        Reclamo reclamo = servicioCliente.realizarReclamo("Probando","Probando realizar reclamo en cliente Comun","12345678");
-        //verificar
+        Reclamo reclamo = servicioCliente.realizarReclamo("Probando", "Probando realizar reclamo en cliente Comun",
+                "12345678");
+        // verificar
         assertNotNull(reclamo);
-        assertEquals("Probando realizar reclamo en cliente Comun",reclamo.getDescripcion());
-        assertEquals("12345678",reclamo.getCliente().getCedula());
+        assertEquals("Probando realizar reclamo en cliente Comun", reclamo.getDescripcion());
+        assertEquals("12345678", reclamo.getCliente().getCedula());
     }
 
     @Test
     @DisplayName("Registro Reclamo Para ClenteProfesional")
     void hacerReclamoParaClienteProfesional() {
-        //Creo un cliente Professional
+        // Creo un cliente Professional
         ClienteProfesional clienteP = new ClienteProfesional(
                 "12345679",
                 "Franco",
@@ -300,14 +300,14 @@ public class TestModuloCliente {
                 "099123456",
                 "1234",
                 TipoProfesional.PREMIUM,
-                15.0f
-        );
-        //Llamo a servicio
+                15.0f);
+        // Llamo a servicio
         servicioCliente.registrarCliente(clienteP);
-        Reclamo reclamo = servicioCliente.realizarReclamo("Probando","Probando realizar reclamo en cliente Profesional","12345679");
-        //verificar
+        Reclamo reclamo = servicioCliente.realizarReclamo("Probando",
+                "Probando realizar reclamo en cliente Profesional", "12345679");
+        // verificar
         assertNotNull(reclamo);
-        assertEquals("Probando realizar reclamo en cliente Profesional",reclamo.getDescripcion());
-        assertEquals("12345679",reclamo.getCliente().getCedula());
+        assertEquals("Probando realizar reclamo en cliente Profesional", reclamo.getDescripcion());
+        assertEquals("12345679", reclamo.getCliente().getCedula());
     }
 }
