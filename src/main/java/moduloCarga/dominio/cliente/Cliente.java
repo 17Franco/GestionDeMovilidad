@@ -27,6 +27,8 @@ public abstract class Cliente {
     private String apellido;
     private String numTel;
     private String contra;
+    @Column(nullable = false)
+    private Boolean deudaActiva = false;
 
     @OneToMany(mappedBy = "cliente")
     private List<Tarjeta> tarjetas = new ArrayList<>();

@@ -69,6 +69,7 @@ public class ServicioCargaImpl implements ServicioCarga {
     }
 
     @Override
+    @Transactional
     public void iniciarCarga(Cliente cli, MedioPago formaPago, Integer idCargador) {
         DTOCarga dtoCarga = cargadorMock.iniciarCarga();
 
@@ -87,8 +88,7 @@ public class ServicioCargaImpl implements ServicioCarga {
         cli.setCargaActual(cargaNueva);
 
         // 5. Busco historial
-        HistorialDeCargas historial = cli.getHistorialAsociado();
-
+        HistorialDeCargas historial = repo.buscarHistorialPorCedula(cli.getCedula());
         // 6. Si no existe, lo creo
         if (historial == null) {
             historial = new HistorialDeCargas();
@@ -123,9 +123,13 @@ public class ServicioCargaImpl implements ServicioCarga {
         return cli.getCargaActual();
     }
 
+
+
+    
     @Override
+    @Transactional
     public void verHistorico(Cliente cli, String fechaIni, String fechaFin) {
-        HistorialDeCargas historial = cli.getHistorialAsociado();
+        HistorialDeCargas historial = repo.buscarHistorialPorCedula(cli.getCedula());        
         List<ElementoHistorial> listaHistorial = historial.getHistorialCargas();
         // parseo las fechas de string a LocalDate
         LocalDate fechaInicio = LocalDate.parse(fechaIni);

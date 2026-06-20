@@ -110,6 +110,34 @@ Antes de ejecutar el proyecto es necesario tener instalado:
 
 ## ▶ Ejecutar el Proyecto
 
+Desde la raíz del proyecto, iniciar la aplicación y WildFly:
+
+```bash
+mvn clean package wildfly:dev -DskipTests
+```
+
+Los servicios externos ubicados en `sistemasExternosMocks/` no se despliegan
+automáticamente con la aplicación principal. Con WildFly ejecutándose, abrir
+otra terminal en la raíz del proyecto y desplegarlos manualmente:
+
+```bash
+./target/server/bin/jboss-cli.sh --connect \
+  --command="deploy --force sistemasExternosMocks/ServicioMedioPagoMock.war"
+
+./target/server/bin/jboss-cli.sh --connect \
+  --command="deploy --force sistemasExternosMocks/MockPagoCuentaUte.war"
+```
+
+Comprobar que todos los despliegues tengan estado `OK`:
+
+```bash
+./target/server/bin/jboss-cli.sh --connect \
+  --command="deployment-info"
+```
+
+Al ejecutar `mvn clean` se puede recrear `target/server`. En ese caso es
+necesario volver a desplegar los WAR de los servicios externos.
+
 ## 🌐 API / Endpoints
 
 ### Endpoints de ModuloCliente
@@ -154,4 +182,3 @@ El proyecto incluye pruebas para validar el correcto funcionamiento de los princ
 - **TestModuloCliente**
   - Verifica la cracion del cliente y Medio de Pagos.
     
-

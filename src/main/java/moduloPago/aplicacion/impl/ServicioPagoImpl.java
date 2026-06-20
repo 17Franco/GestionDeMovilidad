@@ -2,6 +2,9 @@ package moduloPago.aplicacion.impl;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
+import moduloCarga.dominio.cliente.Cliente;
+import moduloCarga.dominio.repositorio.RepoCarga;
 import moduloPago.aplicacion.ServicioPago;
 import moduloPago.dominio.pagoRealizado;
 import moduloPago.dominio.repositorio.RepoPago;
@@ -21,6 +24,9 @@ public class ServicioPagoImpl implements ServicioPago {
 
     @Inject
     private RepoPago repo;
+
+    @Inject
+    private RepoCarga repoCarga;
 
     @Override
     public void pagarCarga(
@@ -103,5 +109,53 @@ public class ServicioPagoImpl implements ServicioPago {
    public List<pagoRealizado> consultarPagos(String cedulaCliente, LocalDate fechaIni, LocalDate fechaFin){
 
         return repo.getPagosPorFecha(cedulaCliente,fechaFin,fechaFin);
+    }
+
+
+    @Override
+    @Transactional
+    public boolean pagarConTarjeta(String cedulaCliente, String numeroTarjeta, float monto) {
+
+        Cliente cliente = repoCarga.buscarPorCedula(cedulaCliente);
+
+        if (cliente == null) {
+            throw new IllegalArgumentException("El cliente no existe");
+        }
+
+        boolean autorizado = pagarConTarjetaServicioExterno(
+                cedulaCliente,
+                numeroTarjeta,
+                monto
+        );
+
+        // Rechazado: se activa la deuda.
+    // Aprobado: se elimina cualquier deuda.
+        cliente.setDeudaActiva(!autorizado);
+        repoCarga.ActualizarCliente(cliente);
+
+        return autorizado;
+    }
+
+
+    //Siempre me cambia el estado de la deuda de true a false
+    @Override
+    @Transactional
+    public boolean pagarDeuda(
+            String cedulaCliente,
+            String numeroTarjeta,
+            float monto) {
+
+        Cliente cliente = repoCarga.buscarPorCedula(cedulaCliente);
+
+        if (cliente == null) {
+            throw new IllegalArgumentException("El cliente no existe");
+        }
+
+        Boolean deudaActiva = false;
+
+        cliente.setDeudaActiva(deudaActiva);
+        repoCarga.ActualizarCliente(cliente);
+
+        return deudaActiva;
     }
 }
