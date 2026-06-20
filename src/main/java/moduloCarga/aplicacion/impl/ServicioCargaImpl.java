@@ -24,10 +24,14 @@ import moduloCarga.dominio.medioPago.CuentaUTE;
 import moduloCarga.dominio.medioPago.MedioPago;
 import moduloCarga.dominio.medioPago.Tarjeta;
 import moduloCarga.dominio.repositorio.RepoCarga;
+import moduloCarga.interfaz.evento.out.PublicadorEvento;
 
 @ApplicationScoped
 public class ServicioCargaImpl implements ServicioCarga {
 
+    @Inject
+    private PublicadorEvento publicadorEvento;
+    
     @Inject
     private RepoCarga repo;
 
@@ -110,7 +114,9 @@ public class ServicioCargaImpl implements ServicioCarga {
         repo.ActualizarCliente(cli);// me acavki de dar cuenta que esto tiene que se actualizar unicamente, no
                                     // persisitir, sino creo un usuario nuevo al iniciar una carga si lo hace un
                                     // usuario sin registrar
-    }
+    
+        publicadorEvento.publicarCargaIniciada(cargaNueva.getId());
+        }
 
     @Override
     public Carga verCargaActual(Cliente cli) {
@@ -141,7 +147,7 @@ public class ServicioCargaImpl implements ServicioCarga {
     @Override
     public void finalizarCarga(Cargador cargador, Carga carga, int recargo) {
 
-        if (carga == null) {
+        if (carga == null || carga.getEstado() != EstadoCarga.ENPROGRESO) {
             return;
         }
 
@@ -154,6 +160,9 @@ public class ServicioCargaImpl implements ServicioCarga {
         float importeBase = 500f;
 
         carga.setImporteTotal(importeBase + recargo);
+
+        repo.actualizarCarga(carga);
+        publicadorEvento.publicarCargaFinalizada(carga.getId());
 
         System.out.println("Carga finalizada correctamente");
     }

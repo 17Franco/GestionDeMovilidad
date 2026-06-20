@@ -89,6 +89,12 @@ public boolean actualizar(Cliente cliente) {
 
     @Override
     @Transactional
+    public void actualizarCarga(Carga carga) {
+        em.merge(carga);
+    }
+
+    @Override
+    @Transactional
     public void persistirOActualizarHistorial(HistorialDeCargas historial) {
         if (historial.getId() == 0) {
             em.persist(historial);
