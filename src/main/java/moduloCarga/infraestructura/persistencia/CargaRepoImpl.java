@@ -164,12 +164,10 @@ public boolean actualizar(Cliente cliente) {
     @Override
     public HistorialDeCargas buscarHistorialPorCedula(String cedula) {
         List<HistorialDeCargas> resultado = em.createQuery(
-                "SELECT DISTINCT h FROM HistorialDeCargas h " +
-                "LEFT JOIN FETCH h.historialCargas elementos " +
-                "LEFT JOIN FETCH elementos.carga " +
-                "LEFT JOIN FETCH elementos.medioPago " +
-                "WHERE h.clienteAsociado.cedula = :cedula",
-                HistorialDeCargas.class
+        "SELECT DISTINCT h FROM HistorialDeCargas h " +
+        "LEFT JOIN FETCH h.historialCargas " +
+        "WHERE h.clienteAsociado.cedula = :cedula",
+        HistorialDeCargas.class
         )
         .setParameter("cedula", cedula)
         .getResultList();

@@ -13,4 +13,8 @@ public interface ServicioPago {
 
 
     List<pagoRealizado> consultarPagos(String cedulaCliente, LocalDate fechaIni, LocalDate fechaFin);
+    
+    boolean pagarDeuda(String cedulaCliente, String numeroTarjeta, float monto);
+
+    public boolean pagarConTarjeta(String cedulaCliente, String numeroTarjeta, float monto);
 }

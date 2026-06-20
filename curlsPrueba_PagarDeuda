@@ -127,7 +127,48 @@ curl -i -u "2222222-2:1234" -X POST http://localhost:8080/GestionDeMovilidad/mov
 curl -i -u "1111111-1:1234" http://localhost:8080/GestionDeMovilidad/movilidad/cargas/verHistorial
 
 
-# 11. VERIFICAR INFLUXDB
+# 11. REALIZAR PAGO RECHAZADO
+# ---------------------------
+
+# Ana intenta pagar con la tarjeta rechazada (La tarjeta "22222222"  siempre da rechazada).
+# Debe responder HTTP 402 y activar deudaActiva.
+curl -i -u "1111111-1:1234" -X POST -H "Content-Type: application/json" -d '{"numeroTarjeta":"22222222","monto":500}' http://localhost:8080/GestionDeMovilidad/movilidad/pagos/pagarConTarjeta
+
+
+# 12. COMPROBAR BLOQUEO POR DEUDA
+# -------------------------------
+
+# Ana intenta iniciar otra carga.
+# Debe responder 400 porque tiene una deuda activa.
+curl -i -u "1111111-1:1234" -X POST -H "Content-Type: application/json" -d '{"cargadorID":1,"metodoPago":"CUENTA_UTE"}' http://localhost:8080/GestionDeMovilidad/movilidad/cargas/iniciar
+
+
+# 13. PAGAR LA DEUDA
+# ------------------
+
+# Ana paga la deuda con la tarjeta aprobada.
+# Debe responder HTTP 200 y dejar deudaActiva en false.
+curl -i -u "1111111-1:1234" -X POST -H "Content-Type: application/json" -d '{"numeroTarjeta":"11111111","monto":500}' http://localhost:8080/GestionDeMovilidad/movilidad/pagos/pagarDeuda
+
+
+# 14. COMPROBAR QUE SE ELIMINO EL BLOQUEO
+# ---------------------------------------
+
+# Ana vuelve a iniciar una carga.
+# Ahora debe responder HTTP 201.
+curl -i -u "1111111-1:1234" -X POST -H "Content-Type: application/json" -d '{"cargadorID":1,"metodoPago":"CUENTA_UTE"}' http://localhost:8080/GestionDeMovilidad/movilidad/cargas/iniciar
+
+
+# 15. REALIZAR PAGO APROBADO DIRECTAMENTE
+# ---------------------------------------
+
+# Bruno paga con una tarjeta aprobada.
+# Debe responder HTTP 200 y mantener deudaActiva en false.
+curl -i -u "2222222-2:1234" -X POST -H "Content-Type: application/json" -d '{"numeroTarjeta":"11111111","monto":350}' http://localhost:8080/GestionDeMovilidad/movilidad/pagos/pagarConTarjeta
+
+
+
+# 16. VERIFICAR INFLUXDB
 # ---------------------
 
 # Micrometer publica cada 10 segundos; esperamos un poco mas.

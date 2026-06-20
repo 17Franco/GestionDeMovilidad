@@ -119,6 +119,15 @@ public class ModuloCargaAPI {
                 .entity("{\"error\":\"El cliente autenticado no está sincronizado con el módulo Carga\"}")                
                 .build();
         }
+
+        //<-------VEO QUE NO TENGA DEUDA----->
+        if (Boolean.TRUE.equals(clienteBuscado.getDeudaActiva())) {
+        return Response.status(Response.Status.BAD_REQUEST)
+                .entity("{\"error\":\"El cliente tiene deudas pendientes\"}")
+                .build();
+        }
+
+
         //<----CASOS EN QUE PAGA CON CUENTA DE UTE ---->
         //Verifico que no coninfida que sea un cliente Profesional y que me pase una cuenta de ute, si pasa eso retorno error
         else if("CUENTA_UTE".equals(medioPagoString) && clienteBuscado instanceof ClienteProfesional){
