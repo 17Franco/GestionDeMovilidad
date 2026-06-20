@@ -1,0 +1,142 @@
+# PRUEBAS MANUALES - GESTION DE MOVILIDAD
+# ========================================
+#
+# Este archivo se puede copiar y pegar completo en una terminal Bash.
+# La aplicacion debe estar ejecutandose y la base debe estar limpia.
+# Todos los usuarios de prueba utilizan la contrasena: 1234
+# Los endpoints de estacion y cargador deben devolver el ID creado.
+
+
+# 1. PREPARAR DOCKER E INFLUXDB
+# -----------------------------
+
+# Ver todos los contenedores.
+docker ps -a
+
+# Iniciar el contenedor de Grafana e InfluxDB.
+docker start docker-influxdb-grafana
+
+# Debe aparecer con STATUS "Up".
+docker ps
+
+
+# 2. CREAR CLIENTES
+# -----------------
+
+# Cliente comun Ana.
+curl -i -X POST -H "Content-Type: application/json" -d '{"cedula":"1111111-1","nombre":"Ana","apellido":"Comun","numTel":"099111111","contra":"1234","tipoCliente":"COMUN"}' http://localhost:8080/GestionDeMovilidad/movilidad/clientes
+
+# Cliente comun Bruno.
+curl -i -X POST -H "Content-Type: application/json" -d '{"cedula":"2222222-2","nombre":"Bruno","apellido":"Comun","numTel":"099222222","contra":"1234","tipoCliente":"COMUN"}' http://localhost:8080/GestionDeMovilidad/movilidad/clientes
+
+# Cliente profesional Carla.
+curl -i -X POST -H "Content-Type: application/json" -d '{"cedula":"3333333-3","nombre":"Carla","apellido":"Profesional","numTel":"099333333","contra":"1234","tipoCliente":"PROFESIONAL","tipoProfesional":"BASICO","porcentajeDescuento":10}' http://localhost:8080/GestionDeMovilidad/movilidad/clientes
+
+
+# 3. CREAR MEDIOS DE PAGO
+# -----------------------
+
+# Cuenta UTE de Ana.
+curl -i -u "1111111-1:1234" -X POST -H "Content-Type: application/json" -d '{"tipoMedioPago":"CUENTA_UTE","numeroCuenta":"11111111"}' http://localhost:8080/GestionDeMovilidad/movilidad/clientes/medioPago
+
+# Cuenta UTE de Bruno.
+curl -i -u "2222222-2:1234" -X POST -H "Content-Type: application/json" -d '{"tipoMedioPago":"CUENTA_UTE","numeroCuenta":"22222222"}' http://localhost:8080/GestionDeMovilidad/movilidad/clientes/medioPago
+
+# Tarjeta de Carla.
+curl -i -u "3333333-3:1234" -X POST -H "Content-Type: application/json" -d '{"tipoMedioPago":"TARJETA","numero":"33333333","fechaVencimiento":"2030-12-31","digitoVerificacion":"123","tipoTarjeta":"CREDITO"}' http://localhost:8080/GestionDeMovilidad/movilidad/clientes/medioPago
+
+
+# 4. CREAR ESTACIONES
+# -------------------
+
+# Estacion Centro. En una base limpia deberia devolver ID 1.
+curl -i -X POST -H "Content-Type: application/json" -d '{"descripcion":"Estacion Centro","calle":"18 de Julio 1234","departamento":"Montevideo","longitud":-56,"latitud":-34}' http://localhost:8080/GestionDeMovilidad/movilidad/carga/estacion
+
+# Estacion Este. En una base limpia deberia devolver ID 2.
+curl -i -X POST -H "Content-Type: application/json" -d '{"descripcion":"Estacion Este","calle":"Avenida Italia 4567","departamento":"Maldonado","longitud":-55,"latitud":-35}' http://localhost:8080/GestionDeMovilidad/movilidad/carga/estacion
+
+# IMPORTANTE: si los IDs no son 1 y 2, hay que reemplazarlos debajo.
+
+
+# 5. CREAR CARGADORES
+# -------------------
+
+# Cargador normal para Estacion Centro.
+curl -i -X POST -H "Content-Type: application/json" -d '{"tipo":"NORMAL","tieneCable":true,"tipoConector":"GRANDE","potenciaMinima":22,"estacionCarga":1}' http://localhost:8080/GestionDeMovilidad/movilidad/carga/cargador
+
+# Cargador rapido para Estacion Centro.
+curl -i -X POST -H "Content-Type: application/json" -d '{"tipo":"RAPIDO","tieneCable":false,"tipoConector":"PEQUENO","potenciaMinima":50,"estacionCarga":1}' http://localhost:8080/GestionDeMovilidad/movilidad/carga/cargador
+
+# Cargador ultrarrapido para Estacion Este.
+curl -i -X POST -H "Content-Type: application/json" -d '{"tipo":"ULTRARRAPIDO","tieneCable":true,"tipoConector":"GRANDE","potenciaMinima":150,"estacionCarga":2}' http://localhost:8080/GestionDeMovilidad/movilidad/carga/cargador
+
+# En una base limpia los IDs de los cargadores deberian ser 1, 2 y 3.
+
+
+# 6. COMPROBAR SEGURIDAD
+# ----------------------
+
+# Sin credenciales: debe responder 401.
+curl -i http://localhost:8080/GestionDeMovilidad/movilidad/cargas/verCarga
+
+# Con contrasena incorrecta: debe responder 401.
+curl -i -u "1111111-1:incorrecta" http://localhost:8080/GestionDeMovilidad/movilidad/cargas/verCarga
+
+# Con credenciales correctas y sin carga actual: debe responder 404.
+curl -i -u "1111111-1:1234" http://localhost:8080/GestionDeMovilidad/movilidad/cargas/verCarga
+
+
+# 7. INICIAR CARGAS
+# -----------------
+
+# Ana inicia una carga con Cuenta UTE en el cargador 1.
+curl -i -u "1111111-1:1234" -X POST -H "Content-Type: application/json" -d '{"cargadorID":1,"metodoPago":"CUENTA_UTE"}' http://localhost:8080/GestionDeMovilidad/movilidad/cargas/iniciar
+
+# Bruno inicia una carga con Cuenta UTE en el cargador 2.
+curl -i -u "2222222-2:1234" -X POST -H "Content-Type: application/json" -d '{"cargadorID":2,"metodoPago":"CUENTA_UTE"}' http://localhost:8080/GestionDeMovilidad/movilidad/cargas/iniciar
+
+# Carla inicia una carga con Tarjeta en el cargador 3.
+curl -i -u "3333333-3:1234" -X POST -H "Content-Type: application/json" -d '{"cargadorID":3,"metodoPago":"TARJETA","numeroTarjeta":"33333333"}' http://localhost:8080/GestionDeMovilidad/movilidad/cargas/iniciar
+
+
+# 8. CONSULTAR CARGA E HISTORIAL
+# ------------------------------
+
+# Carga actual de Ana.
+curl -i -u "1111111-1:1234" http://localhost:8080/GestionDeMovilidad/movilidad/cargas/verCarga
+
+# Historial de Ana.
+curl -i -u "1111111-1:1234" http://localhost:8080/GestionDeMovilidad/movilidad/cargas/verHistorial
+
+
+# 9. FINALIZAR CARGAS 
+# -------------------
+
+# Finalizar carga actual de Ana.
+
+curl -i -u "1111111-1:1234" -X POST http://localhost:8080/GestionDeMovilidad/movilidad/cargas/finalizarCargaActual
+
+# Finalizar carga actual de Bruno 
+curl -i -u "2222222-2:1234" -X POST http://localhost:8080/GestionDeMovilidad/movilidad/cargas/finalizarCargaActual
+
+
+# 10. CHEQUEO QUE FINALIZARON 
+# --------------------------
+
+# Vuevlo a ver historial de Ana.
+curl -i -u "1111111-1:1234" http://localhost:8080/GestionDeMovilidad/movilidad/cargas/verHistorial
+
+
+# 11. VERIFICAR INFLUXDB
+# ---------------------
+
+# Micrometer publica cada 10 segundos; esperamos un poco mas.
+sleep 12
+
+# Mostrar las mediciones de la base.
+docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute 'SHOW MEASUREMENTS'
+
+# Mostrar los ultimos valores de cargasActivas.
+docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute 'SELECT * FROM cargasActivas ORDER BY time DESC LIMIT 10'
+
+# Despues de iniciar las tres cargas, el ultimo valor deberia ser 3.
