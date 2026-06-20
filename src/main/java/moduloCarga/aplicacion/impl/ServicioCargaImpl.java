@@ -176,6 +176,7 @@ public class ServicioCargaImpl implements ServicioCarga {
     }
 
     @Override
+    @Transactional
     public void altaCargador(int estacionId, Cargador datos) {
         if (datos == null) {
             throw new IllegalArgumentException("El cargador no puede ser null");

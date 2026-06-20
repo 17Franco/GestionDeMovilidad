@@ -17,6 +17,7 @@ import moduloCarga.aplicacion.ServicioCarga;
 import moduloCarga.dominio.Carga;
 import moduloCarga.dominio.Cargador;
 import moduloCarga.dominio.ElementoHistorial;
+import moduloCarga.dominio.EstadoCarga;
 import moduloCarga.dominio.cliente.Cliente;
 import moduloCarga.dominio.cliente.ClienteComun;
 import moduloCarga.dominio.cliente.ClienteProfesional;
@@ -26,6 +27,7 @@ import jakarta.ws.rs.core.SecurityContext;
 
 import moduloCarga.dominio.medioPago.Tarjeta;
 import moduloCarga.dominio.repositorio.RepoCarga;
+import moduloCarga.infraestructura.rateLimiter.LimitarHistorial;
 
 
 
@@ -240,6 +242,7 @@ public class ModuloCargaAPI {
     curl -u '1234567-8:contraseña' http://localhost:8080/GestionDeMovilidad/movilidad/cargas/verHistorial    */
     @GET
     @Path("verHistorial")
+    @LimitarHistorial
     @RolesAllowed("appMovil")
     @Produces(MediaType.APPLICATION_JSON)
     public Response verHistorialCliente(){
@@ -268,7 +271,45 @@ public class ModuloCargaAPI {
             .build();
     
     }
-    
+
+    //Formato del curl:
+    //curl -u '1234567-8:contraseña' http://localhost:8080/GestionDeMovilidad/movilidad/cargas/finalizarCargaActual
+    @POST
+    @Path("finalizarCargaActual")
+    @RolesAllowed("appMovil")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response finalizarCargaActualCliente() {
+        String cedulaCliente = securityContext.getUserPrincipal().getName();
+
+        Cliente clienteBuscado = repoCarga.buscarPorCedula(cedulaCliente);
+
+        if (clienteBuscado == null) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("{\"error\":\"El cliente autenticado no está sincronizado con el módulo Carga\"}")
+                    .build();
+        }
+        //quedó medio desactualizado y mal el nombre, debería ser obtenerCargaActual, pero bueno, quedó así
+        Carga cargaBuscada = serivcioCarga.verCargaActual(clienteBuscado);
+
+        if (cargaBuscada == null) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("{\"error\":\"El cliente no tiene una carga actual asociada\"}")
+                    .build();
+        }
+
+        if (cargaBuscada.getEstado() != EstadoCarga.ENPROGRESO) {
+            return Response.status(Response.Status.CONFLICT)
+                    .entity("{\"error\":\"La carga ya fue finalizada\"}")
+                    .build();
+        }
+
+        Cargador cargadorAsociado = cargaBuscada.getCargador();
+        serivcioCarga.finalizarCarga(cargadorAsociado, cargaBuscada, 0);
+
+        return Response.ok()
+                .entity("{\"mensaje\":\"Carga finalizada correctamente\"}")
+                .build();
+    }
     
 
 

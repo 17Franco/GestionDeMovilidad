@@ -21,8 +21,10 @@ connect
     end-try
     #3ero finalmente se crea datasource
     try
-        data-source add --name=tallerjavadb --jndi-name=java:jboss/MySQL --driver-name=mysql --connection-url=jdbc:mysql://localhost:3306/Movilidad?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC --user-name=equipo7 --password=equipo7
+        data-source add --name=tallerjavadb --jndi-name=java:jboss/MariaDB --driver-name=mysql --connection-url=jdbc:mysql://localhost:3306/Movilidad?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC --user-name=equipo7 --password=equipo7
         echo "Se crea nuevo datasource para tallerjavadb"
     catch
         echo "No se crea datasource, ya existe"
     end-try
+
+    #Aclaracion: La base de datos es donde realmente se guardan las tablas y registros, El datasource es la configuración de WildFly para conectarse a esa base.
