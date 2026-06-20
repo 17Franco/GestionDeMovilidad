@@ -30,6 +30,7 @@ public interface RepoCarga {
     void registrarCliente(Cliente cli);
 
     void persistirCarga(Carga cargaNueva);
+    void actualizarCarga(Carga carga);
     void persistirOActualizarHistorial(HistorialDeCargas historial);
     void persistirElementoHistorial(ElementoHistorial elemento);
     void ActualizarCliente(Cliente cli);

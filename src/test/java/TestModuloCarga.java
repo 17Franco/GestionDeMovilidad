@@ -11,11 +11,13 @@ import moduloCarga.aplicacion.impl.ServicioCargaImpl;
 import moduloCarga.dominio.*;
 import moduloCarga.dominio.cliente.Cliente;
 import moduloCarga.dominio.medioPago.CuentaUTE;
+import moduloCarga.dominio.medioPago.MedioPago;
 import moduloCarga.dominio.medioPago.Tarjeta;
 import moduloCarga.dominio.repositorio.RepoCarga;
 import moduloCarga.infraestructura.persistencia.CargaRepoImpl;
 
 import moduloCarga.interfaz.evento.in.ObserverModuloCarga;
+import moduloCarga.interfaz.evento.out.PublicadorEvento;
 import moduloCliente.dominio.TipoProfesional;
 import moduloCliente.dominio.cliente.ClienteComun;
 import moduloCliente.dominio.cliente.ClienteProfesional;
@@ -57,7 +59,8 @@ public class TestModuloCarga {
     //y registra el bean fake
     @WeldSetup
     public WeldInitiator weld =
-            WeldInitiator.from(ServicioCargaImpl.class,ObserverModuloCarga.class,PublicadorEventoCliente.class)//debo agregar las class que son manejadas por wel
+            WeldInitiator.from(ServicioCargaImpl.class, ObserverModuloCarga.class,
+                    PublicadorEventoCliente.class, PublicadorEvento.class)//debo agregar las class que son manejadas por wel
                     .addBeans(crearMockRepositorioImpl())
                     .addBeans(crearMockCargadorImpl())
                     .build();
@@ -161,6 +164,14 @@ public class TestModuloCarga {
                 if (cargaNueva != null){
                     carga.add(cargaNueva);
                 }
+            }
+            @Override
+            public void actualizarCarga(Carga cargaActualizada) {
+                // Las cargas del repositorio fake se conservan por referencia.
+            }
+            @Override
+            public void saveMedioPago(MedioPago medioPago) {
+                // En memoria, el servicio asocia el medio de pago al cliente.
             }
             @Override
             public void persistirOActualizarHistorial(HistorialDeCargas historial) {

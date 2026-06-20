@@ -3,7 +3,7 @@ package moduloCarga.interfaz.remota;
 import java.util.ArrayList;
 import java.util.List;
 
-
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.Produces;
 import jakarta.inject.Inject;
@@ -20,19 +20,27 @@ import moduloCarga.dominio.ElementoHistorial;
 import moduloCarga.dominio.cliente.Cliente;
 import moduloCarga.dominio.cliente.ClienteComun;
 import moduloCarga.dominio.cliente.ClienteProfesional;
+import jakarta.annotation.security.DenyAll;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.ws.rs.core.SecurityContext;
 
 import moduloCarga.dominio.medioPago.Tarjeta;
 import moduloCarga.dominio.repositorio.RepoCarga;
 
 
 
-
+@DenyAll
 @Path("/cargas")
 @ApplicationScoped
 public class ModuloCargaAPI {
+    @Inject
+    private SecurityContext securityContext;
 
-    @Inject ServicioCarga serivcioCarga;
-    @Inject RepoCarga repoCarga;
+    @Inject 
+    ServicioCarga serivcioCarga;
+    
+    @Inject 
+    RepoCarga repoCarga;
 
     //funcion para verificar formato de cedula -> 1234567-8
     private boolean verificarFormatoCedula(String cedula) {
@@ -50,7 +58,6 @@ public class ModuloCargaAPI {
         head-> http://localhost:8080/GestionDeMovilidad/movilidad/cargas/iniciar
         body-> 
         {
-        "cedulaCliente": "1234567-8",
         "cargadorID": "3",
         "metodoPago": "TARJETA",
         "numeroTarjeta": "12345678"
@@ -60,7 +67,6 @@ public class ModuloCargaAPI {
         Y para cuenta UTE:
 
         {
-        "cedulaCliente": "1234567-8",
         "cargadorID" : 3,
         "metodoPago": "CUENTA_UTE"
         }
@@ -74,50 +80,62 @@ public class ModuloCargaAPI {
     */
     @POST
     @Path("/iniciar")
+    @RolesAllowed("appMovil")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response iniciarCarga(iniciarCargaDatos datos) {               //"datos" es el json que me llega por http, el framwork jakarta lo traduce automaticamente al dto que yo le meta, podria trabajar con string, pero justamente el framework es para facilitarme esto
-        String cedulaCliente = datos.getCedulaCliente();
+    public Response iniciarCarga(iniciarCargaDatos datos) {    //"datos" es el json que me llega por http, el framwork jakarta lo traduce automaticamente al dto que yo le meta, podria trabajar con string, pero justamente el framework es para facilitarme esto
+        //Verifico que me lleguen los datos
+        if (datos == null || datos.getMetodoPago() == null) {
+        return Response.status(Response.Status.BAD_REQUEST)
+                .entity("{\"error\":\"Faltan datos para iniciar la carga\"}")
+                .build();
+        }
+
+        // La cédula ahora proviene del usuario autenticado, no del JSON.
+        String cedulaCliente = securityContext.getUserPrincipal().getName();
         String medioPagoString = datos.getMetodoPago();
         Integer idCargador = datos.getCargadorID();
+        
         
         //VERIFICO QUE EL CARGADOR POR EL QUE ME PASA LA ID EXISTA
         Cargador cargadorAux = repoCarga.getCargador(idCargador);
         if (cargadorAux == null){
             return Response
                 .status(Response.Status.NOT_FOUND)
-                .entity("{\"error\":\"No existe el cargador del cual manda ID "+ "\"}")
+                .entity("{\"error\":\"No existe el cargador solicitado\"}")
                 .build();
         }
         
-        if (cedulaCliente == null || !verificarFormatoCedula(cedulaCliente)){
-            return Response
-                .status(Response.Status.BAD_REQUEST)
-                .entity("{\"error\":\"El formato de cedula enviado no es correcto, el formato esperado es '1234567-8'" + "\"}")
-                .build();
-        }
 
         //<----VERIFICO QUE EL CLIENTE EXISTA ----->
-        //Busco en la bd el Cliente que me pasan por cedula en el campo "cedulaCliente" del JSON, si existe lo guardo en una variable, sino retorno error 
+        // Busca la copia del cliente mantenida por el módulo Carga.
+        // La cédula no viene en el JSON: se obtiene desde SecurityContext.
         Cliente clienteBuscado = repoCarga.buscarPorCedula(cedulaCliente);
         if(clienteBuscado == null){
             return Response
                 .status(Response.Status.NOT_FOUND)
-                .entity("{\"error\":\"No existe cliente con cédula " + cedulaCliente + "\"}")
+                .entity("{\"error\":\"El cliente autenticado no está sincronizado con el módulo Carga\"}")                
                 .build();
         }
         //<----CASOS EN QUE PAGA CON CUENTA DE UTE ---->
         //Verifico que no coninfida que sea un cliente Profesional y que me pase una cuenta de ute, si pasa eso retorno error
-        else if(medioPagoString.equals("CUENTA_UTE") && clienteBuscado instanceof ClienteProfesional){
+        else if("CUENTA_UTE".equals(medioPagoString) && clienteBuscado instanceof ClienteProfesional){
             return Response
                 .status(Response.Status.BAD_REQUEST)
                 .entity("{\"error\":\"El metodo de pago " + medioPagoString + " no es valido para el tipo de cliente seleccionado (Profesional)" + "\"}")
                 .build();
         }
         //Si me envian una cuenta de ute y existe el cliente y no es cliente profesional creo la carga 
-        else if(medioPagoString.equals("CUENTA_UTE") && (clienteBuscado instanceof ClienteComun)){
+        else if("CUENTA_UTE".equals(medioPagoString) && (clienteBuscado instanceof ClienteComun)){
             //transformo el cliente que me llega en cliente comun para poder usar la funcion gerFormaPago
             ClienteComun clienteBuscadoComun = (ClienteComun)clienteBuscado; 
+            //Verifico que tenga cuenta de ute antes de iniciar la carga
+            if (clienteBuscadoComun.getFormaPago() == null) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                .entity("{\"error\":\"El cliente no tiene una Cuenta UTE asociada\"}")
+                .build();
+            }
+            //Si tiene cuenta de UTE inicio la carga
             serivcioCarga.iniciarCarga(clienteBuscado, clienteBuscadoComun.getFormaPago(), idCargador);
             return Response
                 .status(Response.Status.CREATED)
@@ -128,7 +146,7 @@ public class ModuloCargaAPI {
         //<----CASPS EM QUE PAGA CON TARJETA ---->
         
         //Si me envian una tarjeta y existe el cliente verifico que la tarjeta exista para ese cliente
-        else if(medioPagoString.equals("TARJETA")){
+        else if("TARJETA".equals(medioPagoString)){
             String numeroTarjeta = datos.getNumeroTarjeta();
             if(verificarFormatoTarjeta(numeroTarjeta)){
                 Tarjeta tarjetaCliente = repoCarga.buscarTarjetaClienteCI(cedulaCliente, numeroTarjeta);
@@ -151,64 +169,48 @@ public class ModuloCargaAPI {
             }else{
                 return Response
                             .status(Response.Status.BAD_REQUEST)
-                            .entity("{\"error\":\"El formato de tarjeta es erroneo, debe ser en el siguiente formato '1234567-8'\"}")
+                            .entity("{\"error\":\"El formato de tarjeta es erroneo, debe ser en el siguiente formato '12345678'\"}")
                             .build();
             }
             
     
         //<---- CASO BORDE, NO ES TARJETA NI CUENTA UTE ---->
         }
-        else if(!(medioPagoString.equals("TARJETA") && medioPagoString.equals("CUENTA_UTE"))){
-            return Response
-                .status(Response.Status.BAD_REQUEST)
-                .entity("{\"error\":\"El metodo de pago " + medioPagoString + " no es valido" + "\"}")
-                .build();
-            
+        else {
+            return Response.status(Response.Status.BAD_REQUEST)
+            .entity("{\"error\":\"El metodo de pago "
+                    + medioPagoString + " no es valido\"}")
+            .build();
         }
-        //No deberia pasar esto
-        else{
-            return Response
-                .status(Response.Status.BAD_REQUEST)
-                .entity("{\"error\":\"Error inesperado, llame a soporte tecnico" + "\"}")
-                .build();
-            
-        }
+        
+    }
 
-}
+        
 
+    
+
+    
+    //Ya no necesita consumir nada porque la cedula no viene en el json sino en el curl con basic auth
     /*
-    head-> http://localhost:8080/GestionDeMovilidad/movilidad/cargas/verCarga
-    body->{
-            "cedulaCliente" : "1234567-8"
-            }
-
-
-    Para usarlo debes tener
-    -Un cliente creado (cualquier tipo)
-    -Una carga Creada 
-    -Asociar la carga al cliete
+    La llamada ahora sería: 
+    curl -u '1234567-8:contraseña' http://localhost:8080/GestionDeMovilidad/movilidad/cargas/verCarga 
     */
-
     @GET
     @Path("verCarga")
+    @RolesAllowed("appMovil")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response verCargaActualCliente(verCargaActualDatos datos){
-        String cedulaCliente = datos.getCedulaCliente();
+    public Response verCargaActualCliente(){
+        // La cédula ahora proviene del usuario autenticado, no del JSON.
+        String cedulaCliente = securityContext.getUserPrincipal().getName();
 
-        //Me fijo que me pase un numero de cedula con formato correcto
-        if (!verificarFormatoCedula(cedulaCliente)){
-            return Response
-                .status(Response.Status.BAD_REQUEST)
-                .entity("{\"error\":\"El formato de cedula enviado no es correcto, el formato esperado es '1234567-8'" + "\"}")
-                .build();
-        }
-        //Si el formato es correcto me fijo que tenga una Carga Actual Asociada
+    
+        //Me fijo que tenga una Carga Actual Asociada
         Cliente clienteBuscado = repoCarga.buscarPorCedula(cedulaCliente);
         if(clienteBuscado == null){
             return Response
             .status(Response.Status.NOT_FOUND)
-            .entity("{\"error\":\"El cliente solicitado no existe" + "\"}")
+            .entity("{\"error\":\"El cliente autenticado no está sincronizado con el módulo Carga\"}")  
             .build();
         }
         else{
@@ -232,50 +234,34 @@ public class ModuloCargaAPI {
 
 
     
-   /*
-    head-> http://localhost:8080/GestionDeMovilidad/movilidad/cargas/verHistorial
-    body->{
-            "cedulaCliente":"7654321."
-            }
-    */
-    @POST
+    //Ya no necesita consumir nada porque la cedula no viene en el json sino en el curl con basic auth
+    /*
+    La llamada ahora sería: 
+    curl -u '1234567-8:contraseña' http://localhost:8080/GestionDeMovilidad/movilidad/cargas/verHistorial    */
+    @GET
     @Path("verHistorial")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @RolesAllowed("appMovil")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response verHistorialCliente(verHistorialClienteDatos datos){
-        String cedulaCliente = datos.getCedulaCliente();
+    public Response verHistorialCliente(){
+        // La cédula ahora proviene del usuario autenticado, no del JSON.
+        String cedulaCliente = securityContext.getUserPrincipal().getName();
 
-        //Verifico que me llegue una cedula en el formato adecuado
-        if (!verificarFormatoCedula(cedulaCliente)){
-            return Response
-                    .status(Response.Status.BAD_REQUEST)
-                    .entity("{\"error\":\"El formato de cedula enviado no es correcto, el formato esperado es '1234567-8'" + "\"}")
-                    .build();
-        }
         //Verifico que el cliente exista
         Cliente clienteBuscado = repoCarga.buscarPorCedula(cedulaCliente);
         if(clienteBuscado == null){
             return Response
             .status(Response.Status.NOT_FOUND)
-            .entity("{\"error\":\"El cliente solicitado no existe" + "\"}")
+            .entity("{\"error\":\"El cliente autenticado no está sincronizado con el módulo Carga\"}")            
             .build();
         }
         
         List<ElementoHistorial> listaDeCargas = repoCarga.buscarElementosHistorialPorCedula(cedulaCliente);
-        if (listaDeCargas.isEmpty()) {
-            return Response
-                    .status(Response.Status.OK)
-                    .entity("{\"mensaje\":\"El cliente no tiene cargas en el historial\"}")
-                    .build();
-        }
-        
         //uso esta lista para poder mostrar el historial como JSON
         List<ElementoHistorialDTO> historialDTO = new ArrayList<>();
         for (ElementoHistorial elemento : listaDeCargas) {
             historialDTO.add(new ElementoHistorialDTO(elemento));
         }
-       
-
+       //quité el if que retornaba error si la lista estaba vacía, si no tiene cargas solo retorno una lista vacía
         return Response
             .status(Response.Status.OK)
             .entity(historialDTO)
