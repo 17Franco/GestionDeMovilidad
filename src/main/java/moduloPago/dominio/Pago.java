@@ -5,6 +5,7 @@ package moduloPago.dominio;
 //tendra idcliente idcarga monto mediopagofecha inicio
 import java.time.LocalDate;
 
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,7 +13,12 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class pagoRealizado {
+@Entity (name = "MPago_Pago")
+//ACA tenemos historial de pagos rechazados y aceptados y podemso saber que tipo se usa si tarjeta o cuenta ute
+public class Pago {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int idPago;
 
     private String cedulaCliente;
 
@@ -23,4 +29,7 @@ public class pagoRealizado {
     private String medioPago;
 
     private LocalDate fecha;
+
+    @Enumerated(EnumType.STRING)
+    private Estado  estado;
 }

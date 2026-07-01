@@ -26,5 +26,7 @@ connect
     catch
         echo "No se crea datasource, ya existe"
     end-try
-
+    #oara qye wilfly lo levante tambien
+    deploy sistemasExternosMocks/MockPagoCuentaUte.war --force
+    deploy sistemasExternosMocks/ServicioMedioPagoMock.war --force
     #Aclaracion: La base de datos es donde realmente se guardan las tablas y registros, El datasource es la configuración de WildFly para conectarse a esa base.

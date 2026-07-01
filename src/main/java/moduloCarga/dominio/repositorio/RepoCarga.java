@@ -24,7 +24,7 @@ public interface RepoCarga {
     List<EstacionCarga> obtenerEstaciones();
 
     Cliente buscarPorCedula(String cedula);
-
+    Cliente buscarConHistorialPorCedula(String cedula);
     boolean actualizar(Cliente cliente);
 
     void registrarCliente(Cliente cli);

@@ -62,6 +62,22 @@ public class CargaRepoImpl implements RepoCarga {
             return em.find(Cliente.class, cedula);
     }
 
+    @Override
+    public Cliente buscarConHistorialPorCedula(String cedula) {
+
+        String jpql =
+                "SELECT c FROM MCarga_Cliente c " +
+                        "LEFT JOIN FETCH c.historialAsociado " +
+                        "LEFT JOIN FETCH c.historialAsociado.historialCargas " +
+                        "WHERE c.cedula = :cedula";
+
+        List<Cliente> resultado = em.createQuery(jpql, Cliente.class)
+                .setParameter("cedula", cedula)
+                .getResultList();
+
+        return resultado.isEmpty() ? null : resultado.get(0);
+    }
+
 @Override
 public boolean actualizar(Cliente cliente) {
     if (cliente == null) {

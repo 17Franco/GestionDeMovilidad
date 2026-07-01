@@ -601,7 +601,7 @@ public class TestModuloCarga {
         Carga carga = cli.getCargaActual();
 
         // finaliza la carga
-        servicioCarga.finalizarCarga(cargador, carga, 100);
+        //servicioCarga.finalizarCarga(cargador, carga, 100);
 
         // muestra datos finales
         System.out.println(carga);

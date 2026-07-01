@@ -90,7 +90,7 @@ public class ModuloClienteApi {
   @Path("/reclamos")
   @RolesAllowed("appMovil") // enpoint se fija si el usuario tiene este rol si lo tiene sigue si no manda
                             // forbidden
-  public Response registrarReclamo(ReclamoDTO reclamo) {
+  public Response registrarReclamo(ReclamoDTO reclamo)  {
     String ci = securityContext.getUserPrincipal().getName(); // obtengo ci
     Reclamo r = servicioCliente.realizarReclamo(reclamo.getAsunto(), reclamo.getDescripcion(), ci);
     ReclamoDTO reclamoDTO = new ReclamoDTO();
