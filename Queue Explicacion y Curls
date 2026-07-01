@@ -1,0 +1,66 @@
+Letra:
+"1) Siguiendo los lineamientos del curso, configurar en el servidor Wildfly que ejecuta el
+
+Gestor de movilidad, una queue de mensajes JMS de tipo point to point"
+
+Traducción: 
+    ¿Que significa Crear una Queue JMS point to point?
+
+>Queque es una cola de mensajes ni más ni menos
+
+>JMS es la api de mensajeria de java/jakarta
+
+>point to point quiere decir comunicación del punto A al B, no hay más puntos entre medio
+
+
+DESAROLLO
+
+Config.cli:
+
+    # Queue JMS point-to-point para procesar reclamos de forma asincronica
+    try
+        /subsystem=messaging-activemq/server=default/jms-queue=reclamosQueue:add(entries=["java:/jms/queue/reclamos"])
+        echo "Se crea queue JMS para reclamos"
+    catch
+        echo "No se crea queue JMS, ya existe"
+    end-try
+
+
+
+
+Que significa:
+
+    /subsystem=messaging-activemq
+    Es el subsistema de mensajería de WildFly.
+
+    server=default
+    Es el broker JMS que viene configurado en standalone-full.xml.
+
+
+    jms-queue=reclamosQueue
+    Es el nombre interno del recurso en WildFly.
+
+
+    entries=["java:/jms/queue/reclamos"]
+    Es el nombre JNDI que van a usar tus compañeros desde Java para producer/consumer.
+
+
+Después, para verificar cuando levanto WildFly:
+
+./target/server/bin/jboss-cli.sh --connect --command="/subsystem=messaging-activemq/server=default/jms-queue=reclamosQueue:read-resource"
+
+
+
+
+CURLS PARA TESTEAR:
+
+
+# Cliente comun Ana.
+curl -i -X POST -H "Content-Type: application/json" -d '{"cedula":"1111111-1","nombre":"Ana","apellido":"Comun","numTel":"099111111","contra":"1234","tipoCliente":"COMUN"}' http://localhost:8080/GestionDeMovilidad/movilidad/clientes
+
+# Reclamo para Ana
+curl -v -u 1111111-1:1234 -H "Content-Type: application/json" -X POST -d '{"asunto":"PrimerReclamo","descripcion":"Hola este es el primer reclamo"}' http://localhost:8080/GestionDeMovilidad/movilidad/clientes/reclamos/
+
+# Ver estado de la Queue
+./target/server/bin/jboss-cli.sh --connect --command="/subsystem=messaging-activemq/server=default/jms-queue=reclamosQueue:read-resource(include-runtime=true)"
+

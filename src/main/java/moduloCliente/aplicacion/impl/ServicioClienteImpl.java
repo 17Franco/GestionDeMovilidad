@@ -16,11 +16,15 @@ import moduloCliente.exepciones.ClienteYaExisteException;
 import moduloCliente.exepciones.GrupoNoExisteException;
 import moduloCliente.interfaz.evento.out.PublicadorEventoCliente;
 
+import moduloCliente.interfaz.evento.out.PublicadorMensajeReclamo;
 import java.util.ArrayList;
 import java.util.List;
 
 @ApplicationScoped
 public class ServicioClienteImpl implements ServicioCliente {
+
+    @Inject
+    private PublicadorMensajeReclamo publicadorMensajeReclamo;
 
     @Inject
     private ClienteRepositorio repo;
@@ -173,6 +177,8 @@ public boolean altaMedioPago(String ci, MedioPago formaPago) {
         reclamo = new Reclamo(asunto, descripcion, c);
         c.getReclamos().add(reclamo);
         repo.saveReclamo(reclamo);
+        //Publico el reclamo en la queue
+        publicadorMensajeReclamo.publicarReclamo(descripcion);
         // llamo a repo creo el objeto reclamo y se lo asigno
         return reclamo;
     }
