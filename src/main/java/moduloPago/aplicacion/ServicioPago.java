@@ -13,7 +13,7 @@ public interface ServicioPago {
 
     boolean tieneDeuda(String clienteId);
 
-    boolean pagarDeuda(String cedulaCliente, String numeroTarjeta, float monto);
+    boolean pagarDeuda(String cedulaCliente,int idCarga,String numeroTarjeta, float monto);
 
     //public boolean pagarConTarjeta(String cedulaCliente, String numeroTarjeta, float monto);
 

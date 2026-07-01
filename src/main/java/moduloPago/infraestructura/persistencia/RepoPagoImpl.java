@@ -51,4 +51,28 @@ public class RepoPagoImpl implements RepoPago {
 
         return !deudas.isEmpty();
     }
+    @Override
+    public Pago obtenerDeuda(String idCliente, int idCarga) {
+
+        String jpql = """
+        SELECT p
+        FROM MPago_Pago p
+        WHERE p.cedulaCliente = :ci
+          AND p.idCarga = :idCarga
+          AND p.estado = 'RECHAZADO'
+          AND NOT EXISTS (
+                SELECT 1
+                FROM MPago_Pago p2
+                WHERE p2.idCarga = p.idCarga
+                  AND p2.estado = 'ACEPTADO'
+          )
+        """;
+
+        List<Pago> resultado = em.createQuery(jpql, Pago.class)
+                .setParameter("ci", idCliente)
+                .setParameter("idCarga", idCarga)
+                .getResultList();
+
+        return resultado.isEmpty() ? null : resultado.get(0);
+    }
 }

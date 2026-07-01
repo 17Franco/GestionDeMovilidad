@@ -23,4 +23,8 @@ public class ServicioPagoLocal {
     public boolean tieneDeuda(String clienteId){
         return pagoServicio.tieneDeuda(clienteId);
     }
+
+    public boolean pagarDeuda(String clienteId,int idCarga,String numeroTarjeta, float monto){
+        return  pagoServicio.pagarDeuda(clienteId,idCarga,numeroTarjeta,monto);
+    }
 }

@@ -83,36 +83,5 @@ public class ApiModuloPago {
     */
 
 
-    /*
-    Llamada:
-    curl -i -u "1111111-1:1234" -X POST \
-    -H "Content-Type: application/json" \
-    -d '{"numeroTarjeta":"11111111","monto":500}' \
-    http://localhost:8080/GestionDeMovilidad/movilidad/pagos/pagarDeuda 
-    */
-    @POST
-    @Path("/pagarDeuda")
-    @RolesAllowed("appMovil")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response pagarDeuda(PagoDeudaDTO datos) {
 
-        String cedula = securityContext.getUserPrincipal().getName();
-
-        boolean deudaActiva = servicios.pagarDeuda(
-                cedula,
-                datos.getNumeroTarjeta(),
-                datos.getMonto()
-        );
-
-        if (!deudaActiva) {
-            return Response.ok(
-                    "{\"mensaje\":\"Deuda pagada correctamente\"}"
-            ).build();
-        }
-
-        return Response.status(Response.Status.PAYMENT_REQUIRED)
-                .entity("{\"error\":\"El pago fue rechazado\"}")
-                .build();
-    }
 }
