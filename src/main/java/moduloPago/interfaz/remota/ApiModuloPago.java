@@ -11,7 +11,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import moduloPago.aplicacion.ServicioPago;
-import moduloPago.dominio.pagoRealizado;
+import moduloPago.dominio.Pago;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -33,7 +33,7 @@ public class ApiModuloPago {
         try{
             LocalDate fechaI = LocalDate.parse(fechaIni);
             LocalDate fechaF = LocalDate.parse(fechaFin);
-            List<pagoRealizado> list = servicios.consultarPagos(ci,fechaI,fechaF);
+            List<Pago> list = servicios.consultarPagos(ci,fechaI,fechaF);
 
 
             return Response
@@ -51,7 +51,8 @@ public class ApiModuloPago {
 
     }
 
-
+    //mepa qeu no es nesesario el pago se hace cuando finaliza carga
+    /*
     @POST
     @Path("/pagarConTarjeta")
     @RolesAllowed("appMovil")
@@ -59,7 +60,7 @@ public class ApiModuloPago {
     @Produces(MediaType.APPLICATION_JSON)
     public Response pagarConTarjeta(PagoConTarjetaDTO datos) {
 
-        String cedula = securityContext.getUserPrincipal().getName();
+      /*  String cedula = securityContext.getUserPrincipal().getName();
 
         boolean autorizado = servicios.pagarConTarjeta(
                 cedula,
@@ -76,7 +77,10 @@ public class ApiModuloPago {
         return Response.status(Response.Status.PAYMENT_REQUIRED)
                 .entity("{\"error\":\"El pago fue rechazado y se generó una deuda\"}")
                 .build();
+
+
     }
+    */
 
 
     /*

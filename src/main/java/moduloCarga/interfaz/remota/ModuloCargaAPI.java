@@ -14,10 +14,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import moduloCarga.aplicacion.ServicioCarga;
-import moduloCarga.dominio.Carga;
-import moduloCarga.dominio.Cargador;
-import moduloCarga.dominio.ElementoHistorial;
-import moduloCarga.dominio.EstadoCarga;
+import moduloCarga.dominio.*;
 import moduloCarga.dominio.cliente.Cliente;
 import moduloCarga.dominio.cliente.ClienteComun;
 import moduloCarga.dominio.cliente.ClienteProfesional;
@@ -25,6 +22,7 @@ import jakarta.annotation.security.DenyAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.ws.rs.core.SecurityContext;
 
+import moduloCarga.dominio.medioPago.MedioPago;
 import moduloCarga.dominio.medioPago.Tarjeta;
 import moduloCarga.dominio.repositorio.RepoCarga;
 import moduloCarga.infraestructura.rateLimiter.LimitarHistorial;
@@ -121,7 +119,8 @@ public class ModuloCargaAPI {
         }
 
         //<-------VEO QUE NO TENGA DEUDA----->
-        if (Boolean.TRUE.equals(clienteBuscado.getDeudaActiva())) {
+
+        if (serivcioCarga.tieneDeuda(cedulaCliente)) {
         return Response.status(Response.Status.BAD_REQUEST)
                 .entity("{\"error\":\"El cliente tiene deudas pendientes\"}")
                 .build();
@@ -311,13 +310,37 @@ public class ModuloCargaAPI {
                     .entity("{\"error\":\"La carga ya fue finalizada\"}")
                     .build();
         }
+        //nesesito el tipo medio de pago
+        Cliente clienteConHistorial = repoCarga.buscarConHistorialPorCedula(cedulaCliente);
+        HistorialDeCargas historial = clienteConHistorial.getHistorialAsociado();
+
+        MedioPago medioPago = null;
+
+        for (ElementoHistorial elemento : historial.getHistorialCargas()) {
+            if (elemento.getCarga().getId() == cargaBuscada.getId()) {
+                medioPago = elemento.getMedioPago();
+                break;
+            }
+        }
+        if (medioPago == null) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("{\"error\":\"No se encontró el medio de pago de la carga\"}")
+                    .build();
+        }
 
         Cargador cargadorAsociado = cargaBuscada.getCargador();
-        serivcioCarga.finalizarCarga(cargadorAsociado, cargaBuscada, 0);
+        boolean resu = serivcioCarga.finalizarCarga(cargadorAsociado, cargaBuscada, 0,medioPago);
 
-        return Response.ok()
-                .entity("{\"mensaje\":\"Carga finalizada correctamente\"}")
-                .build();
+        if (resu) {
+            return Response.ok()
+                    .entity("{\"mensaje\":\"Carga finalizada correctamente y pago aceptado\"}")
+                    .build();
+        } else {
+            return Response.ok()
+                    .entity("{\"mensaje\":\"Carga finalizada correctamente. El pago fue rechazado y quedó una deuda pendiente.\"}")
+                    .build();
+        }
+
     }
     
 

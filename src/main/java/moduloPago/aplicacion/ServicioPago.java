@@ -1,20 +1,21 @@
 package moduloPago.aplicacion;
 
-import moduloPago.dominio.pagoRealizado;
+import moduloPago.dominio.Pago;
 
 import java.time.LocalDate;
 import java.util.List;
 
 public interface ServicioPago {
 
-    void pagarCarga(String cedulaCliente, int idCarga, float importe, String medioPago);
+    boolean pagarConTarjeta(String clienteId,int idCarga, String numeroTarjeta, float monto);
 
-    boolean pagarConTarjetaServicioExterno(String clienteId, String numeroTarjeta, float monto);
+    boolean pagarConCuentUte(String clienteId,int idCarga, String numeroCuenta, float monto);
 
+    boolean tieneDeuda(String clienteId);
 
-    List<pagoRealizado> consultarPagos(String cedulaCliente, LocalDate fechaIni, LocalDate fechaFin);
-    
     boolean pagarDeuda(String cedulaCliente, String numeroTarjeta, float monto);
 
-    public boolean pagarConTarjeta(String cedulaCliente, String numeroTarjeta, float monto);
+    //public boolean pagarConTarjeta(String cedulaCliente, String numeroTarjeta, float monto);
+
+    List<Pago> consultarPagos(String cedulaCliente, LocalDate fechaIni, LocalDate fechaFin);
 }

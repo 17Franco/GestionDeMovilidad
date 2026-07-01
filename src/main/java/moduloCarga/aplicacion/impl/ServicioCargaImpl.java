@@ -25,6 +25,7 @@ import moduloCarga.dominio.medioPago.MedioPago;
 import moduloCarga.dominio.medioPago.Tarjeta;
 import moduloCarga.dominio.repositorio.RepoCarga;
 import moduloCarga.interfaz.evento.out.PublicadorEvento;
+import moduloPago.interfaz.local.ServicioPagoLocal;
 
 @ApplicationScoped
 public class ServicioCargaImpl implements ServicioCarga {
@@ -37,6 +38,9 @@ public class ServicioCargaImpl implements ServicioCarga {
 
     @Inject
     private FuncionalidadCargadorInterfaceMOCK cargadorMock;
+
+    @Inject
+    private ServicioPagoLocal servicioPagoLocal;
 
     // esta funcion es para convertir el dtoEstado en un estado valido en el modulo
     // de carga
@@ -116,14 +120,17 @@ public class ServicioCargaImpl implements ServicioCarga {
                                     // usuario sin registrar
     
         publicadorEvento.publicarCargaIniciada(cargaNueva.getId());
-        }
+    }
 
+    @Override
+    @Transactional
+    public boolean tieneDeuda(String idCLiente){
+        return servicioPagoLocal.tieneDeuda(idCLiente);
+    }
     @Override
     public Carga verCargaActual(Cliente cli) {
         return cli.getCargaActual();
     }
-
-
 
     
     @Override
@@ -149,12 +156,12 @@ public class ServicioCargaImpl implements ServicioCarga {
     }
 
     @Override
-    public void finalizarCarga(Cargador cargador, Carga carga, int recargo) {
+    @Transactional
+    public boolean finalizarCarga(Cargador cargador, Carga carga, int recargo, MedioPago formaPago) {
 
         if (carga == null || carga.getEstado() != EstadoCarga.ENPROGRESO) {
-            return;
+            throw new IllegalArgumentException("La carga no existe.");
         }
-
         carga.setHoraFin(LocalDateTime.now());
 
         carga.setEstado(EstadoCarga.TERMINADO);
@@ -166,9 +173,19 @@ public class ServicioCargaImpl implements ServicioCarga {
         carga.setImporteTotal(importeBase + recargo);
 
         repo.actualizarCarga(carga);
-        publicadorEvento.publicarCargaFinalizada(carga.getId());
+        //nesesito el metodo de pago para pagar
 
-        System.out.println("Carga finalizada correctamente");
+        publicadorEvento.publicarCargaFinalizada(carga.getId());
+        boolean resuPago = false;
+        if(formaPago instanceof Tarjeta){
+            Tarjeta tarjeta = (Tarjeta)formaPago;
+            resuPago= servicioPagoLocal.pagarConTarjeta(carga.getClienteAsociado().getCedula(),carga.getId(),tarjeta.getNumero(),importeBase + recargo);
+        }else{
+            CuentaUTE cuentaUte = (CuentaUTE) formaPago;
+            resuPago= servicioPagoLocal.pagarConCuentaUte(carga.getClienteAsociado().getCedula(),carga.getId(),cuentaUte.getNumeroCuenta(),importeBase + recargo);
+        }
+        return resuPago;
+       // System.out.println("Carga finalizada correctamente");
     }
 
     @Override

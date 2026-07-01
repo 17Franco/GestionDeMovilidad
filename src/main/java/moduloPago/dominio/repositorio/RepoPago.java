@@ -1,11 +1,13 @@
 package moduloPago.dominio.repositorio;
 
-import moduloPago.dominio.pagoRealizado;
+import moduloPago.dominio.Pago;
 
 import java.time.LocalDate;
 import java.util.List;
 
 public interface RepoPago {
-    void save(pagoRealizado pago);
-    List<pagoRealizado> getPagosPorFecha(String ci, LocalDate fechaIni, LocalDate fechaFin);
+    void save(Pago pago);
+    List<Pago> getPagosPorFecha(String ci, LocalDate fechaIni, LocalDate fechaFin);
+    //obtengo si hay deuda del cliente
+    boolean deuda(String idCliente);
 }
