@@ -128,6 +128,47 @@ public class ServicioCargaImpl implements ServicioCarga {
         return servicioPagoLocal.tieneDeuda(idCLiente);
     }
     @Override
+    @Transactional
+    public boolean pagarDeuda(String idCLiente){
+        Cliente cli = repo.buscarPorCedula(idCLiente);
+        if(cli == null){
+            throw new IllegalArgumentException("El cliente no existe");
+        }
+        //me fijo si tiene deuda
+        boolean tieneDeuda =  servicioPagoLocal.tieneDeuda(idCLiente);
+        if(!tieneDeuda){
+            throw new IllegalArgumentException("El cliente no tiene deuda");
+        }
+
+        //si la tiene me traigo su ultima carga o sea la que tiene deuda
+        Carga cargaActual = cli.getCargaActual();
+
+        Cliente clienteConHistorial = repo.buscarConHistorialPorCedula(idCLiente);
+        HistorialDeCargas historial = clienteConHistorial.getHistorialAsociado();
+        MedioPago medioPago = null;
+
+        for (ElementoHistorial elemento : historial.getHistorialCargas()) {
+            if (elemento.getCarga().getId() == cargaActual.getId()) {
+                medioPago = elemento.getMedioPago();
+                break;
+            }
+        }
+        if(medioPago == null){
+            throw new IllegalArgumentException("No se pudo acceder al medioDePago");
+        }
+        
+        //nesesito el numero tarjeta
+        Tarjeta tarjeta = null;
+        if ("Tarjeta".equals(medioPago.getTipoMedioPago())){
+             tarjeta = (Tarjeta) medioPago;
+        }
+        if(tarjeta == null){
+            throw new IllegalArgumentException("El medio de pago no es tarjeta");
+        }
+        return servicioPagoLocal.pagarDeuda(idCLiente,cargaActual.getId(),tarjeta.getNumero(),cargaActual.getImporteTotal());
+    }
+
+    @Override
     public Carga verCargaActual(Cliente cli) {
         return cli.getCargaActual();
     }

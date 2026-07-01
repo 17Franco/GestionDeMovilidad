@@ -142,23 +142,9 @@ public class ServicioPagoImpl implements ServicioPago {
     //Siempre me cambia el estado de la deuda de true false
     @Override
     @Transactional
-    public boolean pagarDeuda(String cedulaCliente, String numeroTarjeta, float monto) {
-
-      /*  Cliente cliente = repoCarga.buscarPorCedula(cedulaCliente);
-
-        if (cliente == null) {
-            throw new IllegalArgumentException("El cliente no existe");
-        }
-
-        Boolean deudaActiva = false;
-
-        cliente.setDeudaActiva(deudaActiva);
-        repoCarga.ActualizarCliente(cliente);
-
-        return deudaActiva;
-
-       */
-        return false;
+    public boolean pagarDeuda(String cedulaCliente,int idCarga,String numeroTarjeta, float monto) {
+        //podria llamar directo a este metodo pero queda mas claro que se paga ddeuda asi
+        return pagarConTarjeta(cedulaCliente,idCarga,numeroTarjeta,monto);
     }
 
     public boolean pagarConCuentUte(String clienteId,int idCarga, String numeroCuenta, float monto){

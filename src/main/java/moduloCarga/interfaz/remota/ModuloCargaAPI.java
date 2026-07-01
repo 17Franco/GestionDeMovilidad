@@ -19,7 +19,7 @@ import moduloCarga.dominio.cliente.Cliente;
 import moduloCarga.dominio.cliente.ClienteComun;
 import moduloCarga.dominio.cliente.ClienteProfesional;
 import jakarta.annotation.security.DenyAll;
-import jakarta.annotation.security.RolesAllowed;
+
 import jakarta.ws.rs.core.SecurityContext;
 
 import moduloCarga.dominio.medioPago.MedioPago;
@@ -340,6 +340,38 @@ public class ModuloCargaAPI {
                     .entity("{\"mensaje\":\"Carga finalizada correctamente. El pago fue rechazado y quedó una deuda pendiente.\"}")
                     .build();
         }
+
+    }
+
+
+    /*
+    Llamada:
+    curl -i -u "1111111-1:1234" -X POST \
+    -H "Content-Type: application/json" \
+    -d '{"numeroTarjeta":"11111111","monto":500}' \
+    http://localhost:8080/GestionDeMovilidad/movilidad/pagos/pagarDeuda
+    */
+    @POST
+    @Path("/pagarDeuda")
+    @RolesAllowed("appMovil")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response pagarDeuda() {
+
+        String cedula = securityContext.getUserPrincipal().getName();
+
+        boolean resuDeuda = serivcioCarga.pagarDeuda(cedula);
+
+
+        if (resuDeuda) {
+            return Response.ok(
+                    "{\"mensaje\":\"Deuda pagada correctamente\"}"
+            ).build();
+        }
+
+        return Response.status(Response.Status.PAYMENT_REQUIRED)
+                .entity("{\"error\":\"El pago fue rechazado\"}")
+                .build();
 
     }
     
