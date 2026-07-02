@@ -153,29 +153,84 @@ Antes de ejecutar el proyecto es necesario tener instalado:
         
         CONTAINER ID   IMAGE                                          COMMAND               CREATED       STATUS       PORTS                                                                                                                                      NAMES
         b72d6975c156   ollama/ollama                                  "/bin/ollama serve"   3 hours ago   Up 3 hours   0.0.0.0:11434->11434/tcp, [::]:11434->11434/tcp                                                                                            ollama
-        66d4427b9de8   philhawthorne/docker-influxdb-grafana:latest   "/run.sh"             3 hours ago   Up 3 hours   0.0.0.0:3003->3003/tcp, [::]:3003->3003/tcp, 0.0.0.0:8086->8086/tcp, [::]:8086->8086/tcp, 0.0.0.0:3004->8083/tcp, [::]:3004->8083/tcp   docker-influxdb-grafana
-   
+        66d4427b9de8   philhawthorne/docker-influxdb-grafana:latest   "/run.sh"             3 hours ago   Up 3 hours   0.0.0.0:3003->3003/tcp, [::]:3003->3003/tcp, 0.0.0.0:8086->8086/tcp, [::]:8086->8086/tcp, 0.0.0.0:3004->8083/tcp, [::]:3004->8083/tcp   docker-influxdb-grafana    
+
+### 3. ▶️ Arranque de la Infraestructura Docker
+Si ya realizaste la instalación inicial, cada vez que vayas a trabajar en el proyecto debes asegurarte de iniciar los servicios con los siguientes comandos:
+
+#### Paso A: Levantar InfluxDB y Grafana
+1. Verificar el estado de los contenedores:
+   ```bash
+   docker ps -a
+   ```
+2. Iniciar el contenedor utilizado por el proyecto:
+   ```bash
+   docker start docker-influxdb-grafana
+   ```
+3. Verificar que esté corriendo (debe figurar con STATUS "Up"):
+   ```bash
+   docker ps
+   ```
+
+#### Paso B: Levantar Ollama
+1. Iniciar el contenedor de Ollama:
+   ```bash
+   docker start ollama
+   ```
+2. Verificar que esté levantado y con el puerto 11434 publicado:
+   ```bash
+   docker ps
+   ```
+3. Comprobar que Ollama responda correctamente en el puerto esperado por el código de la aplicación:
+   ```bash
+   curl http://localhost:11434/api/tags
+   ```
+   **Salida esperada (similar a esto):**
+   ```json
+   {
+     "models": [
+       {
+         "name": "qwen2.5:0.5b",
+         "model": "qwen2.5:0.5b",
+         "modified_at": "2026-07-02T17:43:26.150082696Z",
+         "size": 397821319,
+         "digest": "a8b0c51577010a279d933d14c2a8ab4b268079d44c5c8830c0a93900f1827c67",
+         "details": {
+           "parent_model": "",
+           "format": "gguf",
+           "family": "qwen2",
+           "families": [
+             "qwen2"
+           ],
+           "parameter_size": "494.03M",
+           "quantization_level": "Q4_K_M",
+           "context_length": 32768,
+           "embedding_length": 896
+         },
+         "capabilities": [
+           "completion",
+           "tools"
+         ]
+       }
+     ]
+   }
+   ```
+
+---
+
+### 4. 🗄️ Configuración de la Base de Datos
 
 
-12. 
-
-        
-       
-
-
-### 3. 🗄️ Configuración de la Base de Datos
-
-
-### 4. 🔧 Configuración del Entorno (Variables y Credenciales)
+### 5. 🔧 Configuración del Entorno (Variables y Credenciales)
 *(Indica si hay que configurar algún archivo `application.properties`, variables de entorno del sistema, o si el script `config.cli` de WildFly ya inyecta todo lo necesario).*
 
-### 5. 🏗️ Compilación y Pruebas
+### 6. 🏗️ Compilación y Pruebas
 *(Comandos para compilar el código fuente y verificar que los tests pasan antes de intentar ejecutar).*
 
-### 6. ▶️ Ejecución del Proyecto
+### 7. ▶️ Ejecución del Proyecto
 *(Aquí va tu comando `mvn clean package wildfly:dev -DskipTests` y cualquier instrucción adicional sobre el tiempo de arranque).*
 
-### 7. ✅ Verificación del Despliegue (Puntos de Acceso)
+### 8. ✅ Verificación del Despliegue (Puntos de Acceso)
 *(Una lista con las URLs donde el desarrollador puede comprobar que todo levantó bien).*
 - **API Principal:** `http://localhost:8080/GestionDeMovilidad/api/...`
 - **Panel de Grafana:** `http://localhost:3000`
