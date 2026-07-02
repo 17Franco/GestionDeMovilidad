@@ -27,6 +27,10 @@ public class RegistradorDeMetricas {
     public static final String PAGOS_CON_TARJETA = "pagosConTarjeta";
     // Counter para contar pagos procesados con tarjeta
     private Counter pagosConTarjeta;
+
+    public static final String PAGOS_CON_CUENTA_UTE = "pagosConCuentaUte";
+    // Counter para contar pagos procesados con tarjeta
+    private Counter pagosConCuentaUte;
     // Registry de Micrometer encargado de publicar las metricas registradas hacia InfluxDB (lo uso en Gauge o Counter)
     private InfluxMeterRegistry registry;
 
@@ -40,7 +44,7 @@ public class RegistradorDeMetricas {
         InfluxConfig config = new InfluxConfig() {
             public String get(String key) { return null; }
             public Duration step() { return Duration.ofSeconds(10); } // Frecuencia con la que Micrometer publica las métricas en InfluxDB
-            public String db() { return "metricasTallerJava"; }             // Nombre de la BD en Inlfux
+            public String db() { return "metricasTallerJava"; }  // Nombre de la BD en Inlfux
         };
 
         registry = new InfluxMeterRegistry(config, Clock.SYSTEM);
@@ -57,6 +61,11 @@ public class RegistradorDeMetricas {
         // Counter de Pagos con Tarjeta (cuenta eventos acumulados, solo sube)
         pagosConTarjeta = Counter.builder(PAGOS_CON_TARJETA)
                 .description("Cantidad de pagos procesados con tarjeta")
+                .register(registry);
+
+        // Counter de Pagos con CuentaUte (cuenta eventos acumulados, solo sube)
+        pagosConCuentaUte = Counter.builder(PAGOS_CON_CUENTA_UTE)
+                .description("Cantidad de pagos procesados con Cuenta UTE")
                 .register(registry);
     }
 
@@ -76,6 +85,10 @@ public class RegistradorDeMetricas {
 
     public void registrarPagoConTarjeta() {
         pagosConTarjeta.increment();
+    }
+
+    public void registrarPagoConCuentaUte() {
+        pagosConCuentaUte.increment();
     }
 
     @PreDestroy
