@@ -17,6 +17,12 @@ public class ObserverModuloCarga {
     }
 
     public void accept(@Observes CargaFinalizada evento) {
+        // Decrementa las que están en curso (Gauges)
         registrador.decrementarCargasActivas();
+        
+        // NUEVO: Incrementa el contador acumulativo usando el idCarga del record
+        if (evento != null) {
+            registrador.registrarCargaRealizada(evento.idCarga());
+        }
     }
 }
