@@ -39,11 +39,16 @@ curl -i -X POST -H "Content-Type: application/json" -d '{"cedula":"3333333-3","n
 # Cuenta UTE de Ana.
 curl -i -u "1111111-1:1234" -X POST -H "Content-Type: application/json" -d '{"tipoMedioPago":"CUENTA_UTE","numeroCuenta":"11111111"}' http://localhost:8080/GestionDeMovilidad/movilidad/clientes/medioPago
 
+# Tarjeta de Ana.
+curl -i -u "1111111-1:1234" -X POST -H "Content-Type: application/json" -d '{"tipoMedioPago":"TARJETA","numero":"33333333","fechaVencimiento":"2030-12-31","digitoVerificacion":"123","tipoTarjeta":"CREDITO"}' http://localhost:8080/GestionDeMovilidad/movilidad/clientes/medioPago
+
 # Cuenta UTE de Bruno.
 curl -i -u "2222222-2:1234" -X POST -H "Content-Type: application/json" -d '{"tipoMedioPago":"CUENTA_UTE","numeroCuenta":"22222222"}' http://localhost:8080/GestionDeMovilidad/movilidad/clientes/medioPago
 
 # Tarjeta de Carla.
 curl -i -u "3333333-3:1234" -X POST -H "Content-Type: application/json" -d '{"tipoMedioPago":"TARJETA","numero":"33333333","fechaVencimiento":"2030-12-31","digitoVerificacion":"123","tipoTarjeta":"CREDITO"}' http://localhost:8080/GestionDeMovilidad/movilidad/clientes/medioPago
+
+
 
 
 # 4. CREAR ESTACIONES
@@ -92,6 +97,11 @@ curl -i -u "1111111-1:1234" http://localhost:8080/GestionDeMovilidad/movilidad/c
 # Ana inicia una carga con Cuenta UTE en el cargador 1.
 curl -i -u "1111111-1:1234" -X POST -H "Content-Type: application/json" -d '{"cargadorID":1,"metodoPago":"CUENTA_UTE"}' http://localhost:8080/GestionDeMovilidad/movilidad/cargas/iniciar
 
+
+# Ana inicia una carga con Tarejta Credito en el cargador 1.
+curl -i -u "1111111-1:1234" -X POST -H "Content-Type: application/json" -d '{"cargadorID":1,"metodoPago":"TARJETA","numeroTarjeta":"33333333"}' http://localhost:8080/GestionDeMovilidad/movilidad/cargas/iniciar
+
+
 # Bruno inicia una carga con Cuenta UTE en el cargador 2.
 curl -i -u "2222222-2:1234" -X POST -H "Content-Type: application/json" -d '{"cargadorID":2,"metodoPago":"CUENTA_UTE"}' http://localhost:8080/GestionDeMovilidad/movilidad/cargas/iniciar
 
@@ -138,6 +148,10 @@ docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute
 
 # Mostrar los ultimos valores de cargasActivas.
 docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute 'SELECT * FROM cargasActivas ORDER BY time DESC LIMIT 10'
+
+# Mostrar TOTAL de Pagos con Tarjta
+docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute 'SELECT SUM(value) FROM pagosConTarjeta'
+
 
 # Despues de iniciar las tres cargas, el ultimo valor deberia ser 3.
 
