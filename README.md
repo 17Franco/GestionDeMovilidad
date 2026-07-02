@@ -252,12 +252,6 @@ Si ya realizaste la instalación inicial, cada vez que vayas a trabajar en el pr
 ### 7. ▶️ Ejecución del Proyecto
 *(Aquí va tu comando `mvn clean package wildfly:dev -DskipTests` y cualquier instrucción adicional sobre el tiempo de arranque).*
 
-### 8. ✅ Verificación del Despliegue (Puntos de Acceso)
-*(Una lista con las URLs donde el desarrollador puede comprobar que todo levantó bien).*
-- **API Principal:** `http://localhost:8080/GestionDeMovilidad/api/...`
-- **Panel de Grafana:** `http://localhost:3000`
-- **Ollama API:** `http://localhost:11434`
-
 ---
 
 ## 🌐 API / Endpoints
