@@ -34,9 +34,6 @@ public class RegistradorDeMetricas {
     // Counter para contar errores en pagos con tarjeta
     private Counter erroresPagoTarjeta;
 
-    // Registry de Micrometer encargado de publicar las metricas registradas hacia InfluxDB (lo uso en Gauge o Counter)
-    private InfluxMeterRegistry registry;
-
     // NUEVO: Nombre de la métrica para el total de cargas finalizadas con éxito
     public static final String CARGAS_REALIZADAS = "cargasRealizadas";
     private Counter cargasRealizadas;
@@ -75,7 +72,7 @@ public class RegistradorDeMetricas {
         erroresPagoTarjeta = Counter.builder(ERRORES_PAGO_TARJETA)
                 .description("Cantidad de errores al procesar pagos con tarjeta")
                 .register(registry);
-    }
+    
 
         // NUEVO: Registrar el Counter de cargas realizadas en Micrometer
         cargasRealizadas = Counter.builder(CARGAS_REALIZADAS)
