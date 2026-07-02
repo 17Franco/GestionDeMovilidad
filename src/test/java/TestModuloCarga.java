@@ -22,6 +22,8 @@ import moduloCliente.dominio.TipoProfesional;
 import moduloCliente.dominio.cliente.ClienteComun;
 import moduloCliente.dominio.cliente.ClienteProfesional;
 import moduloCliente.interfaz.evento.out.PublicadorEventoCliente;
+import moduloMonitoreo.infraestructura.RegistradorDeMetricas;
+
 import org.jboss.weld.junit.MockBean;
 import org.jboss.weld.junit5.EnableWeld;
 import org.jboss.weld.junit5.WeldInitiator;
@@ -42,7 +44,8 @@ import static org.junit.jupiter.api.Assertions.*;
         ServicioCargaImpl.class,
         FuncionalidadCargadorInterfaceMOCKImpl.class,
         CargaRepoImpl.class,
-        ObserverModuloCarga.class
+        ObserverModuloCarga.class,
+        RegistradorDeMetricas.class
 })
 public class TestModuloCarga {
 
@@ -52,6 +55,9 @@ public class TestModuloCarga {
     @Inject
     private ServicioCarga servicioCarga; //el real pero con repo fake
 
+    @Inject
+    private RegistradorDeMetricas registrador;
+
     private RepoCarga fakeRepo; //el repo fake
 
     //configuro weld
@@ -59,7 +65,7 @@ public class TestModuloCarga {
     //y registra el bean fake
     @WeldSetup
     public WeldInitiator weld =
-            WeldInitiator.from(ServicioCargaImpl.class, ObserverModuloCarga.class,
+            WeldInitiator.from(ServicioCargaImpl.class, ObserverModuloCarga.class, RegistradorDeMetricas.class,
                     PublicadorEventoCliente.class, PublicadorEvento.class)//debo agregar las class que son manejadas por wel
                     .addBeans(crearMockRepositorioImpl())
                     .addBeans(crearMockCargadorImpl())
@@ -595,13 +601,38 @@ public class TestModuloCarga {
 
         //Llamo a iniciarCarga
         //traigo al usuario
-        Cliente cli =fakeRepo.buscarPorCedula("12345678");
-        servicioCarga.iniciarCarga(cli, cuenta,1);
+        Cliente cli = fakeRepo.buscarPorCedula("12345678");
+        servicioCarga.iniciarCarga(cli, cuenta, 1);
 
         Carga carga = cli.getCargaActual();
+        
+        // En caso de que carga.getId() devuelva 0 por ser un repo fake, 
+        // podés forzarle un ID si tu entidad tiene el setter: 
+        // carga.setId(42); 
 
-        // finaliza la carga
-        //servicioCarga.finalizarCarga(cargador, carga, 100);
+        // -------------------------------------------------------------
+        // NUEVO: CONTROL Y VERIFICACIÓN DE LAS MÉTRICAS DE INFLUXDB
+        // -------------------------------------------------------------
+        
+        // 1. Guardamos el valor histórico de la métrica antes de que termine el proceso
+        double cargasRealizadasAntes = registrador.getCantidadCargasRealizadas();
+
+        // finaliza la carga (Si tu servicio real está comentado, simulamos la llamada del evento)
+        // servicioCarga.finalizarCarga(cargador, carga, 100);
+        
+        // Enviamos el ID de la carga directamente para simular el comportamiento exacto del Observer
+        registrador.registrarCargaRealizada(carga.getId()); 
+
+        // 2. Verificación: Comprobamos que el contador acumulativo de Micrometer subió exactamente en 1
+        assertEquals(cargasRealizadasAntes + 1, registrador.getCantidadCargasRealizadas(), 
+                "La métrica de cargas realizadas debió incrementarse en 1.");
+
+        // 3. Prueba de Idempotencia: Intentamos forzar el procesamiento del mismo ID de carga duplicado
+        registrador.registrarCargaRealizada(carga.getId());
+
+        // 4. Verificación final: El contador NO debe variar porque la carga ya se registró previamente
+        assertEquals(cargasRealizadasAntes + 1, registrador.getCantidadCargasRealizadas(), 
+                "El contador volvió a subir. ¡Error! No se está controlando la duplicación por ID.");
 
         // muestra datos finales
         System.out.println(carga);
