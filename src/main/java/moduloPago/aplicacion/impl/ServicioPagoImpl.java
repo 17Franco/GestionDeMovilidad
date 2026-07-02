@@ -38,7 +38,12 @@ public class ServicioPagoImpl implements ServicioPago {
     @Override
     public boolean pagarConTarjeta(String clienteId,int idCarga, String numeroTarjeta, float monto) {
         String clienteIdNormalizado = normalizarClienteId(clienteId);
-        validarDatosPagoTarjeta(clienteIdNormalizado, numeroTarjeta, monto);
+        try {
+            validarDatosPagoTarjeta(clienteIdNormalizado, numeroTarjeta, monto);
+        } catch (IllegalArgumentException e) {
+            registrador.registrarErrorPagoTarjeta();
+            throw e;
+        }
 
         String body = """
                 {
@@ -69,6 +74,7 @@ public class ServicioPagoImpl implements ServicioPago {
                 pago.setEstado(Estado.ACEPTADO);
             }else {
                 pago.setEstado(Estado.RECHAZADO);
+                registrador.registrarErrorPagoTarjeta();
             }
 
             //mando a guardarlo
@@ -77,8 +83,10 @@ public class ServicioPagoImpl implements ServicioPago {
 
             return response.statusCode() == 200;
         } catch (IOException e) {
+            registrador.registrarErrorPagoTarjeta();
             throw new RuntimeException("No se pudo conectar con el servicio externo de medio de pago", e);
         } catch (InterruptedException e) {
+            registrador.registrarErrorPagoTarjeta();
             Thread.currentThread().interrupt();
             throw new RuntimeException("Se interrumpio la autorizacion del pago con tarjeta", e);
         }

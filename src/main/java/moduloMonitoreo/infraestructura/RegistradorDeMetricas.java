@@ -31,6 +31,11 @@ public class RegistradorDeMetricas {
     public static final String PAGOS_CON_CUENTA_UTE = "pagosConCuentaUte";
     // Counter para contar pagos procesados con tarjeta
     private Counter pagosConCuentaUte;
+
+    public static final String ERRORES_PAGO_TARJETA = "erroresPagoTarjeta";
+    // Counter para contar errores en pagos con tarjeta
+    private Counter erroresPagoTarjeta;
+
     // Registry de Micrometer encargado de publicar las metricas registradas hacia InfluxDB (lo uso en Gauge o Counter)
     private InfluxMeterRegistry registry;
 
@@ -67,6 +72,11 @@ public class RegistradorDeMetricas {
         pagosConCuentaUte = Counter.builder(PAGOS_CON_CUENTA_UTE)
                 .description("Cantidad de pagos procesados con Cuenta UTE")
                 .register(registry);
+
+        // Counter de Errores en Pago con Tarjeta (cuenta eventos acumulados, solo sube)
+        erroresPagoTarjeta = Counter.builder(ERRORES_PAGO_TARJETA)
+                .description("Cantidad de errores al procesar pagos con tarjeta")
+                .register(registry);
     }
 
 
@@ -89,6 +99,10 @@ public class RegistradorDeMetricas {
 
     public void registrarPagoConCuentaUte() {
         pagosConCuentaUte.increment();
+    }
+
+    public void registrarErrorPagoTarjeta() {
+        erroresPagoTarjeta.increment();
     }
 
     @PreDestroy
