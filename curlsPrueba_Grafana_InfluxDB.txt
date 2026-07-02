@@ -149,8 +149,13 @@ docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute
 # Mostrar los ultimos valores de cargasActivas.
 docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute 'SELECT * FROM cargasActivas ORDER BY time DESC LIMIT 10'
 
+#Mostrar TOTAL de Cargas Activas
+docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute 'SELECT SUM(value) FROM cargasActivas'
+
 # Mostrar TOTAL de Pagos con Tarjta
 docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute 'SELECT SUM(value) FROM pagosConTarjeta'
+
+
 
 
 # Despues de iniciar las tres cargas, el ultimo valor deberia ser 3.
