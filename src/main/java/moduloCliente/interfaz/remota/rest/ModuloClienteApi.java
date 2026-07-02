@@ -2,7 +2,6 @@ package moduloCliente.interfaz.remota.rest;
 
 import java.util.List;
 
-import jakarta.annotation.security.DenyAll;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -49,7 +48,6 @@ import moduloCliente.dominio.cliente.Cliente;
 import moduloCliente.dominio.repositorio.ClienteRepositorio;
 
 @ApplicationScoped
-@DenyAll
 @Path("/clientes")
 public class ModuloClienteApi {
 

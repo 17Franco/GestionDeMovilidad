@@ -21,23 +21,16 @@ connect
     end-try
     #3ero finalmente se crea datasource
     try
-        data-source add --name=tallerjavadb --jndi-name=java:jboss/MariaDB --driver-name=mysql --connection-url=jdbc:mysql://localhost:3306/Movilidad?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC --user-name=equipo7 --password=equipo7
+        data-source add --name=tallerjavadb --jndi-name=java:jboss/MySQL --driver-name=mysql --connection-url=jdbc:mysql://localhost:3306/Movilidad?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC --user-name=equipo7 --password=equipo7
         echo "Se crea nuevo datasource para tallerjavadb"
     catch
         echo "No se crea datasource, ya existe"
     end-try
 
-    # Queue JMS point-to-point para procesar reclamos de forma asincronica
+    #4to se crea la queue JMS para los reclamos
     try
-        /subsystem=messaging-activemq/server=default/jms-queue=reclamosQueue:add(entries=["java:/jms/queue/reclamos"])
-        echo "Se crea queue JMS para reclamos"
+        /subsystem=messaging-activemq/server=default/jms-queue=reclamos:add(entries=["java:/jms/queue/reclamos"])
+        echo "Se crea la queue JMS reclamos"
     catch
-        echo "No se crea queue JMS, ya existe"
+        echo "La queue JMS reclamos ya existe"
     end-try
-
-
-    #oara qye wilfly lo levante tambien
-    deploy sistemasExternosMocks/MockPagoCuentaUte.war --force
-    deploy sistemasExternosMocks/ServicioMedioPagoMock.war --force
-    #Aclaracion: La base de datos es donde realmente se guardan las tablas y registros, El datasource es la configuración de WildFly para conectarse a esa base.
-

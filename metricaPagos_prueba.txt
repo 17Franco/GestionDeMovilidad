@@ -1,0 +1,150 @@
+﻿1) Levantar el backend
+Desde la raíz del proyecto:
+
+cd d:\Desktop\proyecto_JAVA\GestionDeMovilidad
+mvn clean package wildfly:dev -DskipTests
+
+Luego, en otra terminal, desplegar los mocks:
+
+cd d:\Desktop\proyecto_JAVA\GestionDeMovilidad
+.\target\server\bin\jboss-cli.bat --connect --command="deploy --force sistemasExternosMocks\ServicioMedioPagoMock.war"
+.\target\server\bin\jboss-cli.bat --connect --command="deploy --force sistemasExternosMocks\MockPagoCuentaUte.war"
+
+Verificá que estén OK:
+
+.\target\server\bin\jboss-cli.bat --connect --command="deployment-info"
+
+2) Crear un cliente para probar
+Si todavía no existe, registrá un cliente:
+
+$clienteBody = @{
+  cedula = "1234567-9"
+  nombre = "Juan"
+  apellido = "Perez"
+  numTel = "099123456"
+  contra = "1234"
+  tipoCliente = "COMUN"
+} | ConvertTo-Json -Compress
+
+Invoke-RestMethod -Method Post -Uri "http://localhost:8080/GestionDeMovilidad/movilidad/clientes" `
+  -ContentType "application/json" `
+  -Body $clienteBody `
+  -ErrorAction Stop
+
+3) Registrar una tarjeta para ese cliente
+
+$medioPagoBody = @{
+  tipoMedioPago = "TARJETA"
+  numero = "11111111"
+  fechaVencimiento = "2030-12-31"
+  digitoVerificacion = "123"
+  tipoTarjeta = "CREDITO"
+} | ConvertTo-Json -Compress
+
+Invoke-RestMethod -Method Post -Uri "http://localhost:8080/GestionDeMovilidad/movilidad/clientes/medioPago" `
+  -ContentType "application/json" `
+  -Headers $basicAuthHeader `
+  -Body $medioPagoBody `
+  -ErrorAction Stop
+
+Si te devuelve 403 en este paso o en los siguientes, primero creá el usuario en WildFly con usuario 12345679, password 1234 y rol appMovil.
+
+4) Crear una estación y un cargador
+
+Crear estación:
+
+$estacionBody = @{
+  descripcion = "Estacion Test"
+  calle = "Av. Test"
+  departamento = "Montevideo"
+  longitud = 12345
+  latitud = -34567
+} | ConvertTo-Json -Compress
+
+$estacion = Invoke-RestMethod -Method Post -Uri "http://localhost:8080/GestionDeMovilidad/movilidad/carga/estacion" `
+  -ContentType "application/json" `
+  -Body $estacionBody `
+  -ErrorAction Stop
+
+$estacionId = $estacion.id
+
+Crear cargador:
+
+$cargadorBody = @{
+  tipo = "NORMAL"
+  tieneCable = $true
+  tipoConector = "GRANDE"
+  potenciaMinima = 22
+  estacionCarga = $estacionId
+} | ConvertTo-Json -Compress
+
+$cargador = Invoke-RestMethod -Method Post -Uri "http://localhost:8080/GestionDeMovilidad/movilidad/carga/cargador" `
+  -ContentType "application/json" `
+  -Body $cargadorBody `
+  -ErrorAction Stop
+
+$cargadorId = $cargador.id
+
+Si el ID de la estación no es 1, usá el valor de $estacionId en el siguiente paso.
+
+5) Iniciar una carga con tarjeta
+
+$cargaBody = @{
+  cargadorID = 1
+  metodoPago = "TARJETA"
+  numeroTarjeta = "11111111"
+} | ConvertTo-Json -Compress
+
+Invoke-RestMethod -Method Post -Uri "http://localhost:8080/GestionDeMovilidad/movilidad/cargas/iniciar" `
+  -ContentType "application/json" `
+  -Headers $basicAuthHeader `
+  -Body $cargaBody `
+  -ErrorAction Stop
+
+Si todo está bien, deberías recibir un mensaje como:
+
+{"mensaje":"Carga iniciada correctamente con Tarjeta"}
+
+6) Finalizar la carga
+
+Invoke-RestMethod -Method Post -Uri "http://localhost:8080/GestionDeMovilidad/movilidad/cargas/finalizarCargaActual" `
+  -Headers $basicAuthHeader `
+  -ErrorAction Stop
+
+6.5)) PAGAR DEUDA
+
+$basicAuthHeader = @{
+  Authorization = "Basic " + [Convert]::ToBase64String(
+    [Text.Encoding]::ASCII.GetBytes("1234567-9:1234")
+  )
+}
+
+$deudaBody = @{
+  numeroTarjeta = "11111111"
+  monto = 500
+} | ConvertTo-Json -Compress
+
+Invoke-RestMethod -Method Post -Uri "http://localhost:8080/GestionDeMovilidad/movilidad/pagos/pagarDeuda" `
+  -Headers $basicAuthHeader `
+  -ContentType "application/json" `
+  -Body $deudaBody `
+  -ErrorAction Stop
+
+7) Verificar en InfluxDB
+
+Si tenés acceso a InfluxDB, revisá si apareció la medición:
+
+docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute 'SHOW MEASUREMENTS'
+
+Y luego:
+
+docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute 'SELECT * FROM "pagosConTarjeta" ORDER BY time DESC LIMIT 10'
+
+8) Verificar en Grafana
+
+create
+import
+upload json file
+subo el dashboard-pagos-tarjeta.json
+datasource: influxdb
+

@@ -27,9 +27,10 @@ import moduloCarga.dominio.medioPago.Tarjeta;
 import moduloCarga.dominio.repositorio.RepoCarga;
 import moduloCarga.infraestructura.rateLimiter.LimitarHistorial;
 
+import moduloMonitoreo.infraestructura.RegistradorDeMetricas;
 
 
-@DenyAll
+
 @Path("/cargas")
 @ApplicationScoped
 public class ModuloCargaAPI {
@@ -41,6 +42,9 @@ public class ModuloCargaAPI {
     
     @Inject 
     RepoCarga repoCarga;
+
+    @Inject
+RegistradorDeMetricas registradorDeMetricas;
 
     //funcion para verificar formato de cedula -> 1234567-8
     private boolean verificarFormatoCedula(String cedula) {
@@ -331,15 +335,22 @@ public class ModuloCargaAPI {
         Cargador cargadorAsociado = cargaBuscada.getCargador();
         boolean resu = serivcioCarga.finalizarCarga(cargadorAsociado, cargaBuscada, 0,medioPago);
 
-        if (resu) {
-            return Response.ok()
-                    .entity("{\"mensaje\":\"Carga finalizada correctamente y pago aceptado\"}")
-                    .build();
-        } else {
-            return Response.ok()
-                    .entity("{\"mensaje\":\"Carga finalizada correctamente. El pago fue rechazado y quedó una deuda pendiente.\"}")
-                    .build();
-        }
+if (resu) {
+
+    if (medioPago instanceof Tarjeta) {
+        registradorDeMetricas.registrarPagoConTarjeta();
+        System.out.println("========== METRICA pagosConTarjeta INCREMENTADA ==========");
+    }
+
+    return Response.ok()
+            .entity("{\"mensaje\":\"Carga finalizada correctamente y pago aceptado\"}")
+            .build();
+
+} else {
+    return Response.ok()
+            .entity("{\"mensaje\":\"Carga finalizada correctamente. El pago fue rechazado y quedó una deuda pendiente.\"}")
+            .build();
+}
 
     }
 

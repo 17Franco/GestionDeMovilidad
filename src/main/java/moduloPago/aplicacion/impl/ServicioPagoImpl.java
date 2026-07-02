@@ -9,6 +9,7 @@ import moduloPago.aplicacion.ServicioPago;
 import moduloPago.dominio.Estado;
 import moduloPago.dominio.Pago;
 import moduloPago.dominio.repositorio.RepoPago;
+import moduloMonitoreo.infraestructura.RegistradorDeMetricas;
 
 import java.io.IOException;
 import java.net.URI;
@@ -25,6 +26,9 @@ public class ServicioPagoImpl implements ServicioPago {
     private static  final  String URL_PAGO_CUENTA_UTE = "http://localhost:8080/MockPagoCuentaUte/api/medioPago/pagar";
     @Inject
     private RepoPago repo;
+
+    @Inject
+    private RegistradorDeMetricas registrador;
 
     @Override
     public boolean pagarConTarjeta(String clienteId,int idCarga, String numeroTarjeta, float monto) {
@@ -64,6 +68,7 @@ public class ServicioPagoImpl implements ServicioPago {
 
             //mando a guardarlo
             repo.save(pago);
+            registrador.registrarPagoConTarjeta();
 
             return response.statusCode() == 200;
         } catch (IOException e) {

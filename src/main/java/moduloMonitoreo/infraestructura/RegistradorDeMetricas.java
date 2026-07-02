@@ -23,6 +23,10 @@ public class RegistradorDeMetricas {
     public static final String RECLAMOS_NEGATIVOS = "reclamosNegativos";
     // Counter para contar cuantos reclamos fueron etiquetados como negativos
     private Counter reclamosNegativos;
+
+    public static final String PAGOS_CON_TARJETA = "pagosConTarjeta";
+    // Counter para contar pagos procesados con tarjeta
+    private Counter pagosConTarjeta;
     // Registry de Micrometer encargado de publicar las metricas registradas hacia InfluxDB (lo uso en Gauge o Counter)
     private InfluxMeterRegistry registry;
 
@@ -49,6 +53,11 @@ public class RegistradorDeMetricas {
         reclamosNegativos = Counter.builder(RECLAMOS_NEGATIVOS)
                 .description("Cantidad de reclamos etiquetados como negativos")
                 .register(registry);
+
+        // Counter de Pagos con Tarjeta (cuenta eventos acumulados, solo sube)
+        pagosConTarjeta = Counter.builder(PAGOS_CON_TARJETA)
+                .description("Cantidad de pagos procesados con tarjeta")
+                .register(registry);
     }
 
 
@@ -63,6 +72,10 @@ public class RegistradorDeMetricas {
 
     public void registrarReclamoNegativo() {
         reclamosNegativos.increment();
+    }
+
+    public void registrarPagoConTarjeta() {
+        pagosConTarjeta.increment();
     }
 
     @PreDestroy
