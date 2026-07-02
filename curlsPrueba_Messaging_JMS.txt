@@ -86,6 +86,10 @@ docker exec ollama ollama list
 # Probar una clasificacion directa contra Ollama.
 curl -s http://localhost:11434/api/generate -H "Content-Type: application/json" -d '{"model":"qwen2.5:0.5b","prompt":"Clasifica el siguiente reclamo como POSITIVO, NEUTRAL o NEGATIVO. Responde solamente una palabra: El servicio funciono mal y tuve un problema con la carga.","stream":false}'
 
+# Para abrir el chat con el modelo:
+docker exec -it ollama ollama run qwen2.5:0.5b
+
+
 
 # 3. VERIFICAR QUE LA QUEUE JMS EXISTE
 # ------------------------------------
