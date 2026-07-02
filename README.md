@@ -4,10 +4,14 @@
 
 GestionDeMovilidad es un sistema que permite administrar el proceso completo de carga de vehículos eléctricos. Desde el registro de usuarios y medios de pago hasta el uso de estaciones de carga y el procesamiento de pagos, el sistema busca facilitar y organizar las distintas operaciones relacionadas con la movilidad eléctrica.
 
+---
+
 ## 🎯 Objetivo
 
 El objetivo del proyecto es desarrollar una aplicación que permita gestionar de forma simple y organizada el proceso de carga de vehículos eléctricos, aplicando una estructura modular para mantener el sistema ordenado y facilitar futuras mejoras y ampliaciones.
 También busca aplicar conceptos como inyección de dependencias, comunicación mediante eventos y separación de responsabilidades entre módulos.
+
+---
 
 ## ✨ Funcionalidades
 
@@ -21,11 +25,12 @@ También busca aplicar conceptos como inyección de dependencias, comunicación 
 - Realizar reclamos.
 - Visualizar estaciones disponibles.
 
+---
+
 ## 🛠 Tecnologías Utilizadas
 
 - **Java**: lenguaje principal del proyecto.
 - **Jakarta EE 10**: APIs utilizadas para el desarrollo de la aplicación.
-- **CDI / Weld**: inyección de dependencias y manejo de eventos.
 - **WildFly**: servidor de aplicaciones utilizado para desplegar el proyecto.
 - **Maven**: gestión de dependencias, compilación y empaquetado del proyecto.
 - **JUnit 5**: ejecución de pruebas unitarias.
@@ -33,6 +38,10 @@ También busca aplicar conceptos como inyección de dependencias, comunicación 
 - **AssertJ**: assertions más expresivas en los tests.
 - **Lombok**: generación automática de código repetitivo como getters, setters y constructores.
 - **JBoss Logging**: registro de mensajes y errores de la aplicación.
+- **Bucket4j**: librería utilizada para implementar rate limiting, lo que permite limitar y controlar la cantidad de peticiones que recibe tu API para evitar sobrecargas o abusos.
+- **Micrometer**: (InfluxDB): fachada de registro de métricas de la aplicación.
+
+---
 
 ## 🏗 Arquitectura del Sistema
 
@@ -47,44 +56,40 @@ La estructura se divide principalmente en:
 
 
 ## 📂 Estructura del Proyecto
+    
+    src/main/java/
+    │
+    ├── FuncionalidadCargadorMOCK.aplicacion/
+    │
+    ├── infraestructura/
+    │   ├── inicio/
+    │   └── seguridad/
+    │
+    ├── moduloCarga/
+    │   ├── aplicacion/
+    │   ├── dominio/
+    │   ├── infraestructura/
+    │   └── interfaz/
+    │
+    ├── moduloCliente/
+    │   ├── aplicacion/
+    │   ├── dominio/
+    │   ├── exepciones/
+    │   ├── infraestructura/
+    │   ├── interfaz/
+    │   └── mapper/
+    │
+    ├── moduloMonitoreo/
+    │   ├── infraestructura/
+    │   └── interfaz.evento.in/
+    │
+    └── moduloPago/
+        ├── aplicacion/
+        ├── dominio/
+        ├── infraestructura/
+        └── interfaz/
 
-    src/
-    │
-    ├── ModuloCliente/
-    │   ├── dominio/
-    │   │   └── repositorio/
-    │   │
-    │   ├── aplicacion/
-    │   │
-    │   ├── interface/
-    │   │
-    │   └── infraestructura/
-    │       ├── configuracion/
-    │       └── persistencia/
-    │
-    ├── ModuloCarga/
-    │   ├── dominio/
-    │   │   └── repositorio/
-    │   │
-    │   ├── aplicacion/
-    │   │
-    │   ├── interface/
-    │   │
-    │   └── infraestructura/
-    │       ├── configuracion/
-    │       └── persistencia/
-    │
-    ├── ModuloPago/
-    │   ├── dominio/
-    │   │   └── repositorio/
-    │   │
-    │   ├── aplicacion/
-    │   │
-    │   ├── interface/
-    │   │
-    │   └── infraestructura/
-    │       ├── configuracion/
-    │       └── persistencia/
+---
 
 ## 📦 Módulos del Sistema
 
@@ -96,47 +101,87 @@ Responsable de administrar el proceso de carga de vehículos eléctricos, incluy
 
 ### 💳 Módulo Pago
 Encargado de procesar y gestionar los pagos asociados a las cargas realizadas por los usuarios.
+
+### 📊 Módulo Monitoreo
+Encargado de la observabilidad del sistema. Recolecta métricas, procesa eventos de entrada (como telemetría o alertas) y facilita la integración con herramientas externas (como InfluxDB y Grafana) para supervisar la salud de la aplicación.
+
+### 🛠️ Infraestructura Transversal (Inicio y Seguridad)
+Gestiona configuraciones globales que afectan a toda la aplicación. Incluye la orquestación de arranque del sistema y el manejo de la seguridad, autenticación y autorización (utilizando Jakarta Security) para proteger los endpoints.
+
+### 🔌 Funcionalidad Cargador MOCK
+Módulo de apoyo utilizado para simular el comportamiento del hardware físico de los cargadores de vehículos eléctricos.
+
+---
     
-## ⚙ Requisitos Previos
+## 🚀 Manual de Despliegue y Ejecución
+
+### 1. ⚙️ Requisitos Previos
 
 Antes de ejecutar el proyecto es necesario tener instalado:
-
 - Java JDK 21+
 - Apache Maven
-- MariaDB
+- MariaDB o MySQL (con la base de datos `Movilidad` creada)
 - IDE compatible (visual studio code o IntelliJ IDEA)
+- Docker
+- Grafana e InfluxDB
+- ollama en Contenedor Ollama
 
-## 📥 Instalación
+### 2. 🐳 Levantando la Infraestructura (Docker)
+> ⚠️ **Nota:** Esta sección se ejecuta **solo la primera vez**, si todavía no existen los contenedores `docker-influxdb-grafana` y `ollama`. Si los contenedores ya existen en tu sistema, puedes saltar directamente al **Punto 3**.
 
-## ▶ Ejecutar el Proyecto
+1. Ver los contenedores existentes en el sistema:
 
-Desde la raíz del proyecto, iniciar la aplicación y WildFly:
+        sudo docker ps -a
+   
+3. Crear el contenedor conjunto de InfluxDB + Grafana (Puertos: 3003 para Grafana, 8086 para InfluxDB y 3004/8083 para la interfaz administrativa):
 
-```bash
-mvn clean package wildfly:dev -DskipTests
-```
+       sudo docker run -d --name docker-influxdb-grafana -p 3003:3003 -p 8086:8086 -p 3004:8083 philhawthorne/docker-influxdb-grafana:latest
+   
+5. Crear el contenedor de Ollama:
 
-Los servicios externos ubicados en `sistemasExternosMocks/` no se despliegan
-automáticamente con la aplicación principal. Con WildFly ejecutándose, abrir
-otra terminal en la raíz del proyecto y desplegarlos manualmente:
+       sudo docker run -d --name ollama -p 11434:11434 ollama/ollama
 
-```bash
-./target/server/bin/jboss-cli.sh --connect \
-  --command="deploy --force sistemasExternosMocks/ServicioMedioPagoMock.war"
+7. Descargar dentro del contenedor el modelo de lenguaje específico utilizado
 
-./target/server/bin/jboss-cli.sh --connect \
-  --command="deploy --force sistemasExternosMocks/MockPagoCuentaUte.war"
-```
+       sudo docker exec ollama ollama pull qwen2.5:0.5b
+   
+10. Verificar que ambos contenedores quedaron creados correctamente:
 
-Comprobar que todos los despliegues tengan estado `OK`:
+        docker ps -a
+   
+        **Salida esperada (similar a esto):**
+        
+        CONTAINER ID   IMAGE                                          COMMAND               CREATED       STATUS       PORTS                                                                                                                                      NAMES
+        b72d6975c156   ollama/ollama                                  "/bin/ollama serve"   3 hours ago   Up 3 hours   0.0.0.0:11434->11434/tcp, [::]:11434->11434/tcp                                                                                            ollama
+        66d4427b9de8   philhawthorne/docker-influxdb-grafana:latest   "/run.sh"             3 hours ago   Up 3 hours   0.0.0.0:3003->3003/tcp, [::]:3003->3003/tcp, 0.0.0.0:8086->8086/tcp, [::]:8086->8086/tcp, 0.0.0.0:3004->8083/tcp, [::]:3004->8083/tcp   docker-influxdb-grafana
+   
 
-```bash
-./target/server/bin/jboss-cli.sh --connect \
-  --command="deployment-info"
-```
 
-Al ejecutar `mvn clean` se puede recrear `target/server`. En ese caso es
-necesario volver a desplegar los WAR de los servicios externos.
+12. 
+
+        
+       
+
+
+### 3. 🗄️ Configuración de la Base de Datos
+
+
+### 4. 🔧 Configuración del Entorno (Variables y Credenciales)
+*(Indica si hay que configurar algún archivo `application.properties`, variables de entorno del sistema, o si el script `config.cli` de WildFly ya inyecta todo lo necesario).*
+
+### 5. 🏗️ Compilación y Pruebas
+*(Comandos para compilar el código fuente y verificar que los tests pasan antes de intentar ejecutar).*
+
+### 6. ▶️ Ejecución del Proyecto
+*(Aquí va tu comando `mvn clean package wildfly:dev -DskipTests` y cualquier instrucción adicional sobre el tiempo de arranque).*
+
+### 7. ✅ Verificación del Despliegue (Puntos de Acceso)
+*(Una lista con las URLs donde el desarrollador puede comprobar que todo levantó bien).*
+- **API Principal:** `http://localhost:8080/GestionDeMovilidad/api/...`
+- **Panel de Grafana:** `http://localhost:3000`
+- **Ollama API:** `http://localhost:11434`
+
+---
 
 ## 🌐 API / Endpoints
 
