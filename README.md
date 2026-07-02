@@ -219,7 +219,29 @@ Si ya realizaste la instalación inicial, cada vez que vayas a trabajar en el pr
 ---
 
 ### 4. 🗄️ Configuración de la Base de Datos
+> 💡 **Nota sobre el Conector (Driver):** El proyecto puede conectarse a tu base de datos usando la configuración para **MariaDB** o **MySQL**. 
+> Por defecto, está habilitado uno de ellos. Si necesitas alternarlos, abre el archivo `config.cli` (ubicado en la raíz del proyecto) y comenta (agregando un `#` al inicio) la línea que no vas a usar, quitándole el `#` a la que sí usarás.
+> 
+> **Ejemplo de cómo se ven estas líneas en `config.cli`:**
+> ```bash
+> # Usando MariaDB (Línea sin el '#'):
+> data-source add --name=tallerjavadb --jndi-name=java:jboss/MariaDB --driver-name=mysql --connection-url=jdbc:mysql://localhost:3306/Movilidad?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC --user-name=equipo7 --password=equipo7
+> 
+> # Usando MySQL (Línea comentada con el '#'):
+> #data-source add --name=tallerjavadb --jndi-name=java:jboss/MySQL --driver-name=mysql --connection-url=jdbc:mysql://localhost:3306/Movilidad?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC --user-name=equipo7 --password=equipo7
+> ```
 
+    CREATE DATABASE Movilidad
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_unicode_ci;
+    
+    CREATE USER 'equipo7'@'%' IDENTIFIED BY 'equipo7';
+    
+    GRANT ALL PRIVILEGES ON Movilidad.* TO 'equipo7'@'%';
+    
+    FLUSH PRIVILEGES;
+
+    
 
 ### 5. 🔧 Configuración del Entorno (Variables y Credenciales)
 *(Indica si hay que configurar algún archivo `application.properties`, variables de entorno del sistema, o si el script `config.cli` de WildFly ya inyecta todo lo necesario).*
