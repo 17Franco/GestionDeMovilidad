@@ -5,11 +5,13 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import moduloCarga.dominio.cliente.Cliente;
 import moduloCarga.dominio.repositorio.RepoCarga;
+
 import moduloPago.aplicacion.ServicioPago;
 import moduloPago.dominio.Estado;
 import moduloPago.dominio.Pago;
 import moduloPago.dominio.repositorio.RepoPago;
 import moduloMonitoreo.infraestructura.RegistradorDeMetricas;
+import moduloPago.interfaz.evento.out.PublicadorEvento;
 
 import java.io.IOException;
 import java.net.URI;
@@ -28,7 +30,10 @@ public class ServicioPagoImpl implements ServicioPago {
     private RepoPago repo;
 
     @Inject
-    private RegistradorDeMetricas registrador;
+    private RegistradorDeMetricas registrador; //no deberia estar aca es etro modulo
+
+    @Inject
+    private PublicadorEvento publicadorEvento;
 
     @Override
     public boolean pagarConTarjeta(String clienteId,int idCarga, String numeroTarjeta, float monto) {
@@ -185,6 +190,7 @@ public class ServicioPagoImpl implements ServicioPago {
 
             //mando a guardarlo
             repo.save(pago);
+            publicadorEvento.publicarPagoConCuentaUte();
 
             return response.statusCode() == 201;
         } catch (IOException e) {
