@@ -1,0 +1,187 @@
+# PRUEBAS MANUALES - TALLER 4 MESSAGING JMS
+# ==========================================
+#
+# Este archivo esta pensado para poder copiarse y pegarse completo en una
+# terminal Bash.
+#
+# Requisitos:
+# - MariaDB/MySQL debe estar levantado.
+# - WildFly debe estar ejecutando la aplicacion GestionDeMovilidad.
+# - La queue JMS debe estar configurada en config.cli.
+# - El contenedor de InfluxDB/Grafana debe estar creado.
+# - Ollama debe estar levantado y tener disponible el modelo qwen2.5:0.5b.
+#
+# Resumen del flujo:
+# 1. Se crea un cliente.
+# 2. El cliente realiza un reclamo.
+# 3. ServicioClienteImpl guarda el reclamo y publica un mensaje JMS.
+# 4. El consumer toma el mensaje desde java:/jms/queue/reclamos.
+# 5. El consumer llama a Ollama para clasificar el reclamo.
+# 6. Se actualiza el tipo del reclamo en la base.
+# 7. Si el reclamo es NEGATIVO, se publica una metrica para InfluxDB/Grafana.
+
+
+# 0. INSTALACION INICIAL DE PRERREQUISITOS DOCKER
+# ------------------------------------------------
+#
+# Esta seccion se ejecuta solo la primera vez, si todavia no existen los
+# contenedores docker-influxdb-grafana y ollama.
+#
+# Si los contenedores ya existen, saltar directo al punto 1.
+
+# Ver contenedores existentes.
+docker ps -a
+
+# Crear el contenedor de InfluxDB + Grafana.
+# Puertos:
+# - 3003: Grafana
+# - 8086: InfluxDB
+# - 8083/3004: interfaz administrativa de InfluxDB, segun imagen
+docker run -d --name docker-influxdb-grafana -p 3003:3003 -p 8086:8086 -p 3004:8083 philhawthorne/docker-influxdb-grafana:latest
+
+# Crear el contenedor de Ollama.
+# El codigo Java usa http://localhost:11434/api/generate
+docker run -d --name ollama -p 11434:11434 ollama/ollama
+
+# Descargar dentro del contenedor el modelo usado por ClasificadorReclamosImpl.
+docker exec ollama ollama pull qwen2.5:0.5b
+
+# Verificar que ambos contenedores quedaron creados.
+docker ps -a
+
+
+# 1. LEVANTAR INFLUXDB Y GRAFANA
+# ------------------------------
+
+# Ver todos los contenedores.
+docker ps -a
+
+# Iniciar el contenedor usado por el proyecto.
+docker start docker-influxdb-grafana
+
+# Verificar que el contenedor este levantado. Debe aparecer con STATUS "Up".
+docker ps
+
+
+# 2. LEVANTAR OLLAMA CON DOCKER
+# -----------------------------
+
+# Ver todos los contenedores.
+docker ps -a
+
+# Iniciar el contenedor de Ollama.
+# En este proyecto el contenedor se llama "ollama".
+docker start ollama
+
+# Verificar que Ollama este levantado y con el puerto 11434 publicado.
+docker ps
+
+# Verificar que Ollama responda en el puerto esperado por el codigo:
+# http://localhost:11434/api/generate
+curl http://localhost:11434/api/tags
+
+# Ver modelos instalados dentro del contenedor.
+docker exec ollama ollama list
+
+# Probar una clasificacion directa contra Ollama.
+curl -s http://localhost:11434/api/generate -H "Content-Type: application/json" -d '{"model":"qwen2.5:0.5b","prompt":"Clasifica el siguiente reclamo como POSITIVO, NEUTRAL o NEGATIVO. Responde solamente una palabra: El servicio funciono mal y tuve un problema con la carga.","stream":false}'
+
+
+# 3. VERIFICAR QUE LA QUEUE JMS EXISTE
+# ------------------------------------
+
+# La salida debe incluir:
+# "outcome" => "success"
+# "entries" => ["java:/jms/queue/reclamos"]
+./target/server/bin/jboss-cli.sh --connect --command="/subsystem=messaging-activemq/server=default/jms-queue=reclamosQueue:read-resource"
+
+
+# 4. CREAR CLIENTE DE PRUEBA
+# --------------------------
+
+# Cliente comun Ana.
+curl -i -X POST -H "Content-Type: application/json" -d '{"cedula":"1111111-1","nombre":"Ana","apellido":"Comun","numTel":"099111111","contra":"1234","tipoCliente":"COMUN"}' http://localhost:8080/GestionDeMovilidad/movilidad/clientes
+
+
+# 5. CREAR RECLAMOS PARA PROBAR JMS Y OLLAMA
+# ------------------------------------------
+
+# Reclamo negativo para Ana.
+# Este texto deberia clasificarse como NEGATIVO.
+curl -v -u 1111111-1:1234 -H "Content-Type: application/json" -X POST -d '{"asunto":"Problema con carga","descripcion":"El servicio funciono mal y tuve un problema con la carga"}' http://localhost:8080/GestionDeMovilidad/movilidad/clientes/reclamos/
+
+# Reclamo positivo para Ana.
+# Este texto deberia clasificarse como POSITIVO o no negativo.
+curl -v -u 1111111-1:1234 -H "Content-Type: application/json" -X POST -d '{"asunto":"Buena experiencia","descripcion":"El servicio funciono bien y la carga fue rapida, muchas gracias"}' http://localhost:8080/GestionDeMovilidad/movilidad/clientes/reclamos/
+
+# Reclamo neutral para Ana.
+# Este texto deberia clasificarse como NEUTRAL.
+curl -v -u 1111111-1:1234 -H "Content-Type: application/json" -X POST -d '{"asunto":"Consulta","descripcion":"Quiero consultar informacion sobre los horarios de las estaciones"}' http://localhost:8080/GestionDeMovilidad/movilidad/clientes/reclamos/
+
+
+# 6. VERIFICAR ESTADO DE LA QUEUE
+# -------------------------------
+
+# Si el consumer esta funcionando, message-count puede quedar en 0 porque
+# los mensajes se consumen enseguida.
+./target/server/bin/jboss-cli.sh --connect --command="/subsystem=messaging-activemq/server=default/jms-queue=reclamosQueue:read-resource(include-runtime=true)"
+
+# Total de mensajes agregados desde que arranco WildFly.
+./target/server/bin/jboss-cli.sh --connect --command="/subsystem=messaging-activemq/server=default/jms-queue=reclamosQueue:read-attribute(name=messages-added)"
+
+# Mensajes esperando en la queue.
+# Sin consumer deberia subir. Con consumer normalmente queda en 0.
+./target/server/bin/jboss-cli.sh --connect --command="/subsystem=messaging-activemq/server=default/jms-queue=reclamosQueue:read-attribute(name=message-count)"
+
+
+# 7. VERIFICAR METRICAS EN INFLUXDB
+# ---------------------------------
+
+# Micrometer publica cada 10 segundos. Esperamos un poco antes de consultar.
+sleep 12
+
+# Mostrar las mediciones existentes en InfluxDB.
+docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute 'SHOW MEASUREMENTS'
+
+# Ver ultimos valores de cargas activas, metrica existente del proyecto.
+docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute 'SELECT * FROM cargasActivas ORDER BY time DESC LIMIT 10'
+
+# Ver puntos publicados por Micrometer.
+# Ojo: no es una fila por reclamo, son puntos por intervalo.
+docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute 'SELECT * FROM reclamosNegativos ORDER BY time DESC LIMIT 10'
+
+# Ver total acumulado de reclamos negativos registrados.
+docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute 'SELECT SUM(value) FROM reclamosNegativos'
+
+# 8. ENTRAR A GRAFANA
+# -------------------
+
+# Abrir en el navegador:
+# http://localhost:3003/
+#
+# Usuario:
+# root
+#
+# Contrasena:
+# root
+
+
+# 9. NOTAS DE DIAGNOSTICO
+# -----------------------
+
+# Si aparece:
+# Error clasificando reclamo con Ollama
+# java.net.ConnectException
+#
+# Entonces el consumer recibio el mensaje JMS, pero no pudo conectarse a Ollama.
+# Revisar:
+# curl http://localhost:11434/api/tags
+
+# Si message-count queda en 0:
+# Puede estar bien. Con consumer funcionando, los mensajes entran y salen rapido.
+# Para verificar actividad mirar messages-added.
+
+# Si no aparece reclamosNegativos en InfluxDB:
+# - Esperar al menos 10 segundos.
+# - Verificar que docker-influxdb-grafana este levantado.
+# - Verificar que se haya enviado un reclamo clasificado como NEGATIVO.

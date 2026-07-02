@@ -46,11 +46,15 @@ import moduloCliente.dominio.cliente.Cliente;
   "porcentajeDescuento":
 }
 */
+import moduloCliente.dominio.repositorio.ClienteRepositorio;
 
 @ApplicationScoped
 @DenyAll
 @Path("/clientes")
 public class ModuloClienteApi {
+
+  @Inject
+  private ClienteRepositorio repoCliente;
 
   @Inject
   private ServicioCliente servicioCliente;
@@ -156,5 +160,18 @@ public class ModuloClienteApi {
         .entity("{\"mensaje\":\"Medio de pago registrado\"}")
         .build();
   }
+
+
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Path("/obtener")
+  @RolesAllowed("appMovil")
+  public List<ReclamoConClienteDTO> mostrarReclamos() {
+      return servicioCliente.mostrarReclamos()
+              .stream()
+              .map(ReclamoConClienteDTO::new)
+              .toList();
+  }
+  
 
 }
