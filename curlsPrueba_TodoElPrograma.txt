@@ -1,0 +1,513 @@
+PRUEBAS MANUALES - TODO EL PROGRAMA GESTION DE MOVILIDAD
+=========================================================
+
+Este documento combina las pruebas de:
+- curlsPrueba.txt
+- curlsPrueba_Grafana_InfluxDB.txt
+- curlsPrueba_Messaging_JMS.txt
+
+Esta pensado para probar el programa por funcionalidades, en orden.
+No hace falta pegar todo de una sola vez: conviene ejecutar por secciones.
+
+Requisitos generales:
+- La aplicacion GestionDeMovilidad debe estar desplegada en WildFly.
+- MariaDB/MySQL debe estar levantado.
+- La queue JMS reclamosQueue debe estar configurada con config.cli.
+- Los usuarios de prueba usan la contrasena: 1234.
+- Si la base no esta limpia, los IDs de estaciones/cargadores pueden cambiar.
+
+Puertos usados:
+- Aplicacion: http://localhost:8080/GestionDeMovilidad
+- Grafana: http://localhost:3003/
+- InfluxDB: localhost:8086
+- Ollama: http://localhost:11434
+
+
+0. INSTALACION INICIAL DE CONTENEDORES DOCKER
+---------------------------------------------
+
+Ejecutar esta seccion solo la primera vez, si los contenedores no existen.
+Si ya existen, saltar al punto 1.
+
+Ver contenedores existentes:
+docker ps -a
+
+Crear contenedor de InfluxDB + Grafana:
+docker run -d --name docker-influxdb-grafana -p 3003:3003 -p 8086:8086 -p 3004:8083 philhawthorne/docker-influxdb-grafana:latest
+
+Crear contenedor de Ollama:
+docker run -d --name ollama -p 11434:11434 ollama/ollama
+
+Descargar el modelo usado por ClasificadorReclamosImpl:
+docker exec ollama ollama pull qwen2.5:0.5b
+
+Verificar que los contenedores existen:
+docker ps -a
+
+
+1. LEVANTAR CONTENEDORES PARA METRICAS, GRAFANA Y OLLAMA
+--------------------------------------------------------
+
+Ver todos los contenedores:
+docker ps -a
+
+Iniciar InfluxDB + Grafana:
+docker start docker-influxdb-grafana
+
+Iniciar Ollama:
+docker start ollama
+
+Verificar que esten levantados. Deben aparecer con STATUS "Up":
+docker ps
+
+Verificar que Ollama responde:
+curl http://localhost:11434/api/tags
+
+Ver modelos instalados en Ollama:
+docker exec ollama ollama list
+
+Probar una clasificacion directa contra Ollama:
+curl -s http://localhost:11434/api/generate -H "Content-Type: application/json" -d '{"model":"qwen2.5:0.5b","prompt":"Clasifica el siguiente reclamo como POSITIVO, NEUTRAL o NEGATIVO. Responde solamente una palabra: El servicio funciono mal y tuve un problema con la carga.","stream":false}'
+
+
+2. VERIFICAR QUE LA QUEUE JMS EXISTE
+------------------------------------
+
+La salida debe incluir:
+- "outcome" => "success"
+- "entries" => ["java:/jms/queue/reclamos"]
+
+./target/server/bin/jboss-cli.sh --connect --command="/subsystem=messaging-activemq/server=default/jms-queue=reclamosQueue:read-resource"
+
+
+3. CREAR CLIENTES DE PRUEBA
+---------------------------
+
+Cliente comun Ana:
+curl -i -X POST -H "Content-Type: application/json" -d '{"cedula":"1111111-1","nombre":"Ana","apellido":"Comun","numTel":"099111111","contra":"1234","tipoCliente":"COMUN"}' http://localhost:8080/GestionDeMovilidad/movilidad/clientes
+
+Cliente comun Bruno:
+curl -i -X POST -H "Content-Type: application/json" -d '{"cedula":"2222222-2","nombre":"Bruno","apellido":"Comun","numTel":"099222222","contra":"1234","tipoCliente":"COMUN"}' http://localhost:8080/GestionDeMovilidad/movilidad/clientes
+
+Cliente profesional Carla:
+curl -i -X POST -H "Content-Type: application/json" -d '{"cedula":"3333333-3","nombre":"Carla","apellido":"Profesional","numTel":"099333333","contra":"1234","tipoCliente":"PROFESIONAL","tipoProfesional":"BASICO","porcentajeDescuento":10}' http://localhost:8080/GestionDeMovilidad/movilidad/clientes
+
+Consultar clientes registrados:
+curl -i -u "1111111-1:1234" http://localhost:8080/GestionDeMovilidad/movilidad/clientes/obtener
+
+IMPORTANTE:
+En el codigo actual hay dos metodos GET con el mismo path /clientes/obtener:
+- uno para obtener clientes
+- otro para obtener reclamos con cliente
+Esto puede generar conflicto o comportamiento ambiguo en JAX-RS. Si este curl no
+responde lo esperado, hay que cambiar uno de los paths en ModuloClienteApi.
+
+
+4. CREAR MEDIOS DE PAGO
+-----------------------
+
+Cuenta UTE de Ana:
+curl -i -u "1111111-1:1234" -X POST -H "Content-Type: application/json" -d '{"tipoMedioPago":"CUENTA_UTE","numeroCuenta":"11111111"}' http://localhost:8080/GestionDeMovilidad/movilidad/clientes/medioPago
+
+Tarjeta de Ana:
+curl -i -u "1111111-1:1234" -X POST -H "Content-Type: application/json" -d '{"tipoMedioPago":"TARJETA","numero":"33333333","fechaVencimiento":"2030-12-31","digitoVerificacion":"123","tipoTarjeta":"CREDITO"}' http://localhost:8080/GestionDeMovilidad/movilidad/clientes/medioPago
+
+Tarjeta de Ana para probar pago rechazado/deuda.
+En el mock usado por las pruebas anteriores, la tarjeta 22222222 se usa como rechazada:
+curl -i -u "1111111-1:1234" -X POST -H "Content-Type: application/json" -d '{"tipoMedioPago":"TARJETA","numero":"22222222","fechaVencimiento":"2030-12-31","digitoVerificacion":"123","tipoTarjeta":"CREDITO"}' http://localhost:8080/GestionDeMovilidad/movilidad/clientes/medioPago
+
+Cuenta UTE de Bruno:
+curl -i -u "2222222-2:1234" -X POST -H "Content-Type: application/json" -d '{"tipoMedioPago":"CUENTA_UTE","numeroCuenta":"22222222"}' http://localhost:8080/GestionDeMovilidad/movilidad/clientes/medioPago
+
+Tarjeta de Carla:
+curl -i -u "3333333-3:1234" -X POST -H "Content-Type: application/json" -d '{"tipoMedioPago":"TARJETA","numero":"33333333","fechaVencimiento":"2030-12-31","digitoVerificacion":"123","tipoTarjeta":"CREDITO"}' http://localhost:8080/GestionDeMovilidad/movilidad/clientes/medioPago
+
+
+5. CREAR ESTACIONES
+-------------------
+
+Estacion Centro. En una base limpia deberia devolver ID 1:
+curl -i -X POST -H "Content-Type: application/json" -d '{"descripcion":"Estacion Centro","calle":"18 de Julio 1234","departamento":"Montevideo","longitud":-56,"latitud":-34}' http://localhost:8080/GestionDeMovilidad/movilidad/carga/estacion
+
+Estacion Este. En una base limpia deberia devolver ID 2:
+curl -i -X POST -H "Content-Type: application/json" -d '{"descripcion":"Estacion Este","calle":"Avenida Italia 4567","departamento":"Maldonado","longitud":-55,"latitud":-35}' http://localhost:8080/GestionDeMovilidad/movilidad/carga/estacion
+
+IMPORTANTE:
+Si los IDs devueltos no son 1 y 2, reemplazarlos en los comandos de cargadores.
+
+
+6. CREAR CARGADORES
+-------------------
+
+Cargador normal para Estacion Centro:
+curl -i -X POST -H "Content-Type: application/json" -d '{"tipo":"NORMAL","tieneCable":true,"tipoConector":"GRANDE","potenciaMinima":22,"estacionCarga":1}' http://localhost:8080/GestionDeMovilidad/movilidad/carga/cargador
+
+Cargador rapido para Estacion Centro:
+curl -i -X POST -H "Content-Type: application/json" -d '{"tipo":"RAPIDO","tieneCable":false,"tipoConector":"PEQUENO","potenciaMinima":50,"estacionCarga":1}' http://localhost:8080/GestionDeMovilidad/movilidad/carga/cargador
+
+Cargador ultrarrapido para Estacion Este:
+curl -i -X POST -H "Content-Type: application/json" -d '{"tipo":"ULTRARRAPIDO","tieneCable":true,"tipoConector":"GRANDE","potenciaMinima":150,"estacionCarga":2}' http://localhost:8080/GestionDeMovilidad/movilidad/carga/cargador
+
+En una base limpia los IDs de los cargadores deberian ser 1, 2 y 3.
+Si son otros, reemplazar cargadorID en los comandos de iniciar cargas.
+
+
+7. COMPROBAR SEGURIDAD DEL MODULO CARGA
+---------------------------------------
+
+Sin credenciales debe responder 401:
+curl -i http://localhost:8080/GestionDeMovilidad/movilidad/cargas/verCarga
+
+Con contrasena incorrecta debe responder 401:
+curl -i -u "1111111-1:incorrecta" http://localhost:8080/GestionDeMovilidad/movilidad/cargas/verCarga
+
+Con credenciales correctas y sin carga actual debe responder 404:
+curl -i -u "1111111-1:1234" http://localhost:8080/GestionDeMovilidad/movilidad/cargas/verCarga
+
+
+8. PROBAR CARGAS ACTIVAS PARA GRAFANA
+-------------------------------------
+
+Esta seccion es importante para que la grafica "Cargas Activas en el Tiempo"
+tenga datos. La metrica cargasActivas es un Gauge: muestra el valor actual.
+No usar SUM(value) para esta metrica, porque suma muestras historicas.
+
+Ana inicia una carga con Cuenta UTE en el cargador 1:
+curl -i -u "1111111-1:1234" -X POST -H "Content-Type: application/json" -d '{"cargadorID":1,"metodoPago":"CUENTA_UTE"}' http://localhost:8080/GestionDeMovilidad/movilidad/cargas/iniciar
+
+Bruno inicia una carga con Cuenta UTE en el cargador 2:
+curl -i -u "2222222-2:1234" -X POST -H "Content-Type: application/json" -d '{"cargadorID":2,"metodoPago":"CUENTA_UTE"}' http://localhost:8080/GestionDeMovilidad/movilidad/cargas/iniciar
+
+Carla inicia una carga con Tarjeta en el cargador 3:
+curl -i -u "3333333-3:1234" -X POST -H "Content-Type: application/json" -d '{"cargadorID":3,"metodoPago":"TARJETA","numeroTarjeta":"33333333"}' http://localhost:8080/GestionDeMovilidad/movilidad/cargas/iniciar
+
+Esperar al menos 12 segundos para que Micrometer publique en InfluxDB:
+sleep 12
+
+Ver el valor actual de cargas activas:
+docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute 'SELECT LAST(value) FROM cargasActivas'
+
+Ver las ultimas muestras de cargas activas:
+docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute 'SELECT * FROM cargasActivas ORDER BY time DESC LIMIT 10'
+
+Resultado esperado despues de iniciar las tres cargas:
+- LAST(value) deberia ser 3.
+
+
+9. CONSULTAR CARGA ACTUAL E HISTORIAL
+-------------------------------------
+
+Carga actual de Ana:
+curl -i -u "1111111-1:1234" http://localhost:8080/GestionDeMovilidad/movilidad/cargas/verCarga
+
+Historial de Ana:
+curl -i -u "1111111-1:1234" http://localhost:8080/GestionDeMovilidad/movilidad/cargas/verHistorial
+
+
+10. FINALIZAR CARGAS Y PROBAR PAGOS CON TARJETA PARA GRAFANA
+-------------------------------------------------------------
+
+Esta seccion alimenta los paneles:
+- Pagos con Tarjeta
+- Evolucion de Pagos con Tarjeta
+
+La metrica pagosConTarjeta es un Counter: cuenta eventos acumulados.
+Para esta metrica si corresponde usar SUM(value).
+
+Finalizar carga actual de Ana:
+curl -i -u "1111111-1:1234" -X POST http://localhost:8080/GestionDeMovilidad/movilidad/cargas/finalizarCargaActual
+
+Finalizar carga actual de Bruno:
+curl -i -u "2222222-2:1234" -X POST http://localhost:8080/GestionDeMovilidad/movilidad/cargas/finalizarCargaActual
+
+Finalizar carga actual de Carla:
+curl -i -u "3333333-3:1234" -X POST http://localhost:8080/GestionDeMovilidad/movilidad/cargas/finalizarCargaActual
+
+Opcional: generar otro pago con tarjeta para que el panel tenga mas datos.
+Ana inicia una nueva carga con Tarjeta en el cargador 1:
+curl -i -u "1111111-1:1234" -X POST -H "Content-Type: application/json" -d '{"cargadorID":1,"metodoPago":"TARJETA","numeroTarjeta":"33333333"}' http://localhost:8080/GestionDeMovilidad/movilidad/cargas/iniciar
+
+Finalizar la carga con Tarjeta de Ana:
+curl -i -u "1111111-1:1234" -X POST http://localhost:8080/GestionDeMovilidad/movilidad/cargas/finalizarCargaActual
+
+Esperar al menos 12 segundos para que se publiquen las metricas:
+sleep 12
+
+Ver el valor actual de cargas activas. Si finalizaste todas, deberia ser 0:
+docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute 'SELECT LAST(value) FROM cargasActivas'
+
+Ver total acumulado de pagos con tarjeta:
+docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute 'SELECT SUM(value) FROM pagosConTarjeta'
+
+Ver las ultimas muestras de pagos con tarjeta:
+docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute 'SELECT * FROM pagosConTarjeta ORDER BY time DESC LIMIT 10'
+
+Ver total acumulado de pagos con Cuenta UTE:
+docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute 'SELECT SUM(value) FROM pagosConCuentaUte'
+
+Consultar pagos desde el endpoint REST del modulo pagos:
+curl -i "http://localhost:8080/GestionDeMovilidad/movilidad/pagos?ci=1111111-1&fechaIni=2026-01-01&fechaFin=2026-12-31"
+
+IMPORTANTE:
+El metodo GET /pagos existe en ApiModuloPago, pero sus parametros no tienen
+@QueryParam. Si no devuelve lo esperado, hay que agregar @QueryParam("ci"),
+@QueryParam("fechaIni") y @QueryParam("fechaFin") en el codigo.
+
+Resultado esperado:
+- Si finalizaste solo la carga con tarjeta de Carla, pagosConTarjeta deberia sumar al menos 1.
+- Si tambien hiciste el flujo opcional con tarjeta de Ana, pagosConTarjeta deberia sumar al menos 2.
+
+Volver a ver historial de Ana:
+curl -i -u "1111111-1:1234" http://localhost:8080/GestionDeMovilidad/movilidad/cargas/verHistorial
+
+
+11. PROBAR DEUDA Y PAGAR DEUDA
+------------------------------
+
+Esta seccion prueba que un cliente con deuda no pueda iniciar una carga nueva,
+y que luego pueda pagar esa deuda.
+
+IMPORTANTE SOBRE LOS ENDPOINTS:
+- En el codigo actual el endpoint activo esta en /movilidad/cargas/pagarDeuda.
+- El endpoint viejo /movilidad/pagos/pagarDeuda aparece en documentos anteriores,
+  pero en ApiModuloPago el endpoint de pagos directos esta comentado.
+
+Ana inicia una carga con la tarjeta que el mock trata como rechazada:
+curl -i -u "1111111-1:1234" -X POST -H "Content-Type: application/json" -d '{"cargadorID":1,"metodoPago":"TARJETA","numeroTarjeta":"22222222"}' http://localhost:8080/GestionDeMovilidad/movilidad/cargas/iniciar
+
+Ana finaliza la carga.
+Si el mock rechaza la tarjeta, debe responder que el pago fue rechazado y quedo deuda pendiente:
+curl -i -u "1111111-1:1234" -X POST http://localhost:8080/GestionDeMovilidad/movilidad/cargas/finalizarCargaActual
+
+Ana intenta iniciar otra carga.
+Debe responder 400 porque tiene una deuda pendiente:
+curl -i -u "1111111-1:1234" -X POST -H "Content-Type: application/json" -d '{"cargadorID":1,"metodoPago":"CUENTA_UTE"}' http://localhost:8080/GestionDeMovilidad/movilidad/cargas/iniciar
+
+Ana intenta pagar la deuda desde el endpoint actual del modulo carga:
+curl -i -u "1111111-1:1234" -X POST http://localhost:8080/GestionDeMovilidad/movilidad/cargas/pagarDeuda
+
+Nota:
+El endpoint actual no recibe numeroTarjeta en el JSON; usa el medio de pago
+asociado a la carga con deuda. Si el mock vuelve a rechazar esa misma tarjeta,
+puede responder 402 y la deuda va a seguir pendiente.
+
+Ana vuelve a intentar iniciar una carga.
+Si la deuda se pago correctamente, debe responder 201:
+curl -i -u "1111111-1:1234" -X POST -H "Content-Type: application/json" -d '{"cargadorID":1,"metodoPago":"CUENTA_UTE"}' http://localhost:8080/GestionDeMovilidad/movilidad/cargas/iniciar
+
+Si tu version tiene habilitado el endpoint viejo del modulo pagos, el comando era este:
+curl -i -u "1111111-1:1234" -X POST -H "Content-Type: application/json" -d '{"numeroTarjeta":"11111111","monto":500}' http://localhost:8080/GestionDeMovilidad/movilidad/pagos/pagarDeuda
+
+
+12. PROBAR RECLAMOS NEGATIVOS PARA GRAFANA, JMS Y OLLAMA
+---------------------------------------------------------
+
+Esta seccion alimenta los paneles:
+- Reclamos Negativos Totales
+- Reclamos Negativos por Tiempo
+
+La metrica reclamosNegativos es un Counter: cuenta eventos acumulados.
+Para esta metrica corresponde usar SUM(value).
+
+Reclamo negativo para Ana.
+Deberia pasar por JMS, ser consumido y clasificarse como NEGATIVO:
+curl -v -u 1111111-1:1234 -H "Content-Type: application/json" -X POST -d '{"asunto":"Problema con carga","descripcion":"El servicio funciono mal y tuve un problema con la carga"}' http://localhost:8080/GestionDeMovilidad/movilidad/clientes/reclamos/
+
+Reclamo positivo para Ana:
+curl -v -u 1111111-1:1234 -H "Content-Type: application/json" -X POST -d '{"asunto":"Buena experiencia","descripcion":"El servicio funciono bien y la carga fue rapida, muchas gracias"}' http://localhost:8080/GestionDeMovilidad/movilidad/clientes/reclamos/
+
+Reclamo neutral para Ana:
+curl -v -u 1111111-1:1234 -H "Content-Type: application/json" -X POST -d '{"asunto":"Consulta","descripcion":"Quiero consultar informacion sobre los horarios de las estaciones"}' http://localhost:8080/GestionDeMovilidad/movilidad/clientes/reclamos/
+
+Esperar al menos 12 segundos para que el consumer procese y Micrometer publique:
+sleep 12
+
+Ver total acumulado de reclamos negativos:
+docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute 'SELECT SUM(value) FROM reclamosNegativos'
+
+Ver las ultimas muestras de reclamos negativos:
+docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute 'SELECT * FROM reclamosNegativos ORDER BY time DESC LIMIT 10'
+
+Resultado esperado:
+- Si Ollama clasifico el primer reclamo como NEGATIVO, reclamosNegativos deberia sumar al menos 1.
+
+
+13. VERIFICAR ESTADO DE JMS
+---------------------------
+
+Si el consumer funciona, message-count puede quedar en 0 porque los mensajes se
+consumen enseguida.
+
+Ver recurso de queue con runtime:
+./target/server/bin/jboss-cli.sh --connect --command="/subsystem=messaging-activemq/server=default/jms-queue=reclamosQueue:read-resource(include-runtime=true)"
+
+Total de mensajes agregados desde que arranco WildFly:
+./target/server/bin/jboss-cli.sh --connect --command="/subsystem=messaging-activemq/server=default/jms-queue=reclamosQueue:read-attribute(name=messages-added)"
+
+Mensajes esperando en la queue:
+./target/server/bin/jboss-cli.sh --connect --command="/subsystem=messaging-activemq/server=default/jms-queue=reclamosQueue:read-attribute(name=message-count)"
+
+
+14. VERIFICAR METRICAS EN INFLUXDB
+----------------------------------
+
+Micrometer publica cada 10 segundos. Esperar un poco antes de consultar:
+sleep 12
+
+Mostrar mediciones existentes:
+docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute 'SHOW MEASUREMENTS'
+
+Cargas activas actuales:
+docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute 'SELECT LAST(value) FROM cargasActivas'
+
+Historial reciente de cargas activas:
+docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute 'SELECT * FROM cargasActivas ORDER BY time DESC LIMIT 10'
+
+Puntos publicados de pagos con tarjeta:
+docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute 'SELECT * FROM pagosConTarjeta ORDER BY time DESC LIMIT 10'
+
+Total acumulado de pagos con tarjeta:
+docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute 'SELECT SUM(value) FROM pagosConTarjeta'
+
+Puntos publicados de reclamos negativos:
+docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute 'SELECT * FROM reclamosNegativos ORDER BY time DESC LIMIT 10'
+
+Total acumulado de reclamos negativos:
+docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute 'SELECT SUM(value) FROM reclamosNegativos'
+
+
+15. CONSULTAS RECOMENDADAS PARA GRAFANA
+---------------------------------------
+
+Entrar a Grafana:
+http://localhost:3003/
+
+Usuario:
+root
+
+Contrasena:
+root
+
+Panel tipo Time series - Cargas Activas en el Tiempo:
+SELECT last("value") FROM "cargasActivas" WHERE ("metric_type" = 'gauge') AND $timeFilter GROUP BY time($__interval) fill(previous)
+
+Panel tipo Stat o Gauge - Cargas Activas Actuales:
+SELECT last("value") FROM "cargasActivas" WHERE ("metric_type" = 'gauge') AND $timeFilter
+
+Panel tipo Stat - Total Pagos con Tarjeta:
+SELECT sum("value") FROM "pagosConTarjeta" WHERE $timeFilter
+
+Panel tipo Time series - Pagos con Tarjeta en el Tiempo:
+SELECT sum("value") FROM "pagosConTarjeta" WHERE $timeFilter GROUP BY time($__interval) fill(0)
+
+Panel tipo Stat - Total Reclamos Negativos:
+SELECT sum("value") FROM "reclamosNegativos" WHERE $timeFilter
+
+Panel tipo Time series - Reclamos Negativos en el Tiempo:
+SELECT sum("value") FROM "reclamosNegativos" WHERE $timeFilter GROUP BY time($__interval) fill(0)
+
+Notas:
+- Para cargasActivas usar last(value), porque es un Gauge.
+- Para pagosConTarjeta y reclamosNegativos usar sum(value), porque son Counters.
+- Para que "Cargas Activas en el Tiempo" muestre cambios, primero hay que iniciar cargas, esperar 12 segundos, y despues finalizarlas.
+
+
+16. INVENTARIO COMPLETO DE ENDPOINTS DETECTADOS
+-----------------------------------------------
+
+Base URL:
+http://localhost:8080/GestionDeMovilidad/movilidad
+
+Modulo Cliente:
+
+POST /clientes
+Registra un cliente.
+Ejemplo usado en seccion 3.
+
+POST /clientes/reclamos
+Registra un reclamo del cliente autenticado.
+Ejemplo usado en seccion 12.
+
+GET /clientes/obtener
+Lista clientes, pero actualmente comparte el mismo path con mostrarReclamos().
+Ejemplo:
+curl -i -u "1111111-1:1234" http://localhost:8080/GestionDeMovilidad/movilidad/clientes/obtener
+
+POST /clientes/medioPago
+Registra una Cuenta UTE o Tarjeta para el cliente autenticado.
+Ejemplo usado en seccion 4.
+
+Modulo Carga:
+
+POST /carga/estacion
+Crea una estacion.
+Ejemplo usado en seccion 5.
+
+POST /carga/cargador
+Crea un cargador asociado a una estacion.
+Ejemplo usado en seccion 6.
+
+POST /cargas/iniciar
+Inicia una carga para el cliente autenticado.
+Ejemplo usado en secciones 8, 10 y 11.
+
+GET /cargas/verCarga
+Obtiene la carga actual del cliente autenticado.
+Ejemplo usado en secciones 7 y 9.
+
+GET /cargas/verHistorial
+Obtiene el historial de cargas del cliente autenticado.
+Ejemplo usado en secciones 9 y 10.
+
+POST /cargas/finalizarCargaActual
+Finaliza la carga actual y dispara el pago.
+Ejemplo usado en secciones 10 y 11.
+
+POST /cargas/pagarDeuda
+Intenta pagar la deuda pendiente del cliente autenticado.
+Ejemplo usado en seccion 11.
+
+Modulo Pago:
+
+GET /pagos
+Consulta pagos por cliente y rango de fechas, pero actualmente los parametros
+del metodo no tienen @QueryParam.
+Ejemplo propuesto:
+curl -i "http://localhost:8080/GestionDeMovilidad/movilidad/pagos?ci=1111111-1&fechaIni=2026-01-01&fechaFin=2026-12-31"
+
+POST /pagos/pagarConTarjeta
+Aparece anotado en ApiModuloPago, pero esta dentro de un bloque comentado.
+No deberia considerarse disponible en la version actual.
+
+Endpoints repetidos o dudosos detectados:
+- GET /clientes/obtener esta duplicado en ModuloClienteApi.
+- GET /pagos necesita @QueryParam para que los parametros de query funcionen.
+- POST /pagos/pagarConTarjeta y el endpoint viejo /pagos/pagarDeuda pertenecen
+  a pruebas/documentos anteriores, pero no estan activos en el codigo actual.
+
+
+17. DIAGNOSTICO RAPIDO
+----------------------
+
+Si Grafana muestra "No data":
+- Verificar que docker-influxdb-grafana este Up: docker ps
+- Esperar al menos 12 segundos despues de ejecutar curls.
+- Revisar InfluxDB con SHOW MEASUREMENTS.
+- Revisar que el rango de tiempo de Grafana incluya el momento de la prueba.
+
+Si cargasActivas muestra numeros enormes:
+- Revisar que no se este usando SELECT SUM(value) FROM cargasActivas.
+- Usar SELECT LAST(value) FROM cargasActivas.
+
+Si reclamosNegativos no aparece:
+- Verificar que se envio un reclamo negativo.
+- Verificar que Ollama responde: curl http://localhost:11434/api/tags
+- Verificar actividad en la queue JMS con messages-added.
+
+Si message-count queda en 0:
+- Puede estar bien. Con consumer activo, los mensajes entran y salen rapido.
+- Para ver actividad mirar messages-added.
+
+Si aparece error de conexion con Ollama:
+- Iniciar el contenedor: docker start ollama
+- Verificar el puerto 11434: curl http://localhost:11434/api/tags

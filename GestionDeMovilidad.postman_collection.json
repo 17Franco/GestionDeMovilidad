@@ -1,0 +1,1219 @@
+{
+  "info": {
+    "_postman_id": "8a6f9c3b-9a42-4e86-9a55-gestion-movilidad",
+    "name": "Gestion de Movilidad - Pruebas completas",
+    "description": "Coleccion para probar los endpoints principales de GestionDeMovilidad. Importar en Postman y ejecutar por carpetas en orden.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/GestionDeMovilidad/movilidad"
+    },
+    {
+      "key": "ana",
+      "value": "1111111-1"
+    },
+    {
+      "key": "bruno",
+      "value": "2222222-2"
+    },
+    {
+      "key": "carla",
+      "value": "3333333-3"
+    },
+    {
+      "key": "password",
+      "value": "1234"
+    },
+    {
+      "key": "estacionCentroId",
+      "value": "1"
+    },
+    {
+      "key": "estacionEsteId",
+      "value": "2"
+    },
+    {
+      "key": "cargadorNormalId",
+      "value": "1"
+    },
+    {
+      "key": "cargadorRapidoId",
+      "value": "2"
+    },
+    {
+      "key": "cargadorUltraId",
+      "value": "3"
+    },
+    {
+      "key": "fechaIni",
+      "value": "2026-01-01"
+    },
+    {
+      "key": "fechaFin",
+      "value": "2026-12-31"
+    }
+  ],
+  "item": [
+    {
+      "name": "01 - Clientes",
+      "item": [
+        {
+          "name": "Crear cliente Ana comun",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"cedula\":\"{{ana}}\",\"nombre\":\"Ana\",\"apellido\":\"Comun\",\"numTel\":\"099111111\",\"contra\":\"{{password}}\",\"tipoCliente\":\"COMUN\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/clientes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "clientes"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear cliente Bruno comun",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"cedula\":\"{{bruno}}\",\"nombre\":\"Bruno\",\"apellido\":\"Comun\",\"numTel\":\"099222222\",\"contra\":\"{{password}}\",\"tipoCliente\":\"COMUN\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/clientes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "clientes"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear cliente Carla profesional",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"cedula\":\"{{carla}}\",\"nombre\":\"Carla\",\"apellido\":\"Profesional\",\"numTel\":\"099333333\",\"contra\":\"{{password}}\",\"tipoCliente\":\"PROFESIONAL\",\"tipoProfesional\":\"BASICO\",\"porcentajeDescuento\":10}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/clientes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "clientes"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener clientes / reclamos (path duplicado)",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{ana}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{password}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/clientes/obtener",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "clientes",
+                "obtener"
+              ]
+            },
+            "description": "Ojo: en ModuloClienteApi hay dos GET con el mismo path /clientes/obtener."
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 - Medios de pago",
+      "item": [
+        {
+          "name": "Ana - Cuenta UTE",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{ana}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{password}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"tipoMedioPago\":\"CUENTA_UTE\",\"numeroCuenta\":\"11111111\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/clientes/medioPago",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "clientes",
+                "medioPago"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Ana - Tarjeta aprobada",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{ana}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{password}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"tipoMedioPago\":\"TARJETA\",\"numero\":\"33333333\",\"fechaVencimiento\":\"2030-12-31\",\"digitoVerificacion\":\"123\",\"tipoTarjeta\":\"CREDITO\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/clientes/medioPago",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "clientes",
+                "medioPago"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Ana - Tarjeta rechazada para deuda",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{ana}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{password}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"tipoMedioPago\":\"TARJETA\",\"numero\":\"22222222\",\"fechaVencimiento\":\"2030-12-31\",\"digitoVerificacion\":\"123\",\"tipoTarjeta\":\"CREDITO\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/clientes/medioPago",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "clientes",
+                "medioPago"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Bruno - Cuenta UTE",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{bruno}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{password}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"tipoMedioPago\":\"CUENTA_UTE\",\"numeroCuenta\":\"22222222\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/clientes/medioPago",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "clientes",
+                "medioPago"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Carla - Tarjeta",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{carla}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{password}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"tipoMedioPago\":\"TARJETA\",\"numero\":\"33333333\",\"fechaVencimiento\":\"2030-12-31\",\"digitoVerificacion\":\"123\",\"tipoTarjeta\":\"CREDITO\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/clientes/medioPago",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "clientes",
+                "medioPago"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 - Estaciones y cargadores",
+      "item": [
+        {
+          "name": "Crear estacion Centro",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  if (json.id) pm.collectionVariables.set('estacionCentroId', json.id);",
+                  "} catch (e) {}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"descripcion\":\"Estacion Centro\",\"calle\":\"18 de Julio 1234\",\"departamento\":\"Montevideo\",\"longitud\":-56,\"latitud\":-34}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/carga/estacion",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "carga",
+                "estacion"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear estacion Este",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  if (json.id) pm.collectionVariables.set('estacionEsteId', json.id);",
+                  "} catch (e) {}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"descripcion\":\"Estacion Este\",\"calle\":\"Avenida Italia 4567\",\"departamento\":\"Maldonado\",\"longitud\":-55,\"latitud\":-35}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/carga/estacion",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "carga",
+                "estacion"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear cargador normal",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  if (json.id) pm.collectionVariables.set('cargadorNormalId', json.id);",
+                  "} catch (e) {}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"tipo\":\"NORMAL\",\"tieneCable\":true,\"tipoConector\":\"GRANDE\",\"potenciaMinima\":22,\"estacionCarga\":{{estacionCentroId}}}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/carga/cargador",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "carga",
+                "cargador"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear cargador rapido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  if (json.id) pm.collectionVariables.set('cargadorRapidoId', json.id);",
+                  "} catch (e) {}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"tipo\":\"RAPIDO\",\"tieneCable\":false,\"tipoConector\":\"PEQUENO\",\"potenciaMinima\":50,\"estacionCarga\":{{estacionCentroId}}}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/carga/cargador",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "carga",
+                "cargador"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear cargador ultrarrapido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  if (json.id) pm.collectionVariables.set('cargadorUltraId', json.id);",
+                  "} catch (e) {}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"tipo\":\"ULTRARRAPIDO\",\"tieneCable\":true,\"tipoConector\":\"GRANDE\",\"potenciaMinima\":150,\"estacionCarga\":{{estacionEsteId}}}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/carga/cargador",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "carga",
+                "cargador"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 - Cargas y pagos",
+      "item": [
+        {
+          "name": "Ver carga Ana sin iniciar",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{ana}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{password}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cargas/verCarga",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cargas",
+                "verCarga"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Ana inicia carga con Cuenta UTE",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{ana}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{password}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"cargadorID\":{{cargadorNormalId}},\"metodoPago\":\"CUENTA_UTE\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/cargas/iniciar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cargas",
+                "iniciar"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Bruno inicia carga con Cuenta UTE",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{bruno}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{password}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"cargadorID\":{{cargadorRapidoId}},\"metodoPago\":\"CUENTA_UTE\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/cargas/iniciar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cargas",
+                "iniciar"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Carla inicia carga con Tarjeta",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{carla}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{password}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"cargadorID\":{{cargadorUltraId}},\"metodoPago\":\"TARJETA\",\"numeroTarjeta\":\"33333333\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/cargas/iniciar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cargas",
+                "iniciar"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Ver carga actual Ana",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{ana}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{password}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cargas/verCarga",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cargas",
+                "verCarga"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Ver historial Ana",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{ana}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{password}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cargas/verHistorial",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cargas",
+                "verHistorial"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Finalizar carga Ana",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{ana}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{password}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cargas/finalizarCargaActual",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cargas",
+                "finalizarCargaActual"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Finalizar carga Bruno",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{bruno}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{password}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cargas/finalizarCargaActual",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cargas",
+                "finalizarCargaActual"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Finalizar carga Carla",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{carla}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{password}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cargas/finalizarCargaActual",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cargas",
+                "finalizarCargaActual"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Consultar pagos (endpoint con parametros dudosos)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pagos?ci={{ana}}&fechaIni={{fechaIni}}&fechaFin={{fechaFin}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pagos"
+              ],
+              "query": [
+                {
+                  "key": "ci",
+                  "value": "{{ana}}"
+                },
+                {
+                  "key": "fechaIni",
+                  "value": "{{fechaIni}}"
+                },
+                {
+                  "key": "fechaFin",
+                  "value": "{{fechaFin}}"
+                }
+              ]
+            },
+            "description": "El metodo existe, pero en el codigo faltan @QueryParam en los parametros."
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 - Deuda",
+      "item": [
+        {
+          "name": "Ana inicia carga con tarjeta rechazada",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{ana}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{password}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"cargadorID\":{{cargadorNormalId}},\"metodoPago\":\"TARJETA\",\"numeroTarjeta\":\"22222222\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/cargas/iniciar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cargas",
+                "iniciar"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Ana finaliza carga y genera deuda",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{ana}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{password}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cargas/finalizarCargaActual",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cargas",
+                "finalizarCargaActual"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Ana intenta iniciar carga con deuda",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{ana}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{password}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"cargadorID\":{{cargadorNormalId}},\"metodoPago\":\"CUENTA_UTE\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/cargas/iniciar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cargas",
+                "iniciar"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Ana paga deuda",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{ana}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{password}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cargas/pagarDeuda",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cargas",
+                "pagarDeuda"
+              ]
+            },
+            "description": "No recibe body; usa la carga y medio de pago asociados a la deuda."
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 - Reclamos JMS",
+      "item": [
+        {
+          "name": "Reclamo negativo",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{ana}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{password}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"asunto\":\"Problema con carga\",\"descripcion\":\"El servicio funciono mal y tuve un problema con la carga\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/clientes/reclamos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "clientes",
+                "reclamos"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Reclamo positivo",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{ana}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{password}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"asunto\":\"Buena experiencia\",\"descripcion\":\"El servicio funciono bien y la carga fue rapida, muchas gracias\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/clientes/reclamos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "clientes",
+                "reclamos"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Reclamo neutral",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{ana}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{password}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"asunto\":\"Consulta\",\"descripcion\":\"Quiero consultar informacion sobre los horarios de las estaciones\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/clientes/reclamos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "clientes",
+                "reclamos"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
