@@ -337,10 +337,10 @@ RegistradorDeMetricas registradorDeMetricas;
 
 if (resu) {
 
-    if (medioPago instanceof Tarjeta) {
-        registradorDeMetricas.registrarPagoConTarjeta();
-        System.out.println("========== METRICA pagosConTarjeta INCREMENTADA ==========");
-    }
+   /* if (medioPago instanceof Tarjeta) {
+        //registradorDeMetricas.registrarPagoConTarjeta();
+       // System.out.println("========== METRICA pagosConTarjeta INCREMENTADA ==========");
+    }*/
 
     return Response.ok()
             .entity("{\"mensaje\":\"Carga finalizada correctamente y pago aceptado\"}")
