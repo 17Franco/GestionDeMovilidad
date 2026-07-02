@@ -16,4 +16,6 @@ public interface ClienteRepositorio {
     boolean saveReclamo(Reclamo reclamo);
     Grupo findGroup(String grupo);
     void saveMedioPago(MedioPago medioPago); //altaMedioPago
+    Reclamo buscarReclamoPorID(Long idReclamo);
+    List<Reclamo> mostrarReclamos();
 }

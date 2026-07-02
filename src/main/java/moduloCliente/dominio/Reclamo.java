@@ -25,6 +25,9 @@ public class Reclamo {
     @JoinColumn(name = "cliente_id")
     private Cliente cliente;
 
+    @Enumerated(EnumType.STRING)
+    private TipoReclamo tipoReclamo;
+
     public Reclamo(String asunto, String descripcion, Cliente cliente) {
         this.asunto = asunto;
         this.descripcion = descripcion;

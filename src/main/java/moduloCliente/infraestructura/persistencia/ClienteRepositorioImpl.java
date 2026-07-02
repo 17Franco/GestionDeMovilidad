@@ -76,4 +76,17 @@ public class ClienteRepositorioImpl implements ClienteRepositorio {
         em.persist(medioPago);
     }
 
+    @Override
+    public Reclamo buscarReclamoPorID(Long idReclamo){
+        return em.find(Reclamo.class, idReclamo);
+    }
+
+   @Override
+    public List<Reclamo> mostrarReclamos() {
+        return em.createQuery(
+                "SELECT r FROM Reclamo r JOIN FETCH r.cliente ORDER BY r.id DESC",
+                Reclamo.class
+        ).getResultList();
+    }
+
 }

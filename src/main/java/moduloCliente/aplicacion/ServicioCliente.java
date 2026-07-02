@@ -13,4 +13,6 @@ public interface ServicioCliente {
     List<Cliente> obtenerClientes();
     Reclamo realizarReclamo(String asunto, String descripcion, String ci);
     List<Reclamo> obtenerReclamos(String ci);
+    public Reclamo buscarReclamoPorID(Long idReclamo);
+    public List<Reclamo> mostrarReclamos();
 }

@@ -32,6 +32,7 @@ public class ServicioClienteImpl implements ServicioCliente {
     @Inject
     private PublicadorEventoCliente evento;
 
+
     @Transactional // hace que todo el metodo sea una transacción
     @Override
     public void registrarCliente(Cliente cliente) {
@@ -178,7 +179,7 @@ public boolean altaMedioPago(String ci, MedioPago formaPago) {
         c.getReclamos().add(reclamo);
         repo.saveReclamo(reclamo);
         //Publico el reclamo en la queue
-        publicadorMensajeReclamo.publicarReclamo(descripcion);
+        publicadorMensajeReclamo.publicarReclamo(reclamo.getId(), descripcion);
         // llamo a repo creo el objeto reclamo y se lo asigno
         return reclamo;
     }
@@ -188,4 +189,15 @@ public boolean altaMedioPago(String ci, MedioPago formaPago) {
     public List<Reclamo> obtenerReclamos(String ci) {
         return new ArrayList<>();
     }
+
+    @Override
+    public Reclamo buscarReclamoPorID(Long idReclamo){
+        return repo.buscarReclamoPorID(idReclamo);
+    }
+
+    @Override
+    public List<Reclamo> mostrarReclamos(){
+        return repo.mostrarReclamos();
+    }
+
 }

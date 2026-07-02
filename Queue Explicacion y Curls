@@ -47,8 +47,6 @@ Que significa:
 
 Después, para verificar cuando levanto WildFly:
 
-./target/server/bin/jboss-cli.sh --connect --command="/subsystem=messaging-activemq/server=default/jms-queue=reclamosQueue:read-resource"
-
 
 
 
@@ -63,4 +61,25 @@ curl -v -u 1111111-1:1234 -H "Content-Type: application/json" -X POST -d '{"asun
 
 # Ver estado de la Queue
 ./target/server/bin/jboss-cli.sh --connect --command="/subsystem=messaging-activemq/server=default/jms-queue=reclamosQueue:read-resource(include-runtime=true)"
+
+
+
+Flujo:
+ModuloClienteApi
+ -> ServicioClienteImpl.realizarReclamo()
+    -> crea Reclamo sin TipoReclamo
+    -> guarda Reclamo
+    -> publica mensaje JMS con id + descripcion
+    -> devuelve Reclamo
+
+Consumidor JMS
+ -> recibe id + descripcion
+ -> llama a Ollama
+ -> convierte respuesta a TipoReclamo
+ -> busca Reclamo por id
+ -> reclamo.setTipoReclamo(tipo)
+ -> guarda/actualiza Reclamo
+ -> si tipo == NEGATIVO, publica evento ReclamoNegativoEtiquetado
+
+
 

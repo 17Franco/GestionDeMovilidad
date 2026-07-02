@@ -21,6 +21,10 @@ public class PublicadorEventoCliente {
 
     @Inject
     private  Event<ClienteMetodoDePago> metodoPago;
+    
+    @Inject
+    private Event<ReclamoNegativoEtiquetado> reclamoNegativo;
+    
 
     public void publicarEventoClienteComun(Cliente cliente){
         ClienteComun comun = (ClienteComun) cliente;
@@ -73,5 +77,10 @@ public class PublicadorEventoCliente {
         }
 
 
+    }
+
+
+     public void publicarReclamoNegativo(Long idReclamo) {
+        reclamoNegativo.fire(new ReclamoNegativoEtiquetado(idReclamo));
     }
 }
