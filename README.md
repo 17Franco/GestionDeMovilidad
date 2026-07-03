@@ -121,41 +121,62 @@ Antes de ejecutar el proyecto es necesario tener instalado:
 - Java JDK 21+
 - Apache Maven
 - MariaDB o MySQL (con la base de datos `Movilidad` creada)
-- IDE compatible (visual studio code o IntelliJ IDEA)
+- IDE compatible (Visual Studio Code o IntelliJ IDEA)
 - Docker
 - Grafana e InfluxDB
-- ollama en Contenedor Ollama
+- Ollama en Contenedor Ollama
+  
+---
 
-### 2. 🐳 Levantando la Infraestructura (Docker)
-> ⚠️ **Nota:** Esta sección se ejecuta **solo la primera vez**, si todavía no existen los contenedores `docker-influxdb-grafana` y `ollama`. Si los contenedores ya existen en tu sistema, puedes saltar directamente al **Punto 3**.
+### 2. 📂 Clonar el Repositorio
+
+Primero, clona el repositorio oficial en tu máquina local y accede al directorio raíz del proyecto:
+
+```bash
+# Clonar el proyecto (reemplaza con la URL correcta si es necesario)
+git clone https://github.com/17Franco/GestionDeMovilidad
+
+```
+
+---
+
+### 3. 🐳 Levantando la Infraestructura (Docker)
+> ⚠️ **Nota:** Esta sección se ejecuta **solo la primera vez**, si todavía no existen los contenedores `docker-influxdb-grafana` y `ollama`. Si los contenedores ya existen en tu sistema, puedes saltar directamente al **Punto 4**.
 
 1. Ver los contenedores existentes en el sistema:
-
-        sudo docker ps -a
+   ```bash
+   sudo docker ps -a
+   ```
    
-3. Crear el contenedor conjunto de InfluxDB + Grafana (Puertos: 3003 para Grafana, 8086 para InfluxDB y 3004/8083 para la interfaz administrativa):
-
-       sudo docker run -d --name docker-influxdb-grafana -p 3003:3003 -p 8086:8086 -p 3004:8083 philhawthorne/docker-influxdb-grafana:latest
+2. Crear el contenedor conjunto de InfluxDB + Grafana (Puertos: 3003 para Grafana, 8086 para InfluxDB y 3004/8083 para la interfaz administrativa):
+   ```bash
+   sudo docker run -d --name docker-influxdb-grafana -p 3003:3003 -p 8086:8086 -p 3004:8083 philhawthorne/docker-influxdb-grafana:latest
+   ```
    
-5. Crear el contenedor de Ollama:
+3. Crear el contenedor de Ollama:
+   ```bash
+   sudo docker run -d --name ollama -p 11434:11434 ollama/ollama
+   ```
 
-       sudo docker run -d --name ollama -p 11434:11434 ollama/ollama
-
-7. Descargar dentro del contenedor el modelo de lenguaje específico utilizado
-
-       sudo docker exec ollama ollama pull qwen2.5:0.5b
+4. Descargar dentro del contenedor el modelo de lenguaje específico utilizado:
+   ```bash
+   sudo docker exec ollama ollama pull qwen2.5:0.5b
+   ```
    
-10. Verificar que ambos contenedores quedaron creados correctamente:
-
-        docker ps -a
+5. Verificar que ambos contenedores quedaron creados correctamente:
+   ```bash
+   docker ps -a
+   ```
    
-        **Salida esperada (similar a esto):**
-        
-        CONTAINER ID   IMAGE                                          COMMAND               CREATED       STATUS       PORTS                                                                                                                                      NAMES
-        b72d6975c156   ollama/ollama                                  "/bin/ollama serve"   3 hours ago   Up 3 hours   0.0.0.0:11434->11434/tcp, [::]:11434->11434/tcp                                                                                            ollama
-        66d4427b9de8   philhawthorne/docker-influxdb-grafana:latest   "/run.sh"             3 hours ago   Up 3 hours   0.0.0.0:3003->3003/tcp, [::]:3003->3003/tcp, 0.0.0.0:8086->8086/tcp, [::]:8086->8086/tcp, 0.0.0.0:3004->8083/tcp, [::]:3004->8083/tcp   docker-influxdb-grafana    
+   **Salida esperada (similar a esto):**
+   ```text
+   CONTAINER ID   IMAGE                                         COMMAND                  CREATED        STATUS        PORTS                                                                                                                   NAMES
+   b72d6975c156   ollama/ollama                                 "/bin/ollama serve"      3 hours ago    Up 3 hours    0.0.0.0:11434->11434/tcp, [::]:11434->11434/tcp                                                                          ollama
+   66d4427b9de8   philhawthorne/docker-influxdb-grafana:latest   "/run.sh"                3 hours ago    Up 3 hours    0.0.0.0:3003->3003/tcp, [::]:3003->3003/tcp, 0.0.0.0:8086->8086/tcp, [::]:8086->8086/tcp, 0.0.0.0:3004->8083/tcp        docker-influxdb-grafana
+   ```
+---
 
-### 3. ▶️ Arranque de la Infraestructura Docker
+### 4. ▶️ Arranque de la Infraestructura Docker
 Si ya realizaste la instalación inicial, cada vez que vayas a trabajar en el proyecto debes asegurarte de iniciar los servicios con los siguientes comandos:
 
 #### Paso A: Levantar InfluxDB y Grafana
@@ -185,6 +206,7 @@ Si ya realizaste la instalación inicial, cada vez que vayas a trabajar en el pr
    ```bash
    curl http://localhost:11434/api/tags
    ```
+   
    **Salida esperada (similar a esto):**
    ```json
    {
@@ -218,9 +240,9 @@ Si ya realizaste la instalación inicial, cada vez que vayas a trabajar en el pr
 
 ---
 
-### 4. 🗄️ Configuración de la Base de Datos
+### 5. 🗄️ Configuración de la Base de Datos
 > 💡 **Nota sobre el Conector (Driver):** El proyecto puede conectarse a tu base de datos usando la configuración para **MariaDB** o **MySQL**. 
-> Por defecto, está habilitado uno de ellos. Si necesitas alternarlos, abre el archivo `config.cli` (ubicado en la raíz del proyecto) y comenta (agregando un `#` al inicio) la línea que no vas a usar, quitándole el `#` a la que sí usarás.
+> Por defecto, está habilitado uno de ellos. Si necesitas alternarlos, abre el archivo `config.cli` (ubicado en la raíz del proyecto que clonaste en el Paso 2) y comenta (agregando un `#` al inicio) la línea que no vas a usar, quitándole el `#` a la que sí usarás.
 > 
 > **Ejemplo de cómo se ven estas líneas en `config.cli`:**
 > ```bash
@@ -231,27 +253,36 @@ Si ya realizaste la instalación inicial, cada vez que vayas a trabajar en el pr
 > #data-source add --name=tallerjavadb --jndi-name=java:jboss/MySQL --driver-name=mysql --connection-url=jdbc:mysql://localhost:3306/Movilidad?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC --user-name=equipo7 --password=equipo7
 > ```
 
-    CREATE DATABASE Movilidad
-    CHARACTER SET utf8mb4
-    COLLATE utf8mb4_unicode_ci;
-    
-    CREATE USER 'equipo7'@'%' IDENTIFIED BY 'equipo7';
-    
-    GRANT ALL PRIVILEGES ON Movilidad.* TO 'equipo7'@'%';
-    
-    FLUSH PRIVILEGES;
+Ejecuta el siguiente script en tu gestor de bases de datos de preferencia (MariaDB/MySQL CLI, DBeaver, etc.) para inicializar el esquema y los permisos correspondientes:
 
-    
+```sql
+CREATE DATABASE Movilidad
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
+   
+CREATE USER 'equipo7'@'%' IDENTIFIED BY 'equipo7';
+   
+GRANT ALL PRIVILEGES ON Movilidad.* TO 'equipo7'@'%';
+   
+FLUSH PRIVILEGES;
+```
 
-### 5. 🔧 Configuración del Entorno (Variables y Credenciales)
-*(Indica si hay que configurar algún archivo `application.properties`, variables de entorno del sistema, o si el script `config.cli` de WildFly ya inyecta todo lo necesario).*
+---
 
-### 6. 🏗️ Compilación y Pruebas
-*(Comandos para compilar el código fuente y verificar que los tests pasan antes de intentar ejecutar).*
+### 6. ▶️ Ejecución del Proyecto
 
-### 7. ▶️ Ejecución del Proyecto
-*(Aquí va tu comando `mvn clean package wildfly:dev -DskipTests` y cualquier instrucción adicional sobre el tiempo de arranque).*
+Una vez que la infraestructura Docker está activa y la base de datos configurada, sigue estos pasos para compilar y ejecutar la aplicación Java:
 
+1. **Ingresar a la carpeta del proyecto:**
+   ```bash
+    cd <rutaaDelProyectoClonado>
+    ```
+
+3. **Compilar y ejecutar el proyecto con Maven:**
+     ```bash
+     mvn clean package -DskipTests wildfly:run
+     ```
+   
 ---
 
 ## 🌐 API / Endpoints
