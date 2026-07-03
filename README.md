@@ -377,9 +377,10 @@ Una vez que la infraestructura Docker está activa y la base de datos configurad
 
 ### Pruebas manuales con curls
 
-Para probar los endpoints desde el navegador, se puede abrir el archivo HTML con los curls de prueba (el mismo se encuentra en la carpeta Resourses):
+Para probar los endpoints desde el navegador, se puede abrir el archivo HTML con los curls de prueba. GitHub muestra los archivos `.html` como código, por eso se deja un enlace para verlo renderizado y otro para ubicarlo en el repositorio:
 
-[Abrir curlsPrueba_TodoElPrograma.html](Resourses/curlsPrueba_TodoElPrograma.html)
+- [Ver HTML renderizado](https://htmlpreview.github.io/?https://github.com/17Franco/GestionDeMovilidad/blob/main/Resourses/curlsPrueba_TodoElPrograma.html)
+- [Ver archivo en el repositorio](Resourses/curlsPrueba_TodoElPrograma.html)
 
 ### Endpoints de ModuloCliente
 
