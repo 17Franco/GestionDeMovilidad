@@ -110,7 +110,7 @@ public class ModuloClienteApi {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("/obtenerClientes")
-  @RolesAllowed("appMovil")
+  //@RolesAllowed("appMovil")
   public List<Cliente> verClientes() {
     return servicioCliente.obtenerClientes();
   }
