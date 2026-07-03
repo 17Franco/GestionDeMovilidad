@@ -109,7 +109,7 @@ public class ModuloClienteApi {
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  @Path("/obtener")
+  @Path("/obtenerClientes")
   @RolesAllowed("appMovil")
   public List<Cliente> verClientes() {
     return servicioCliente.obtenerClientes();
@@ -159,10 +159,10 @@ public class ModuloClienteApi {
         .build();
   }
 
-
+  /*
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  @Path("/obtener")
+  @Path("/obtenerReclamos")
   @RolesAllowed("appMovil")
   public List<ReclamoConClienteDTO> mostrarReclamos() {
       return servicioCliente.mostrarReclamos()
@@ -170,6 +170,7 @@ public class ModuloClienteApi {
               .map(ReclamoConClienteDTO::new)
               .toList();
   }
+  */
   
 
 }
