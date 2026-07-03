@@ -110,7 +110,7 @@ Cuenta UTE de Ana:
 curl -i -u "1111111-1:1234" -X POST -H "Content-Type: application/json" -d '{"tipoMedioPago":"CUENTA_UTE","numeroCuenta":"11111111"}' http://localhost:8080/GestionDeMovilidad/movilidad/clientes/medioPago
 
 Tarjeta de Ana:
-curl -i -u "1111111-1:1234" -X POST -H "Content-Type: application/json" -d '{"tipoMedioPago":"TARJETA","numero":"33333333","fechaVencimiento":"2030-12-31","digitoVerificacion":"123","tipoTarjeta":"CREDITO"}' http://localhost:8080/GestionDeMovilidad/movilidad/clientes/medioPago
+curl -i -u "1111111-1:1234" -X POST -H "Content-Type: application/json" -d '{"tipoMedioPago":"TARJETA","numero":"11111111","fechaVencimiento":"2030-12-31","digitoVerificacion":"123","tipoTarjeta":"CREDITO"}' http://localhost:8080/GestionDeMovilidad/movilidad/clientes/medioPago
 
 Tarjeta de Ana para probar pago rechazado/deuda.
 En el mock usado por las pruebas anteriores, la tarjeta 22222222 se usa como rechazada:
@@ -175,11 +175,21 @@ No usar SUM(value) para esta metrica, porque suma muestras historicas.
 Ana inicia una carga con Cuenta UTE en el cargador 1:
 curl -i -u "1111111-1:1234" -X POST -H "Content-Type: application/json" -d '{"cargadorID":1,"metodoPago":"CUENTA_UTE"}' http://localhost:8080/GestionDeMovilidad/movilidad/cargas/iniciar
 
+Ana inicia una carga con Tarjeta en el cargador 1:
+curl -i -u "1111111-1:1234" -X POST -H "Content-Type: application/json" -d '{"cargadorID":1,"metodoPago":"TARJETA","numeroTarjeta":"11111111"}' http://localhost:8080/GestionDeMovilidad/movilidad/cargas/iniciar
+
+Ana inicia una carga con Tarjeta QUE DA ERROR en el cargador 1:
+curl -i -u "1111111-1:1234" -X POST -H "Content-Type: application/json" -d '{"cargadorID":1,"metodoPago":"TARJETA","numeroTarjeta":"22222222"}' http://localhost:8080/GestionDeMovilidad/movilidad/cargas/iniciar
+
+
+
 Bruno inicia una carga con Cuenta UTE en el cargador 2:
 curl -i -u "2222222-2:1234" -X POST -H "Content-Type: application/json" -d '{"cargadorID":2,"metodoPago":"CUENTA_UTE"}' http://localhost:8080/GestionDeMovilidad/movilidad/cargas/iniciar
 
 Carla inicia una carga con Tarjeta en el cargador 3:
 curl -i -u "3333333-3:1234" -X POST -H "Content-Type: application/json" -d '{"cargadorID":3,"metodoPago":"TARJETA","numeroTarjeta":"33333333"}' http://localhost:8080/GestionDeMovilidad/movilidad/cargas/iniciar
+
+
 
 Esperar al menos 12 segundos para que Micrometer publique en InfluxDB:
 sleep 12
