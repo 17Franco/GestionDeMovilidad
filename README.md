@@ -271,6 +271,16 @@ Si ya realizaste la instalación inicial, cada vez que vayas a trabajar en el pr
    docker ps
    ```
 
+#### Capturas del Dashboard en Grafana
+
+El dashboard **Gestión de Movilidad** permite visualizar métricas operativas del sistema, como pagos por Cuenta UTE, cargas finalizadas, cargas activas, pagos con tarjeta, reclamos negativos y errores de pago.
+
+![Dashboard de Grafana - pagos Cuenta UTE, cargas finalizadas y cargas activas](Resourses/Grafana1.png)
+
+![Dashboard de Grafana - cargas activas y pagos con tarjeta](Resourses/Grafana2.png)
+
+![Dashboard de Grafana - reclamos negativos y errores de pago](Resourses/Grafana3.png)
+
 #### Paso B: Levantar Ollama
 1. Iniciar el contenedor de Ollama:
    ```bash
@@ -381,7 +391,33 @@ Una vez que la infraestructura Docker está activa y la base de datos configurad
 |---|---|---|---|
 | POST | movilidad/cargas/iniciar | Permite generar una carga nueva | app móvil |
 | GET | movilidad/cargas/verCarga | Retorna la carga actual del cliente consultado | app móvil |
-| POST | movilidad/cargas/verHistorial | Retorna el historial de cargas del cliente consultado | app móvil |
+| GET | movilidad/cargas/verHistorial | Retorna el historial de cargas del cliente consultado. Este endpoint tiene rate limiter. | app móvil |
+
+### Rate Limiter del Historial de Cargas
+
+El endpoint `GET movilidad/cargas/verHistorial` cuenta con un limitador de peticiones implementado con **Bucket4j** para evitar abusos o sobrecarga en la consulta del historial.
+
+La limitación se aplica mediante la anotación `@LimitarHistorial`, que activa el filtro `RateLimiterHistorialFiltro` antes de ejecutar el endpoint. La configuración actual permite **3 consultas iniciales** y recarga **3 tokens cada 50 segundos**.
+
+Cuando se supera el límite, la API responde con estado HTTP `429 Too Many Requests` y el siguiente mensaje:
+
+```json
+{
+  "error": "Demasiadas consultas al historial. Intente nuevamente más tarde."
+}
+```
+
+Para probarlo manualmente se pueden ejecutar varias consultas seguidas con el mismo usuario:
+
+```bash
+curl -i -u "1111111-1:1234" http://localhost:8080/GestionDeMovilidad/movilidad/cargas/verHistorial
+```
+
+También puede probarse con JMeter configurando una prueba HTTP contra el mismo endpoint y generando más de 3 peticiones dentro de la ventana de 50 segundos.
+
+Captura de prueba donde se observa la respuesta `429 Too Many Requests` al exceder el límite de consultas:
+
+![Prueba del rate limiter con respuesta 429](Resourses/RateLimiter.png)
 
 ---
 ### Endpoints de ModuloPago
