@@ -1,0 +1,598 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pruebas Manuales - Gestion de Movilidad</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #111820;
+      --panel: #17212d;
+      --text: #d6dde6;
+      --muted: #9aa7b5;
+      --line: #334155;
+      --code-bg: #0b1118;
+      --code-border: #263241;
+      --link: #93c5fd;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 15px/1.58 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    main {
+      width: min(1120px, calc(100vw - 40px));
+      margin: 0 auto;
+      padding: 32px 0 56px;
+    }
+    h1, h2, h3 { line-height: 1.2; margin: 28px 0 12px; color: #eef2f7; }
+    h1 { font-size: 2rem; margin-top: 0; }
+    h2 { border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+    h3 { color: #cbd5e1; }
+    p { margin: 10px 0; }
+    a { color: var(--link); }
+    code {
+      color: #f8d08a;
+      background: rgba(15, 23, 42, .75);
+      padding: 0.12rem 0.32rem;
+      border-radius: 4px;
+      font-size: .92em;
+    }
+    pre.code {
+      background: var(--code-bg);
+      border: 1px solid var(--code-border);
+      border-radius: 8px;
+      padding: 14px 16px;
+      overflow-x: auto;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
+    }
+    pre.code code {
+      background: transparent;
+      color: #e5e7eb;
+      padding: 0;
+      border-radius: 0;
+      font-size: .9rem;
+    }
+    table {
+      border-collapse: collapse;
+      width: auto;
+      min-width: 420px;
+      margin: 12px 0 22px;
+    }
+    th, td {
+      border-bottom: 1px solid var(--line);
+      padding: 8px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th { color: #e2e8f0; }
+    hr { border: 0; border-top: 1px solid var(--line); margin: 28px 0; }
+    ul { margin-top: 8px; }
+    div[style] {
+      border-radius: 8px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+    }
+    .actions {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(17, 24, 32, .92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--line);
+      margin: -32px calc((min(1120px, calc(100vw - 40px)) - 100vw) / 2) 28px;
+      padding: 10px max(20px, calc((100vw - 1120px) / 2));
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    button {
+      background: #1f2937;
+      color: #e5e7eb;
+      border: 1px solid #3b4756;
+      border-radius: 6px;
+      padding: 7px 11px;
+      cursor: pointer;
+    }
+    button:hover { background: #293548; }
+    .code-box {
+      position: relative;
+      margin: 12px 0;
+    }
+    .code-box pre.code {
+      margin: 0;
+      padding-top: 44px;
+    }
+    .copy-code {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      z-index: 2;
+      padding: 5px 9px;
+      font-size: .82rem;
+      color: #cbd5e1;
+      background: #162032;
+      border-color: #344156;
+    }
+    .copy-code:hover { background: #223049; }
+    .copy-code.copied {
+      color: #bbf7d0;
+      border-color: #22c55e;
+      background: #12351f;
+    }
+    @media print {
+      :root { color-scheme: light; }
+      body { background: white; color: #111827; }
+      .actions { display: none; }
+      .copy-code { display: none; }
+      main { width: 100%; padding: 0; }
+      pre.code { white-space: pre-wrap; border-color: #d1d5db; }
+      h2 { break-after: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+<h1>Pruebas Manuales - Gestion de Movilidad</h1>
+
+<div style="border-left: 6px solid #2563eb; background: #172033; color: #dbeafe; padding: 12px 16px; margin: 12px 0;">
+  <strong style="color:#93c5fd;">Objetivo</strong><br>
+<p>Guia visual para ejecutar las pruebas manuales de todo el programa, basada en <code>curlsPrueba_TodoElPrograma.txt</code>.</p>
+</div>
+
+<h2>Leyenda</h2>
+
+<table>
+<tr><th>Color</th><th>Parte</th></tr>
+<tr><td><span style="color:#2563eb;"><strong>Azul</strong></span></td><td>Infraestructura, Docker, WildFly, JMS</td></tr>
+<tr><td><span style="color:#16a34a;"><strong>Verde</strong></span></td><td>Modulo Cliente</td></tr>
+<tr><td><span style="color:#ea580c;"><strong>Naranja</strong></span></td><td>Modulo Carga</td></tr>
+<tr><td><span style="color:#9333ea;"><strong>Violeta</strong></span></td><td>Pagos</td></tr>
+<tr><td><span style="color:#dc2626;"><strong>Rojo</strong></span></td><td>Reclamos, errores, deuda</td></tr>
+<tr><td><span style="color:#0891b2;"><strong>Celeste</strong></span></td><td>Grafana, InfluxDB, metricas</td></tr>
+</table>
+
+<h2>Requisitos</h2>
+
+<div style="border-left: 6px solid #64748b; background: #1f2937; color: #e5e7eb; padding: 12px 16px; margin: 12px 0;">
+
+<ul>
+<li>La aplicacion <strong>GestionDeMovilidad</strong> debe estar desplegada en WildFly.</li>
+<li>MariaDB/MySQL debe estar levantado.</li>
+<li>La queue JMS <code>reclamosQueue</code> debe estar configurada con <code>config.cli</code>.</li>
+<li>Los usuarios de prueba usan la contrasena <code>1234</code>.</li>
+<li>Si la base no esta limpia, los IDs de estaciones/cargadores pueden cambiar.</li>
+<li>Para ejecutar comandos con rutas relativas como <code>./target/server/bin/jboss-cli.sh</code>, la terminal debe estar parada en la carpeta del proyecto.</li>
+</ul>
+
+</div>
+
+<h2>Carpeta De Trabajo</h2>
+
+<pre class="code bash"><code>cd ~/Escritorio/Java/GestionDeMovilidad</code></pre>
+
+<h2>Puertos</h2>
+
+<table>
+<tr><th>Servicio</th><th>URL</th></tr>
+<tr><td>Aplicacion</td><td><code>http://localhost:8080/GestionDeMovilidad</code></td></tr>
+<tr><td>Grafana</td><td><code>http://localhost:3003/</code></td></tr>
+<tr><td>InfluxDB</td><td><code>localhost:8086</code></td></tr>
+<tr><td>Ollama</td><td><code>http://localhost:11434</code></td></tr>
+</table>
+
+<hr>
+
+<h2><span style="color:#2563eb;">0. Instalacion Inicial De Contenedores Docker</span></h2>
+
+<div style="border-left: 6px solid #2563eb; background: #172033; color: #dbeafe; padding: 12px 16px; margin: 12px 0;">
+<p>Ejecutar esta seccion solo la primera vez, si los contenedores no existen. Si ya existen, saltar al punto 1.</p>
+</div>
+
+<pre class="code bash"><code>
+docker ps -a
+docker run -d --name docker-influxdb-grafana -p 3003:3003 -p 8086:8086 -p 3004:8083 philhawthorne/docker-influxdb-grafana:latest
+docker run -d --name ollama -p 11434:11434 ollama/ollama
+docker exec ollama ollama pull qwen2.5:0.5b
+docker ps -a
+</code></pre>
+
+<h2><span style="color:#2563eb;">1. Levantar Contenedores Para Metricas, Grafana Y Ollama</span></h2>
+
+
+
+<pre class="code bash"><code>
+docker ps -a
+docker start docker-influxdb-grafana
+docker start ollama
+docker ps
+curl http://localhost:11434/api/tags
+docker exec ollama ollama list
+
+# Opcionl: curl de prueba al modelo qwen2.5:0.5b
+curl -s http://localhost:11434/api/generate -H &quot;Content-Type: application/json&quot; -d &#x27;{&quot;model&quot;:&quot;qwen2.5:0.5b&quot;,&quot;prompt&quot;:&quot;Clasifica el siguiente reclamo como POSITIVO, NEUTRAL o NEGATIVO. Responde solamente una palabra: El servicio funciono mal y tuve un problema con la carga.&quot;,&quot;stream&quot;:false}&#x27;
+
+# Opcional: abrir chat interactivo con el modelo
+docker exec -it ollama ollama run qwen2.5:0.5b
+</code></pre>
+
+<h2><span style="color:#2563eb;">2. Verificar Que La Queue JMS Existe</span></h2>
+
+<div style="border-left: 6px solid #2563eb; background: #172033; color: #dbeafe; padding: 12px 16px; margin: 12px 0;">
+<p>La salida debe incluir <code>"outcome" =&gt; "success"</code> y <code>"entries" =&gt; ["java:/jms/queue/reclamos"]</code>.</p>
+</div>
+
+<pre class="code bash"><code>
+./target/server/bin/jboss-cli.sh --connect --command=&quot;/subsystem=messaging-activemq/server=default/jms-queue=reclamosQueue:read-resource&quot;
+</code></pre>
+
+<hr>
+
+<h2><span style="color:#16a34a;">3. Crear Clientes De Prueba</span></h2>
+
+<pre class="code bash"><code>
+curl -i -X POST -H &quot;Content-Type: application/json&quot; -d &#x27;{&quot;cedula&quot;:&quot;1111111-1&quot;,&quot;nombre&quot;:&quot;Ana&quot;,&quot;apellido&quot;:&quot;Comun&quot;,&quot;numTel&quot;:&quot;099111111&quot;,&quot;contra&quot;:&quot;1234&quot;,&quot;tipoCliente&quot;:&quot;COMUN&quot;}&#x27; http://localhost:8080/GestionDeMovilidad/movilidad/clientes
+
+curl -i -X POST -H &quot;Content-Type: application/json&quot; -d &#x27;{&quot;cedula&quot;:&quot;2222222-2&quot;,&quot;nombre&quot;:&quot;Bruno&quot;,&quot;apellido&quot;:&quot;Comun&quot;,&quot;numTel&quot;:&quot;099222222&quot;,&quot;contra&quot;:&quot;1234&quot;,&quot;tipoCliente&quot;:&quot;COMUN&quot;}&#x27; http://localhost:8080/GestionDeMovilidad/movilidad/clientes
+
+curl -i -X POST -H &quot;Content-Type: application/json&quot; -d &#x27;{&quot;cedula&quot;:&quot;3333333-3&quot;,&quot;nombre&quot;:&quot;Carla&quot;,&quot;apellido&quot;:&quot;Profesional&quot;,&quot;numTel&quot;:&quot;099333333&quot;,&quot;contra&quot;:&quot;1234&quot;,&quot;tipoCliente&quot;:&quot;PROFESIONAL&quot;,&quot;tipoProfesional&quot;:&quot;BASICO&quot;,&quot;porcentajeDescuento&quot;:10}&#x27; http://localhost:8080/GestionDeMovilidad/movilidad/clientes
+
+curl -i -u &quot;1111111-1:1234&quot; http://localhost:8080/GestionDeMovilidad/movilidad/clientes/obtenerClientes
+</code></pre>
+
+<div style="border-left: 6px solid #16a34a; background: #14261c; color: #dcfce7; padding: 12px 16px; margin: 12px 0;">
+<p>Paths separados actualmente:</p>
+<code>/clientes/obtenerClientes</code> lista clientes y <code>/clientes/obtenerReclamos</code> lista reclamos con cliente.
+</div>
+
+<h2><span style="color:#16a34a;">4. Crear Medios De Pago</span></h2>
+
+<pre class="code bash"><code>
+curl -i -u &quot;1111111-1:1234&quot; -X POST -H &quot;Content-Type: application/json&quot; -d &#x27;{&quot;tipoMedioPago&quot;:&quot;CUENTA_UTE&quot;,&quot;numeroCuenta&quot;:&quot;11111111&quot;}&#x27; http://localhost:8080/GestionDeMovilidad/movilidad/clientes/medioPago
+
+curl -i -u &quot;1111111-1:1234&quot; -X POST -H &quot;Content-Type: application/json&quot; -d &#x27;{&quot;tipoMedioPago&quot;:&quot;TARJETA&quot;,&quot;numero&quot;:&quot;11111111&quot;,&quot;fechaVencimiento&quot;:&quot;2030-12-31&quot;,&quot;digitoVerificacion&quot;:&quot;123&quot;,&quot;tipoTarjeta&quot;:&quot;CREDITO&quot;}&#x27; http://localhost:8080/GestionDeMovilidad/movilidad/clientes/medioPago
+
+curl -i -u &quot;1111111-1:1234&quot; -X POST -H &quot;Content-Type: application/json&quot; -d &#x27;{&quot;tipoMedioPago&quot;:&quot;TARJETA&quot;,&quot;numero&quot;:&quot;22222222&quot;,&quot;fechaVencimiento&quot;:&quot;2030-12-31&quot;,&quot;digitoVerificacion&quot;:&quot;123&quot;,&quot;tipoTarjeta&quot;:&quot;CREDITO&quot;}&#x27; http://localhost:8080/GestionDeMovilidad/movilidad/clientes/medioPago
+
+curl -i -u &quot;2222222-2:1234&quot; -X POST -H &quot;Content-Type: application/json&quot; -d &#x27;{&quot;tipoMedioPago&quot;:&quot;CUENTA_UTE&quot;,&quot;numeroCuenta&quot;:&quot;22222222&quot;}&#x27; http://localhost:8080/GestionDeMovilidad/movilidad/clientes/medioPago
+
+curl -i -u &quot;3333333-3:1234&quot; -X POST -H &quot;Content-Type: application/json&quot; -d &#x27;{&quot;tipoMedioPago&quot;:&quot;TARJETA&quot;,&quot;numero&quot;:&quot;33333333&quot;,&quot;fechaVencimiento&quot;:&quot;2030-12-31&quot;,&quot;digitoVerificacion&quot;:&quot;123&quot;,&quot;tipoTarjeta&quot;:&quot;CREDITO&quot;}&#x27; http://localhost:8080/GestionDeMovilidad/movilidad/clientes/medioPago
+</code></pre>
+
+<hr>
+
+<h2><span style="color:#ea580c;">5. Crear Estaciones</span></h2>
+
+<div style="border-left: 6px solid #ea580c; background: #2a1c12; color: #ffedd5; padding: 12px 16px; margin: 12px 0;">
+<p>En una base limpia deberian devolver ID <code>1</code> y <code>2</code>. Si devuelven otros IDs, reemplazarlos en los comandos de cargadores.</p>
+</div>
+
+<pre class="code bash"><code>
+curl -i -X POST -H &quot;Content-Type: application/json&quot; -d &#x27;{&quot;descripcion&quot;:&quot;Estacion Centro&quot;,&quot;calle&quot;:&quot;18 de Julio 1234&quot;,&quot;departamento&quot;:&quot;Montevideo&quot;,&quot;longitud&quot;:-56,&quot;latitud&quot;:-34}&#x27; http://localhost:8080/GestionDeMovilidad/movilidad/carga/estacion
+
+curl -i -X POST -H &quot;Content-Type: application/json&quot; -d &#x27;{&quot;descripcion&quot;:&quot;Estacion Este&quot;,&quot;calle&quot;:&quot;Avenida Italia 4567&quot;,&quot;departamento&quot;:&quot;Maldonado&quot;,&quot;longitud&quot;:-55,&quot;latitud&quot;:-35}&#x27; http://localhost:8080/GestionDeMovilidad/movilidad/carga/estacion
+</code></pre>
+
+<h2><span style="color:#ea580c;">6. Crear Cargadores</span></h2>
+
+<div style="border-left: 6px solid #ea580c; background: #2a1c12; color: #ffedd5; padding: 12px 16px; margin: 12px 0;">
+<p>En una base limpia los IDs de los cargadores deberian ser <code>1</code>, <code>2</code> y <code>3</code>.</p>
+</div>
+
+<pre class="code bash"><code>
+curl -i -X POST -H &quot;Content-Type: application/json&quot; -d &#x27;{&quot;tipo&quot;:&quot;NORMAL&quot;,&quot;tieneCable&quot;:true,&quot;tipoConector&quot;:&quot;GRANDE&quot;,&quot;potenciaMinima&quot;:22,&quot;estacionCarga&quot;:1}&#x27; http://localhost:8080/GestionDeMovilidad/movilidad/carga/cargador
+
+curl -i -X POST -H &quot;Content-Type: application/json&quot; -d &#x27;{&quot;tipo&quot;:&quot;RAPIDO&quot;,&quot;tieneCable&quot;:false,&quot;tipoConector&quot;:&quot;PEQUENO&quot;,&quot;potenciaMinima&quot;:50,&quot;estacionCarga&quot;:1}&#x27; http://localhost:8080/GestionDeMovilidad/movilidad/carga/cargador
+
+curl -i -X POST -H &quot;Content-Type: application/json&quot; -d &#x27;{&quot;tipo&quot;:&quot;ULTRARRAPIDO&quot;,&quot;tieneCable&quot;:true,&quot;tipoConector&quot;:&quot;GRANDE&quot;,&quot;potenciaMinima&quot;:150,&quot;estacionCarga&quot;:2}&#x27; http://localhost:8080/GestionDeMovilidad/movilidad/carga/cargador
+</code></pre>
+
+<h2><span style="color:#dc2626;">7. Comprobar Seguridad Del Modulo Carga</span></h2>
+
+<pre class="code bash"><code>
+curl -i http://localhost:8080/GestionDeMovilidad/movilidad/cargas/verCarga
+curl -i -u &quot;1111111-1:incorrecta&quot; http://localhost:8080/GestionDeMovilidad/movilidad/cargas/verCarga
+curl -i -u &quot;1111111-1:1234&quot; http://localhost:8080/GestionDeMovilidad/movilidad/cargas/verCarga
+</code></pre>
+
+<div style="border-left: 6px solid #dc2626; background: #2a1717; color: #fee2e2; padding: 12px 16px; margin: 12px 0;">
+<p>Esperado: sin credenciales o con contrasena incorrecta debe responder <code>403</code>. Con credenciales correctas y sin carga actual debe responder <code>404</code>.</p>
+</div>
+
+<h2><span style="color:#ea580c;">8. Probar Cargas Activas Para Grafana</span></h2>
+
+<div style="border-left: 6px solid #0891b2; background: #10262d; color: #cffafe; padding: 12px 16px; margin: 12px 0;">
+<p>La metrica <code>cargasActivas</code> es un Gauge. Para verla correctamente usar <code>LAST(value)</code>, no <code>SUM(value)</code>.</p>
+</div>
+
+<pre class="code bash"><code>
+curl -i -u &quot;1111111-1:1234&quot; -X POST -H &quot;Content-Type: application/json&quot; -d &#x27;{&quot;cargadorID&quot;:1,&quot;metodoPago&quot;:&quot;CUENTA_UTE&quot;}&#x27; http://localhost:8080/GestionDeMovilidad/movilidad/cargas/iniciar
+
+curl -i -u &quot;1111111-1:1234&quot; -X POST -H &quot;Content-Type: application/json&quot; -d &#x27;{&quot;cargadorID&quot;:1,&quot;metodoPago&quot;:&quot;TARJETA&quot;,&quot;numeroTarjeta&quot;:&quot;11111111&quot;}&#x27; http://localhost:8080/GestionDeMovilidad/movilidad/cargas/iniciar
+
+curl -i -u &quot;1111111-1:1234&quot; -X POST -H &quot;Content-Type: application/json&quot; -d &#x27;{&quot;cargadorID&quot;:1,&quot;metodoPago&quot;:&quot;TARJETA&quot;,&quot;numeroTarjeta&quot;:&quot;22222222&quot;}&#x27; http://localhost:8080/GestionDeMovilidad/movilidad/cargas/iniciar
+
+curl -i -u &quot;2222222-2:1234&quot; -X POST -H &quot;Content-Type: application/json&quot; -d &#x27;{&quot;cargadorID&quot;:2,&quot;metodoPago&quot;:&quot;CUENTA_UTE&quot;}&#x27; http://localhost:8080/GestionDeMovilidad/movilidad/cargas/iniciar
+
+curl -i -u &quot;3333333-3:1234&quot; -X POST -H &quot;Content-Type: application/json&quot; -d &#x27;{&quot;cargadorID&quot;:3,&quot;metodoPago&quot;:&quot;TARJETA&quot;,&quot;numeroTarjeta&quot;:&quot;33333333&quot;}&#x27; http://localhost:8080/GestionDeMovilidad/movilidad/cargas/iniciar
+
+sleep 12
+
+docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute &#x27;SELECT LAST(value) FROM cargasActivas&#x27;
+docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute &#x27;SELECT * FROM cargasActivas ORDER BY time DESC LIMIT 10&#x27;
+</code></pre>
+
+<h2><span style="color:#ea580c;">9. Consultar Carga Actual E Historial</span></h2>
+
+<pre class="code bash"><code>
+curl -i -u &quot;1111111-1:1234&quot; http://localhost:8080/GestionDeMovilidad/movilidad/cargas/verCarga
+curl -i -u &quot;1111111-1:1234&quot; http://localhost:8080/GestionDeMovilidad/movilidad/cargas/verHistorial
+</code></pre>
+
+<hr>
+
+<h2><span style="color:#9333ea;">10. Finalizar Cargas Y Probar Pagos Con Tarjeta Para Grafana</span></h2>
+
+<div style="border-left: 6px solid #9333ea; background: #23172f; color: #f3e8ff; padding: 12px 16px; margin: 12px 0;">
+<p>La metrica <code>pagosConTarjeta</code> es un Counter. Para esta metrica corresponde usar <code>SUM(value)</code>.</p>
+</div>
+
+<pre class="code bash"><code>
+curl -i -u &quot;1111111-1:1234&quot; -X POST http://localhost:8080/GestionDeMovilidad/movilidad/cargas/finalizarCargaActual
+curl -i -u &quot;2222222-2:1234&quot; -X POST http://localhost:8080/GestionDeMovilidad/movilidad/cargas/finalizarCargaActual
+curl -i -u &quot;3333333-3:1234&quot; -X POST http://localhost:8080/GestionDeMovilidad/movilidad/cargas/finalizarCargaActual
+
+curl -i -u &quot;1111111-1:1234&quot; -X POST -H &quot;Content-Type: application/json&quot; -d &#x27;{&quot;cargadorID&quot;:1,&quot;metodoPago&quot;:&quot;TARJETA&quot;,&quot;numeroTarjeta&quot;:&quot;33333333&quot;}&#x27; http://localhost:8080/GestionDeMovilidad/movilidad/cargas/iniciar
+curl -i -u &quot;1111111-1:1234&quot; -X POST http://localhost:8080/GestionDeMovilidad/movilidad/cargas/finalizarCargaActual
+
+sleep 12
+
+docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute &#x27;SELECT LAST(value) FROM cargasActivas&#x27;
+docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute &#x27;SELECT SUM(value) FROM pagosConTarjeta&#x27;
+docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute &#x27;SELECT * FROM pagosConTarjeta ORDER BY time DESC LIMIT 10&#x27;
+docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute &#x27;SELECT SUM(value) FROM pagosConCuentaUte&#x27;
+
+curl -i &quot;http://localhost:8080/GestionDeMovilidad/movilidad/pagos?ci=1111111-1&amp;fechaIni=2026-01-01&amp;fechaFin=2026-12-31&quot;
+curl -i -u &quot;1111111-1:1234&quot; http://localhost:8080/GestionDeMovilidad/movilidad/cargas/verHistorial
+</code></pre>
+
+<h2><span style="color:#dc2626;">11. Probar Deuda Y Pagar Deuda</span></h2>
+
+<pre class="code bash"><code>
+curl -i -u &quot;1111111-1:1234&quot; -X POST -H &quot;Content-Type: application/json&quot; -d &#x27;{&quot;cargadorID&quot;:1,&quot;metodoPago&quot;:&quot;TARJETA&quot;,&quot;numeroTarjeta&quot;:&quot;22222222&quot;}&#x27; http://localhost:8080/GestionDeMovilidad/movilidad/cargas/iniciar
+
+curl -i -u &quot;1111111-1:1234&quot; -X POST http://localhost:8080/GestionDeMovilidad/movilidad/cargas/finalizarCargaActual
+
+curl -i -u &quot;1111111-1:1234&quot; -X POST -H &quot;Content-Type: application/json&quot; -d &#x27;{&quot;cargadorID&quot;:1,&quot;metodoPago&quot;:&quot;CUENTA_UTE&quot;}&#x27; http://localhost:8080/GestionDeMovilidad/movilidad/cargas/iniciar
+
+curl -i -u &quot;1111111-1:1234&quot; -X POST http://localhost:8080/GestionDeMovilidad/movilidad/cargas/pagarDeuda
+
+curl -i -u &quot;1111111-1:1234&quot; -X POST -H &quot;Content-Type: application/json&quot; -d &#x27;{&quot;cargadorID&quot;:1,&quot;metodoPago&quot;:&quot;CUENTA_UTE&quot;}&#x27; http://localhost:8080/GestionDeMovilidad/movilidad/cargas/iniciar
+
+curl -i -u &quot;1111111-1:1234&quot; -X POST -H &quot;Content-Type: application/json&quot; -d &#x27;{&quot;numeroTarjeta&quot;:&quot;11111111&quot;,&quot;monto&quot;:500}&#x27; http://localhost:8080/GestionDeMovilidad/movilidad/pagos/pagarDeuda
+</code></pre>
+
+<div style="border-left: 6px solid #dc2626; background: #2a1717; color: #fee2e2; padding: 12px 16px; margin: 12px 0;">
+<p>El endpoint actual activo esta en <code>/movilidad/cargas/pagarDeuda</code>. El endpoint viejo <code>/movilidad/pagos/pagarDeuda</code> puede no estar disponible segun la version.</p>
+</div>
+
+<h2><span style="color:#dc2626;">12. Probar Reclamos Negativos Para Grafana, JMS Y Ollama</span></h2>
+
+<div style="border-left: 6px solid #dc2626; background: #2a1717; color: #fee2e2; padding: 12px 16px; margin: 12px 0;">
+<p>La metrica <code>reclamosNegativos</code> es un Counter. Para esta metrica corresponde usar <code>SUM(value)</code>.</p>
+</div>
+
+<pre class="code bash"><code>
+curl -v -u 1111111-1:1234 -H &quot;Content-Type: application/json&quot; -X POST -d &#x27;{&quot;asunto&quot;:&quot;Problema con carga&quot;,&quot;descripcion&quot;:&quot;El servicio funciono mal y tuve un problema con la carga&quot;}&#x27; http://localhost:8080/GestionDeMovilidad/movilidad/clientes/reclamos/
+
+curl -v -u 1111111-1:1234 -H &quot;Content-Type: application/json&quot; -X POST -d &#x27;{&quot;asunto&quot;:&quot;Buena experiencia&quot;,&quot;descripcion&quot;:&quot;El servicio funciono bien y la carga fue rapida, muchas gracias&quot;}&#x27; http://localhost:8080/GestionDeMovilidad/movilidad/clientes/reclamos/
+
+curl -v -u 1111111-1:1234 -H &quot;Content-Type: application/json&quot; -X POST -d &#x27;{&quot;asunto&quot;:&quot;Consulta&quot;,&quot;descripcion&quot;:&quot;Quiero consultar informacion sobre los horarios de las estaciones&quot;}&#x27; http://localhost:8080/GestionDeMovilidad/movilidad/clientes/reclamos/
+
+sleep 12
+
+docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute &#x27;SELECT SUM(value) FROM reclamosNegativos&#x27;
+docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute &#x27;SELECT * FROM reclamosNegativos ORDER BY time DESC LIMIT 10&#x27;
+</code></pre>
+
+<h2><span style="color:#2563eb;">13. Verificar Estado De JMS</span></h2>
+
+<pre class="code bash"><code>
+./target/server/bin/jboss-cli.sh --connect --command=&quot;/subsystem=messaging-activemq/server=default/jms-queue=reclamosQueue:read-resource(include-runtime=true)&quot;
+
+./target/server/bin/jboss-cli.sh --connect --command=&quot;/subsystem=messaging-activemq/server=default/jms-queue=reclamosQueue:read-attribute(name=messages-added)&quot;
+
+./target/server/bin/jboss-cli.sh --connect --command=&quot;/subsystem=messaging-activemq/server=default/jms-queue=reclamosQueue:read-attribute(name=message-count)&quot;
+</code></pre>
+
+<div style="border-left: 6px solid #2563eb; background: #172033; color: #dbeafe; padding: 12px 16px; margin: 12px 0;">
+<p>Si el consumer funciona, <code>message-count</code> puede quedar en <code>0</code> porque los mensajes se consumen enseguida. Para ver actividad mirar <code>messages-added</code>.</p>
+</div>
+
+<h2><span style="color:#0891b2;">14. Verificar Metricas En InfluxDB</span></h2>
+
+<pre class="code bash"><code>
+sleep 12
+
+docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute &#x27;SHOW MEASUREMENTS&#x27;
+docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute &#x27;SELECT LAST(value) FROM cargasActivas&#x27;
+docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute &#x27;SELECT * FROM cargasActivas ORDER BY time DESC LIMIT 10&#x27;
+docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute &#x27;SELECT * FROM pagosConTarjeta ORDER BY time DESC LIMIT 10&#x27;
+docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute &#x27;SELECT SUM(value) FROM pagosConTarjeta&#x27;
+docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute &#x27;SELECT * FROM reclamosNegativos ORDER BY time DESC LIMIT 10&#x27;
+docker exec docker-influxdb-grafana influx -database metricasTallerJava -execute &#x27;SELECT SUM(value) FROM reclamosNegativos&#x27;
+</code></pre>
+
+<h2><span style="color:#0891b2;">15. Consultas Recomendadas Para Grafana</span></h2>
+
+<div style="border-left: 6px solid #0891b2; background: #10262d; color: #cffafe; padding: 12px 16px; margin: 12px 0;">
+<p>Entrar a Grafana en <code>http://localhost:3003/</code>. Usuario: <code>root</code>. Contrasena: <code>root</code>.</p>
+</div>
+
+<h3>Cargas Activas En El Tiempo</h3>
+
+<pre class="code sql"><code>
+SELECT last(&quot;value&quot;) FROM &quot;cargasActivas&quot; WHERE (&quot;metric_type&quot; = &#x27;gauge&#x27;) AND $timeFilter GROUP BY time($__interval) fill(previous)
+</code></pre>
+
+<h3>Cargas Activas Actuales</h3>
+
+<pre class="code sql"><code>
+SELECT last(&quot;value&quot;) FROM &quot;cargasActivas&quot; WHERE (&quot;metric_type&quot; = &#x27;gauge&#x27;) AND $timeFilter
+</code></pre>
+
+<h3>Total Pagos Con Tarjeta</h3>
+
+<pre class="code sql"><code>
+SELECT sum(&quot;value&quot;) FROM &quot;pagosConTarjeta&quot; WHERE $timeFilter
+</code></pre>
+
+<h3>Pagos Con Tarjeta En El Tiempo</h3>
+
+<pre class="code sql"><code>
+SELECT sum(&quot;value&quot;) FROM &quot;pagosConTarjeta&quot; WHERE $timeFilter GROUP BY time($__interval) fill(0)
+</code></pre>
+
+<h3>Total Reclamos Negativos</h3>
+
+<pre class="code sql"><code>
+SELECT sum(&quot;value&quot;) FROM &quot;reclamosNegativos&quot; WHERE $timeFilter
+</code></pre>
+
+<h3>Reclamos Negativos En El Tiempo</h3>
+
+<pre class="code sql"><code>
+SELECT sum(&quot;value&quot;) FROM &quot;reclamosNegativos&quot; WHERE $timeFilter GROUP BY time($__interval) fill(0)
+</code></pre>
+
+<hr>
+
+<h2><span style="color:#16a34a;">16. Inventario Completo De Endpoints Detectados</span></h2>
+
+<h3>Modulo Cliente</h3>
+
+<table>
+<tr><th>Metodo</th><th>Endpoint</th><th>Descripcion</th></tr>
+<tr><td><code>POST</code></td><td><code>/clientes</code></td><td>Registra un cliente</td></tr>
+<tr><td><code>POST</code></td><td><code>/clientes/reclamos</code></td><td>Registra un reclamo del cliente autenticado</td></tr>
+<tr><td><code>GET</code></td><td><code>/clientes/obtenerClientes</code></td><td>Lista clientes</td></tr>
+<tr><td><code>GET</code></td><td><code>/clientes/obtenerReclamos</code></td><td>Lista reclamos con datos del cliente asociado</td></tr>
+<tr><td><code>POST</code></td><td><code>/clientes/medioPago</code></td><td>Registra Cuenta UTE o Tarjeta</td></tr>
+</table>
+
+<pre class="code bash"><code>
+curl -i -u &quot;1111111-1:1234&quot; http://localhost:8080/GestionDeMovilidad/movilidad/clientes/obtenerClientes
+curl -i -u &quot;1111111-1:1234&quot; http://localhost:8080/GestionDeMovilidad/movilidad/clientes/obtenerReclamos
+</code></pre>
+
+<h3>Modulo Carga</h3>
+
+<table>
+<tr><th>Metodo</th><th>Endpoint</th><th>Descripcion</th></tr>
+<tr><td><code>POST</code></td><td><code>/carga/estacion</code></td><td>Crea una estacion</td></tr>
+<tr><td><code>POST</code></td><td><code>/carga/cargador</code></td><td>Crea un cargador asociado a una estacion</td></tr>
+<tr><td><code>POST</code></td><td><code>/cargas/iniciar</code></td><td>Inicia una carga</td></tr>
+<tr><td><code>GET</code></td><td><code>/cargas/verCarga</code></td><td>Obtiene la carga actual</td></tr>
+<tr><td><code>GET</code></td><td><code>/cargas/verHistorial</code></td><td>Obtiene historial de cargas</td></tr>
+<tr><td><code>POST</code></td><td><code>/cargas/finalizarCargaActual</code></td><td>Finaliza carga actual y dispara pago</td></tr>
+<tr><td><code>POST</code></td><td><code>/cargas/pagarDeuda</code></td><td>Intenta pagar deuda pendiente</td></tr>
+</table>
+
+<h3>Modulo Pago</h3>
+
+<table>
+<tr><th>Metodo</th><th>Endpoint</th><th>Descripcion</th></tr>
+<tr><td><code>GET</code></td><td><code>/pagos</code></td><td>Consulta pagos por cliente y rango de fechas</td></tr>
+<tr><td><code>POST</code></td><td><code>/pagos/pagarConTarjeta</code></td><td>Aparece anotado, pero esta dentro de un bloque comentado</td></tr>
+</table>
+
+<pre class="code bash"><code>
+curl -i &quot;http://localhost:8080/GestionDeMovilidad/movilidad/pagos?ci=1111111-1&amp;fechaIni=2026-01-01&amp;fechaFin=2026-12-31&quot;
+</code></pre>
+
+<hr>
+
+<h2><span style="color:#dc2626;">17. Diagnostico Rapido</span></h2>
+
+<div style="border-left: 6px solid #dc2626; background: #2a1717; color: #fee2e2; padding: 12px 16px; margin: 12px 0;">
+<strong>Si Grafana muestra "No data"</strong>
+
+<ul>
+<li>Verificar que <code>docker-influxdb-grafana</code> este Up: <code>docker ps</code>.</li>
+<li>Esperar al menos 12 segundos despues de ejecutar curls.</li>
+<li>Revisar InfluxDB con <code>SHOW MEASUREMENTS</code>.</li>
+<li>Revisar que el rango de tiempo de Grafana incluya el momento de la prueba.</li>
+</ul>
+
+</div>
+
+<div style="border-left: 6px solid #0891b2; background: #10262d; color: #cffafe; padding: 12px 16px; margin: 12px 0;">
+<strong>Si cargasActivas muestra numeros enormes</strong>
+
+<ul>
+<li>Revisar que no se este usando <code>SELECT SUM(value) FROM cargasActivas</code>.</li>
+<li>Usar <code>SELECT LAST(value) FROM cargasActivas</code>.</li>
+</ul>
+
+</div>
+
+<div style="border-left: 6px solid #dc2626; background: #2a1717; color: #fee2e2; padding: 12px 16px; margin: 12px 0;">
+<strong>Si reclamosNegativos no aparece</strong>
+
+<ul>
+<li>Verificar que se envio un reclamo negativo.</li>
+<li>Verificar que Ollama responde: <code>curl http://localhost:11434/api/tags</code>.</li>
+<li>Verificar actividad en la queue JMS con <code>messages-added</code>.</li>
+</ul>
+
+</div>
+
+<div style="border-left: 6px solid #2563eb; background: #172033; color: #dbeafe; padding: 12px 16px; margin: 12px 0;">
+<strong>Si aparece error de conexion con Ollama</strong>
+
+<pre class="code bash"><code>docker start ollama
+curl http://localhost:11434/api/tags</code></pre>
+
+</div>
+  </main>
+  <script>
+    document.querySelectorAll('pre.code').forEach((pre) => {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'code-box';
+      pre.parentNode.insertBefore(wrapper, pre);
+      wrapper.appendChild(pre);
+
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'copy-code';
+      button.textContent = 'Copiar';
+      wrapper.appendChild(button);
+
+      button.addEventListener('click', async () => {
+        const text = pre.innerText.trim();
+        try {
+          await navigator.clipboard.writeText(text);
+        } catch {
+          const area = document.createElement('textarea');
+          area.value = text;
+          area.style.position = 'fixed';
+          area.style.left = '-9999px';
+          document.body.appendChild(area);
+          area.select();
+          document.execCommand('copy');
+          area.remove();
+        }
+
+        button.textContent = 'Copiado';
+        button.classList.add('copied');
+        setTimeout(() => {
+          button.textContent = 'Copiar';
+          button.classList.remove('copied');
+        }, 1200);
+      });
+    });
+  </script>
+</body>
+</html>
