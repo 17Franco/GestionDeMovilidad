@@ -26,17 +26,17 @@ public class RepoPagoImpl implements RepoPago {
 
     }
     @Override
-    //no probado
+
     public List<Pago> getPagosPorFecha(String ci, LocalDate fechaIni, LocalDate fechaFin){
-        //busco entre pagos los que pertenezcan al cliente y sena entre esa fecha
-        //preparo consulta
-        String sql = "select p from MPago_Pago  where p.cedulaCliente= :ci and p.fecha BETWEEN :fechaIni AND :fechaFin";
-        //bind le paso los parametros
-        TypedQuery<Pago> query =
-                em.createQuery(sql, Pago.class)
-                        .setParameter("cedula", ci)
-                        .setParameter("inicio", fechaIni)
-                        .setParameter("fin", fechaFin);
+
+        String sql = "select p from MPago_Pago p where p.cedulaCliente = :ci and p.fecha BETWEEN :fechaIni AND :fechaFin";
+
+
+        TypedQuery<Pago> query = em.createQuery(sql, Pago.class)
+                .setParameter("ci", ci)           // Antes decía "cedula"
+                .setParameter("fechaIni", fechaIni) // Antes decía "inicio"
+                .setParameter("fechaFin", fechaFin); // Antes decía "fin"
+
         return query.getResultList();
     }
 
