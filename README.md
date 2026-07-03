@@ -112,7 +112,85 @@ Gestiona configuraciones globales que afectan a toda la aplicación. Incluye la 
 Módulo de apoyo utilizado para simular el comportamiento del hardware físico de los cargadores de vehículos eléctricos.
 
 ---
-    
+
+## 🌐 Servicios Externos Simulados
+
+Además de los módulos principales, el proyecto incluye dos aplicaciones independientes (`.war`) que simulan la integración con proveedores externos de medios de pago.
+
+Los servicios deben desplegarse en WildFly junto con la aplicación principal.
+
+### 📦 Servicios incluidos
+
+| Servicio | Archivo WAR | Descripción |
+|----------|-------------|-------------|
+| Mock Pago Cuenta UTE | `MockPagoCuentaUte.war` | Simula un proveedor externo encargado de procesar pagos mediante cuenta UTE. |
+| Mock Medio de Pago | `ServicioMedioPagoMock.war` | Simula un proveedor externo encargado de procesar pagos realizados mediante tarjeta. |
+
+Estos servicios representan APIs externas consumidas por el módulo de pagos mediante llamadas HTTP.
+
+### 🔗 Endpoints de los Servicios Externos
+
+Los siguientes endpoints corresponden a los servicios externos simulados que consume el módulo de pagos.
+
+### ⚡ MockPagoCuentaUte
+
+Permite simular el procesamiento de un pago utilizando una cuenta UTE.
+
+| Método | Endpoint | Descripción |
+|---------|----------|-------------|
+| POST | `http://localhost:8080/MockPagoCuentaUte/api/medioPago/pagar` | Procesa un pago mediante una cuenta UTE. |
+
+#### Body de la solicitud
+
+```json
+{
+    "cuentaUte": "2323232",
+    "monto": "2000",
+    "clienteID": "333333"
+}
+```
+
+| Campo | Descripción |
+|--------|-------------|
+| `cuentaUte` | Número de cuenta UTE utilizada para el pago. |
+| `monto` | Monto a cobrar. |
+| `clienteID` | Identificador del cliente que realiza el pago. |
+
+---
+
+### 💳 ServicioMedioPagoMock
+
+Permite simular la autorización de pagos realizados mediante tarjeta.
+
+| Método | Endpoint | Descripción |
+|---------|----------|-------------|
+| POST | `http://localhost:8080/ServicioMedioPagoMock/api/medioPago/autorizar` | Autoriza un pago utilizando una tarjeta. |
+
+#### Body de la solicitud
+
+```json
+{
+    "numeroTarjeta": "11111111",
+    "monto": 350
+}
+```
+
+| Campo | Descripción |
+|--------|-------------|
+| `numeroTarjeta` | Número de la tarjeta utilizada para realizar el pago. |
+| `monto` | Monto a autorizar. |
+
+#### Comportamiento del servicio
+
+El servicio devuelve una respuesta diferente según el número de tarjeta enviado, permitiendo probar distintos escenarios del sistema:
+
+| Número de tarjeta | Resultado |
+|-------------------|-----------|
+| `11111111` | Pago autorizado (HTTP 200). |
+| `22222222` | Pago rechazado (HTTP 402). Esta tarjeta siempre genera un rechazo para facilitar las pruebas del manejo de deudas y pagos fallidos. |
+
+
+---  
 ## 🚀 Manual de Despliegue y Ejecución
 
 ### 1. ⚙️ Requisitos Previos
