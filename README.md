@@ -375,6 +375,12 @@ Una vez que la infraestructura Docker está activa y la base de datos configurad
 
 ## 🌐 API / Endpoints
 
+### Pruebas manuales con curls
+
+Para probar los endpoints desde el navegador, se puede abrir el archivo HTML con los curls de prueba (el mismo se encuentra en la carpeta Resourses):
+
+[Abrir curlsPrueba_TodoElPrograma.html](Resourses/curlsPrueba_TodoElPrograma.html)
+
 ### Endpoints de ModuloCliente
 
 | Método | Endpoint | Descripción | Consumido Por |
